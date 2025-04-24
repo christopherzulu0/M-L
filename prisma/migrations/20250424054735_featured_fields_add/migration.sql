@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "locations" ADD COLUMN     "description" TEXT,
+ADD COLUMN     "featured" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "image" VARCHAR(255),
+ADD COLUMN     "name" VARCHAR(100) NOT NULL DEFAULT '',
+ADD COLUMN     "order" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "region" VARCHAR(100);

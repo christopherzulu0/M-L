@@ -1,0 +1,308 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  clerkid       String?
+  email         String         @unique
+  firstName     String         @map("first_name") @db.VarChar(100)
+  lastName      String         @map("last_name") @db.VarChar(100)
+  phone         String?        @db.VarChar(50)
+  role          String         @default("user") @db.VarChar(20)
+  profileImage  String?        @map("profile_image")
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime       @default(now()) @map("updated_at") @db.Timestamptz
+  lastLogin     DateTime?      @map("last_login") @db.Timestamptz
+  status        String         @default("active") @db.VarChar(20)
+  emailVerified Boolean        @default(false) @map("email_verified")
+  agent         Agent?
+  properties    Property[]     @relation("PropertyOwner")
+  tasks         Task[]
+  appointments  Appointment[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model Agent {
+  id             Int              @id @default(autoincrement())
+  userId         Int              @unique @map("user_id")
+  bio            String?
+  specialization String?          @db.VarChar(100)
+  licenseNumber  String?          @map("license_number") @db.VarChar(100)
+  commissionRate Decimal?         @map("commission_rate") @db.Decimal(5, 2)
+  joinDate       DateTime         @default(now()) @map("join_date") @db.Date
+  status         String           @default("active") @db.VarChar(20)
+  rating         Decimal?         @db.Decimal(3, 1)
+  totalSales     Int              @default(0) @map("total_sales")
+  totalListings  Int              @default(0) @map("total_listings")
+  totalRevenue   Decimal          @default(0) @map("total_revenue") @db.Decimal(15, 2)
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime         @default(now()) @map("updated_at") @db.Timestamptz
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  properties     Property[]
+  inquiries      Inquiry[]
+  appointments   Appointment[]
+  analytics      AgentAnalytics[]
+
+  @@map("agents")
+}
+
+model PropertyType {
+  id          Int        @id @default(autoincrement())
+  name        String     @unique @db.VarChar(100)
+  description String?
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime   @default(now()) @map("updated_at") @db.Timestamptz
+  properties  Property[]
+
+  @@map("property_types")
+}
+
+model ListingType {
+  id          Int        @id @default(autoincrement())
+  name        String     @unique @db.VarChar(100)
+  description String?
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime   @default(now()) @map("updated_at") @db.Timestamptz
+  properties  Property[]
+
+  @@map("listing_types")
+}
+
+model Location {
+  id            Int        @id @default(autoincrement())
+  name          String     @default("") @db.VarChar(100)
+  city          String     @db.VarChar(100)
+  stateProvince String?    @map("state_province") @db.VarChar(100)
+  country       String     @default("Zambia") @db.VarChar(100)
+  postalCode    String?    @map("postal_code") @db.VarChar(20)
+  region        String?    @db.VarChar(100)
+  description   String?
+  featured      Boolean    @default(false)
+  order         Int        @default(0)
+  image         String?    @db.VarChar(255)
+  createdAt     DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime   @default(now()) @map("updated_at") @db.Timestamptz
+  properties    Property[]
+
+  @@map("locations")
+}
+
+model Property {
+  id             Int       @id @default(autoincrement())
+  title          String    @db.VarChar(255)
+  description    String?
+  DView          String?
+  propertyTypeId Int       @map("property_type_id")
+  listingTypeId  Int       @map("listing_type_id")
+  price          Decimal   @db.Decimal(15, 2)
+  priceType      String    @default("total") @map("price_type") @db.VarChar(20)
+  address        String    @db.VarChar(255)
+  locationId     Int       @map("location_id")
+  latitude       Decimal?  @db.Decimal(10, 8)
+  longitude      Decimal?  @db.Decimal(11, 8)
+  bedrooms       Int?
+  bathrooms      Decimal?  @db.Decimal(4, 1)
+  squareFeet     Decimal?  @map("square_feet") @db.Decimal(10, 2)
+  lotSize        Decimal?  @map("lot_size") @db.Decimal(10, 2)
+  yearBuilt      Int?      @map("year_built")
+  parkingSpaces  Int?      @map("parking_spaces")
+  status         String    @default("draft") @db.VarChar(20)
+  featured       Boolean   @default(false)
+  agentId        Int?      @map("agent_id")
+  ownerId        Int?      @map("owner_id")
+  views          Int       @default(0)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime  @default(now()) @map("updated_at") @db.Timestamptz
+  publishedAt    DateTime? @map("published_at") @db.Timestamptz
+  soldRentedAt   DateTime? @map("sold_rented_at") @db.Timestamptz
+
+  propertyType PropertyType        @relation(fields: [propertyTypeId], references: [id])
+  listingType  ListingType         @relation(fields: [listingTypeId], references: [id])
+  location     Location            @relation(fields: [locationId], references: [id])
+  agent        Agent?              @relation(fields: [agentId], references: [id])
+  owner        User?               @relation("PropertyOwner", fields: [ownerId], references: [id])
+  features     PropertyFeature[]
+  media        PropertyMedia[]
+  inquiries    Inquiry[]
+  appointments Appointment[]
+  analytics    PropertyAnalytics[]
+
+  @@map("properties")
+}
+
+model Feature {
+  id         Int               @id @default(autoincrement())
+  name       String            @unique @db.VarChar(100)
+  category   String            @default("general") @db.VarChar(50)
+  createdAt  DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime          @default(now()) @map("updated_at") @db.Timestamptz
+  properties PropertyFeature[]
+
+  @@map("features")
+}
+
+model PropertyFeature {
+  propertyId Int
+  featureId  Int      @map("feature_id")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  feature    Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+
+  @@id([propertyId, featureId])
+  @@map("property_features")
+}
+
+model PropertyMedia {
+  id         Int      @id @default(autoincrement())
+  propertyId Int      @map("property_id")
+  mediaType  String   @map("media_type") @db.VarChar(20)
+  filePath   String   @map("file_path") @db.VarChar(255)
+  fileName   String   @map("file_name") @db.VarChar(255)
+  fileSize   Int?     @map("file_size")
+  isPrimary  Boolean  @default(false) @map("is_primary")
+  sortOrder  Int      @default(0) @map("sort_order")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @default(now()) @map("updated_at") @db.Timestamptz
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@map("property_media")
+}
+
+model Inquiry {
+  id           Int       @id @default(autoincrement())
+  propertyId   Int?      @map("property_id")
+  name         String    @db.VarChar(100)
+  email        String    @db.VarChar(255)
+  phone        String?   @db.VarChar(50)
+  message      String
+  status       String    @default("new") @db.VarChar(20)
+  priority     String    @default("medium") @db.VarChar(20)
+  source       String?   @db.VarChar(50)
+  assignedTo   Int?      @map("assigned_to")
+  followUpDate DateTime? @map("follow_up_date") @db.Date
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamptz
+  closedAt     DateTime? @map("closed_at") @db.Timestamptz
+  property     Property? @relation(fields: [propertyId], references: [id])
+  agent        Agent?    @relation(fields: [assignedTo], references: [id])
+
+  @@map("inquiries")
+}
+
+model Appointment {
+  id              Int       @id @default(autoincrement())
+  propertyId      Int?      @map("property_id")
+  clientId        Int?      @map("client_id")
+  agentId         Int?      @map("agent_id")
+  appointmentDate DateTime  @map("appointment_date") @db.Date
+  appointmentTime DateTime  @map("appointment_time") @db.Time
+  appointmentType String    @map("appointment_type") @db.VarChar(50)
+  status          String    @default("pending") @db.VarChar(20)
+  notes           String?
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime  @default(now()) @map("updated_at") @db.Timestamptz
+  property        Property? @relation(fields: [propertyId], references: [id])
+  client          User?     @relation(fields: [clientId], references: [id])
+  agent           Agent?    @relation(fields: [agentId], references: [id])
+
+  @@map("appointments")
+}
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  title       String    @db.VarChar(255)
+  description String?
+  dueDate     DateTime? @map("due_date") @db.Date
+  priority    String    @default("medium") @db.VarChar(20)
+  status      String    @default("pending") @db.VarChar(20)
+  category    String?   @db.VarChar(50)
+  assignedTo  Int?      @map("assigned_to")
+  relatedTo   String?   @map("related_to") @db.VarChar(255)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz
+  completedAt DateTime? @map("completed_at") @db.Timestamptz
+  assignee    User?     @relation(fields: [assignedTo], references: [id])
+
+  @@map("tasks")
+}
+
+model Analytics {
+  id                Int      @id @default(autoincrement())
+  date              DateTime @db.Date
+  totalViews        Int      @default(0) @map("total_views")
+  totalInquiries    Int      @default(0) @map("total_inquiries")
+  totalAppointments Int      @default(0) @map("total_appointments")
+  totalNewListings  Int      @default(0) @map("total_new_listings")
+  totalSales        Int      @default(0) @map("total_sales")
+  totalRevenue      Decimal  @default(0) @map("total_revenue") @db.Decimal(15, 2)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime @default(now()) @map("updated_at") @db.Timestamptz
+
+  @@map("analytics")
+}
+
+model PropertyAnalytics {
+  id           Int      @id @default(autoincrement())
+  propertyId   Int      @map("property_id")
+  date         DateTime @db.Date
+  views        Int      @default(0)
+  inquiries    Int      @default(0)
+  appointments Int      @default(0)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @default(now()) @map("updated_at") @db.Timestamptz
+  property     Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@map("property_analytics")
+}
+
+model AgentAnalytics {
+  id                    Int      @id @default(autoincrement())
+  agentId               Int      @map("agent_id")
+  date                  DateTime @db.Date
+  listingsAdded         Int      @default(0) @map("listings_added")
+  propertiesSold        Int      @default(0) @map("properties_sold")
+  revenue               Decimal  @default(0) @db.Decimal(15, 2)
+  inquiriesHandled      Int      @default(0) @map("inquiries_handled")
+  appointmentsConducted Int      @default(0) @map("appointments_conducted")
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt             DateTime @default(now()) @map("updated_at") @db.Timestamptz
+  agent                 Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("agent_analytics")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  title     String   @db.VarChar(255)
+  message   String
+  type      String?  @db.VarChar(50)
+  isRead    Boolean  @default(false) @map("is_read")
+  relatedTo String?  @map("related_to") @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model Setting {
+  id           Int      @id @default(autoincrement())
+  settingKey   String   @unique @map("setting_key") @db.VarChar(100)
+  settingValue String?  @map("setting_value")
+  settingGroup String?  @map("setting_group") @db.VarChar(50)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @default(now()) @map("updated_at") @db.Timestamptz
+
+  @@map("settings")
+}

@@ -1,0 +1,133 @@
+import { NextResponse } from 'next/server'
+import { auth } from "@clerk/nextjs/server";
+import { apiHandler } from '@/lib/utils/api-handler';
+import { ApiError } from '@/lib/utils/api-error';
+import { UserService } from '@/lib/services/user-service';
+import { z } from 'zod';
+
+// Schema for user creation validation
+const createUserSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  firstName: z.string().min(1, { message: "First name is required" }),
+  lastName: z.string().min(1, { message: "Last name is required" }),
+  phone: z.string().optional(),
+  role: z.string().default("user"),
+});
+
+// Schema for user update validation
+const updateUserSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }).optional(),
+  firstName: z.string().min(1, { message: "First name is required" }).optional(),
+  lastName: z.string().min(1, { message: "Last name is required" }).optional(),
+  phone: z.string().optional(),
+  role: z.string().optional(),
+  status: z.string().optional(),
+});
+
+/**
+ * GET /api/users - Get all users
+ */
+export async function GET(request: Request) {
+  return apiHandler(async () => {
+    return UserService.getAllUsers();
+  });
+}
+
+/**
+ * POST /api/users - Create a new user
+ */
+export async function POST(request: Request) {
+  return apiHandler(async () => {
+    const session = await auth();
+
+    if (!session || session.userId === null) {
+      throw ApiError.unauthorized("You must be logged in to create a user");
+    }
+
+    const body = await request.json();
+    
+    // Validate input data
+    const validationResult = createUserSchema.safeParse(body);
+    if (!validationResult.success) {
+      throw ApiError.badRequest(
+        "Invalid input data", 
+        "VALIDATION_ERROR", 
+        validationResult.error.format()
+      );
+    }
+    
+    const userData = {
+      ...validationResult.data,
+      clerkid: session.userId
+    };
+
+    // Use the service to create the user
+    const user = await UserService.createUser(userData);
+    
+    return NextResponse.json(user, { status: 201 });
+  });
+}
+
+/**
+ * PATCH /api/users/:id - Update a user
+ */
+export async function PATCH(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  return apiHandler(async () => {
+    const session = await auth();
+
+    if (!session || session.userId === null) {
+      throw ApiError.unauthorized("You must be logged in to update a user");
+    }
+
+    const id = parseInt(params.id, 10);
+    if (isNaN(id)) {
+      throw ApiError.badRequest("Invalid user ID");
+    }
+
+    const body = await request.json();
+    
+    // Validate input data
+    const validationResult = updateUserSchema.safeParse(body);
+    if (!validationResult.success) {
+      throw ApiError.badRequest(
+        "Invalid input data", 
+        "VALIDATION_ERROR", 
+        validationResult.error.format()
+      );
+    }
+
+    // Use the service to update the user
+    const user = await UserService.updateUser(id, validationResult.data);
+    
+    return user;
+  });
+}
+
+/**
+ * DELETE /api/users/:id - Delete a user
+ */
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  return apiHandler(async () => {
+    const session = await auth();
+
+    if (!session || session.userId === null) {
+      throw ApiError.unauthorized("You must be logged in to delete a user");
+    }
+
+    const id = parseInt(params.id, 10);
+    if (isNaN(id)) {
+      throw ApiError.badRequest("Invalid user ID");
+    }
+
+    // Use the service to delete the user
+    await UserService.deleteUser(id);
+    
+    return { success: true };
+  });
+}

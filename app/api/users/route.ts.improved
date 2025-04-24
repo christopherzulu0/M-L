@@ -1,0 +1,85 @@
+import { NextResponse } from 'next/server'
+import prisma from '@/lib/prisma'
+import { auth } from "@clerk/nextjs/server";
+import { apiHandler } from '@/lib/utils/api-handler';
+import { ApiError } from '@/lib/utils/api-error';
+import { z } from 'zod';
+
+// Schema for user creation validation
+const createUserSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  firstName: z.string().min(1, { message: "First name is required" }),
+  lastName: z.string().min(1, { message: "Last name is required" }),
+  phone: z.string().optional(),
+  role: z.string().default("user"),
+});
+
+export async function GET(request: Request) {
+  return apiHandler(async () => {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        role: true,
+        profileImage: true,
+        createdAt: true,
+        status: true,
+        emailVerified: true,
+      }
+    });
+    
+    return users;
+  });
+}
+
+export async function POST(request: Request) {
+  return apiHandler(async () => {
+    const session = await auth();
+
+    if (!session || session.userId === null) {
+      throw ApiError.unauthorized("You must be logged in to create a user");
+    }
+
+    const body = await request.json();
+    
+    // Validate input data
+    const validationResult = createUserSchema.safeParse(body);
+    if (!validationResult.success) {
+      throw ApiError.badRequest(
+        "Invalid input data", 
+        "VALIDATION_ERROR", 
+        validationResult.error.format()
+      );
+    }
+    
+    const { email, firstName, lastName, phone, role } = validationResult.data;
+
+    // Check if user with this email already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+    
+    if (existingUser) {
+      throw ApiError.conflict(
+        "A user with this email already exists", 
+        "EMAIL_EXISTS"
+      );
+    }
+
+    const user = await prisma.user.create({
+      data: {
+        clerkid: session.userId,
+        email,
+        firstName,
+        lastName,
+        phone,
+        role,
+      },
+    });
+
+    return user;
+  });
+}
