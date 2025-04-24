@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
   Home,
   Search,
@@ -31,6 +32,8 @@ import {
   TrendingUp,
   Building,
   LayoutDashboard,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
@@ -41,6 +44,8 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const [progress, setProgress] = useState(13)
+  const [propertiesOpen, setPropertiesOpen] = useState(false)
+  const [agentsOpen, setAgentsOpen] = useState(false)
 
   // Simulate loading progress
   useEffect(() => {
@@ -163,16 +168,62 @@ export default function DashboardLayout({
                     <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
                   </Button>
                 </Link>
-                <Link href="/dashboard/properties" passHref>
-                  <Button variant="ghost" className="w-full justify-start">
-                    <Home className="mr-2 h-4 w-4" /> Properties
-                  </Button>
-                </Link>
-                <Link href="/dashboard/agents" passHref>
-                  <Button variant="ghost" className="w-full justify-start">
-                    <Users className="mr-2 h-4 w-4" /> Agents
-                  </Button>
-                </Link>
+                <Collapsible 
+                  className="w-full" 
+                  open={propertiesOpen} 
+                  onOpenChange={setPropertiesOpen}
+                >
+                  <CollapsibleTrigger className="w-full">
+                    <Button variant="ghost" className="w-full justify-start">
+                      <Home className="mr-2 h-4 w-4" /> Properties
+                      {propertiesOpen ? (
+                        <ChevronDown className="ml-auto h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="ml-auto h-4 w-4" />
+                      )}
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pl-6 mt-1 space-y-1">
+                    <Link href="/dashboard/add-listing" passHref>
+                      <Button variant="ghost" className="w-full justify-start text-sm">
+                        Add Property
+                      </Button>
+                    </Link>
+                    <Link href="/dashboard/properties" passHref>
+                      <Button variant="ghost" className="w-full justify-start text-sm">
+                        Manage Properties
+                      </Button>
+                    </Link>
+                  </CollapsibleContent>
+                </Collapsible>
+                <Collapsible 
+                  className="w-full" 
+                  open={agentsOpen} 
+                  onOpenChange={setAgentsOpen}
+                >
+                  <CollapsibleTrigger className="w-full">
+                    <Button variant="ghost" className="w-full justify-start">
+                      <Users className="mr-2 h-4 w-4" /> Agents
+                      {agentsOpen ? (
+                        <ChevronDown className="ml-auto h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="ml-auto h-4 w-4" />
+                      )}
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pl-6 mt-1 space-y-1">
+                    <Link href="/dashboard/agents-add" passHref>
+                      <Button variant="ghost" className="w-full justify-start text-sm">
+                        Add Agent
+                      </Button>
+                    </Link>
+                    <Link href="/dashboard/agents" passHref>
+                      <Button variant="ghost" className="w-full justify-start text-sm">
+                        Manage Agents
+                      </Button>
+                    </Link>
+                  </CollapsibleContent>
+                </Collapsible>
                 <Link href="/dashboard/inquiries" passHref>
                   <Button variant="ghost" className="w-full justify-start">
                     <MessageSquare className="mr-2 h-4 w-4" /> Inquiries
