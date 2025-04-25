@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -36,12 +36,64 @@ import {
   Map,
   Download,
   Share2,
+  Loader2,
 } from "lucide-react"
 import PropertyList from "@/app/dashboard/PropertyList"
 
 export default function PropertiesPage() {
   const [activeFilters, setActiveFilters] = useState<string[]>([])
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  const [properties, setProperties] = useState<any[]>([])
+  const [stats, setStats] = useState<any>({
+    overview: { totalProperties: 0, averagePrice: 0, priceRange: { min: 0, max: 0 } },
+    distributions: { status: [], propertyTypes: [] }
+  })
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [totalPages, setTotalPages] = useState<number>(1)
+  const [selectedTab, setSelectedTab] = useState<string>("all")
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        // Fetch properties
+        const statusFilter = selectedTab !== "all" ? 
+          selectedTab === "sale" ? "For Sale" :
+          selectedTab === "rent" ? "For Rent" :
+          selectedTab === "sold" ? "Sold" : "" : "";
+
+        const propertiesResponse = await fetch(`/api/properties?page=${currentPage}&limit=10${statusFilter ? `&status=${statusFilter}` : ""}`)
+
+        if (!propertiesResponse.ok) {
+          throw new Error("Failed to fetch properties")
+        }
+
+        const propertiesData = await propertiesResponse.json()
+        setProperties(propertiesData.properties)
+        setTotalPages(propertiesData.pagination.pages)
+
+        // Fetch stats
+        const statsResponse = await fetch("/api/properties/stats")
+
+        if (!statsResponse.ok) {
+          throw new Error("Failed to fetch property statistics")
+        }
+
+        const statsData = await statsResponse.json()
+        setStats(statsData)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred")
+        console.error("Error fetching data:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [currentPage, selectedTab])
 
   const addFilter = (filter: string) => {
     if (!activeFilters.includes(filter)) {
@@ -85,32 +137,52 @@ export default function PropertiesPage() {
 
           {/* Stats Cards */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              {
-                title: "Total Properties",
-                value: "248",
-                icon: <Home className="h-5 w-5" />,
-                color: "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400",
-              },
-              {
-                title: "For Sale",
-                value: "156",
-                icon: <Tag className="h-5 w-5" />,
-                color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400",
-              },
-              {
-                title: "For Rent",
-                value: "92",
-                icon: <Building className="h-5 w-5" />,
-                color: "bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400",
-              },
-              {
-                title: "New This Week",
-                value: "24",
-                icon: <Clock className="h-5 w-5" />,
-                color: "bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400",
-              },
-            ].map((stat, index) => (
+            {loading ? (
+              // Loading skeleton for stats cards
+              Array(4).fill(0).map((_, index) => (
+                <Card key={index} className="overflow-hidden border-0 shadow-md bg-white dark:bg-gray-800">
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                        <div className="h-8 w-16 bg-gray-200 dark:bg-gray-700 rounded mt-2 animate-pulse"></div>
+                      </div>
+                      <div className="rounded-full p-3 bg-gray-200 dark:bg-gray-700 animate-pulse h-12 w-12"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : error ? (
+              <div className="col-span-4 p-4 text-center text-red-500">
+                <p>Error loading statistics: {error}</p>
+              </div>
+            ) : (
+              [
+                {
+                  title: "Total Properties",
+                  value: stats.overview.totalProperties.toString(),
+                  icon: <Home className="h-5 w-5" />,
+                  color: "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400",
+                },
+                {
+                  title: "For Sale",
+                  value: stats.distributions.status.find((s: any) => s.status === "For Sale")?._count.toString() || "0",
+                  icon: <Tag className="h-5 w-5" />,
+                  color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400",
+                },
+                {
+                  title: "For Rent",
+                  value: stats.distributions.status.find((s: any) => s.status === "For Rent")?._count.toString() || "0",
+                  icon: <Building className="h-5 w-5" />,
+                  color: "bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400",
+                },
+                {
+                  title: "Average Price",
+                  value: `K ${Math.round(stats.overview.averagePrice).toLocaleString()}`,
+                  icon: <DollarSign className="h-5 w-5" />,
+                  color: "bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400",
+                },
+              ].map((stat, index) => (
                 <Card key={index} className="overflow-hidden border-0 shadow-md bg-white dark:bg-gray-800">
                   <CardContent className="p-4 md:p-6">
                     <div className="flex items-center justify-between">
@@ -122,7 +194,8 @@ export default function PropertiesPage() {
                     </div>
                   </CardContent>
                 </Card>
-            ))}
+              ))
+            )}
           </div>
 
           {/* Search and Filters */}
@@ -270,7 +343,15 @@ export default function PropertiesPage() {
           </Card>
 
           {/* Property Categories */}
-          <Tabs defaultValue="all" className="w-full">
+          <Tabs 
+            defaultValue="all" 
+            className="w-full"
+            value={selectedTab}
+            onValueChange={(value) => {
+              setSelectedTab(value);
+              setCurrentPage(1); // Reset to first page when changing tabs
+            }}
+          >
             <TabsList className="w-full max-w-md mx-auto grid grid-cols-4 bg-gray-100 dark:bg-gray-800 p-1">
               <TabsTrigger value="all" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700">
                 All
@@ -290,9 +371,15 @@ export default function PropertiesPage() {
           {/* Property List */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <p className="text-sm text-muted-foreground">
-                Showing <span className="font-medium">248</span> properties
-              </p>
+              {loading ? (
+                <div className="h-5 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              ) : error ? (
+                <p className="text-sm text-red-500">Error: {error}</p>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Showing <span className="font-medium">{properties.length}</span> of <span className="font-medium">{stats.overview.totalProperties}</span> properties
+                </p>
+              )}
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="hidden md:flex">
                   <Download className="mr-2 h-4 w-4" />
@@ -305,34 +392,100 @@ export default function PropertiesPage() {
               </div>
             </div>
 
-            <PropertyList />
-
-            {/* Pagination Placeholder */}
-            <div className="flex justify-center mt-6">
-              <div className="flex items-center gap-1">
-                <Button variant="outline" size="sm" disabled>
-                  Previous
-                </Button>
-                <Button variant="outline" size="sm" className="bg-indigo-50 text-indigo-600 border-indigo-200">
-                  1
-                </Button>
-                <Button variant="outline" size="sm">
-                  2
-                </Button>
-                <Button variant="outline" size="sm">
-                  3
-                </Button>
-                <Button variant="outline" size="sm">
-                  4
-                </Button>
-                <Button variant="outline" size="sm">
-                  5
-                </Button>
-                <Button variant="outline" size="sm">
-                  Next
+            {loading ? (
+              // Loading skeleton for property list
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {Array(6).fill(0).map((_, index) => (
+                  <Card key={index} className="overflow-hidden border-0 shadow-lg bg-white dark:bg-gray-800 rounded-xl">
+                    <CardContent className="p-0">
+                      <div className="relative">
+                        <div className="h-56 w-full bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
+                      </div>
+                      <div className="p-5 space-y-4">
+                        <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                        <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                        <div className="h-8 w-1/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                        <div className="grid grid-cols-3 gap-2">
+                          {Array(3).fill(0).map((_, i) => (
+                            <div key={i} className="h-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : error ? (
+              <div className="p-8 text-center">
+                <p className="text-red-500 mb-2">Failed to load properties</p>
+                <Button onClick={() => window.location.reload()}>Try Again</Button>
+              </div>
+            ) : properties.length === 0 ? (
+              <div className="p-8 text-center">
+                <p className="text-muted-foreground mb-2">No properties found</p>
+                <Button 
+                  onClick={() => {
+                    setSelectedTab("all");
+                    setActiveFilters([]);
+                  }}
+                >
+                  Clear Filters
                 </Button>
               </div>
-            </div>
+            ) : (
+              <PropertyList properties={properties} />
+            )}
+
+            {/* Pagination */}
+            {!loading && !error && properties.length > 0 && (
+              <div className="flex justify-center mt-6">
+                <div className="flex items-center gap-1">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  >
+                    Previous
+                  </Button>
+
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    // Show pages around current page
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+
+                    return (
+                      <Button 
+                        key={i} 
+                        variant="outline" 
+                        size="sm" 
+                        className={pageNum === currentPage ? "bg-indigo-50 text-indigo-600 border-indigo-200" : ""}
+                        onClick={() => setCurrentPage(pageNum)}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,0 +1,1415 @@
+"use client"
+
+import { useState } from "react"
+import Image from "next/image"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell,
+} from "recharts"
+import {
+    Home,
+    DollarSign,
+    Users,
+    Calendar,
+    Clock,
+    Star,
+    CheckCircle,
+    ArrowUpRight,
+    MessageSquare,
+    Settings,
+    User,
+    FileText,
+    Search,
+    Filter,
+    ChevronRight,
+    Plus,
+    MoreHorizontal,
+    Eye,
+    Edit,
+    Trash2,
+    MapPin,
+    Phone,
+    Mail,
+    CalendarDays,
+    TrendingUp,
+    Award,
+    Target,
+    Zap,
+    Download,
+    Share2,
+    Bed,
+    Bath,
+    Square,
+    Heart,
+} from "lucide-react"
+
+export default function AgentDashboard() {
+    const [activeTab, setActiveTab] = useState("overview")
+    const [timeRange, setTimeRange] = useState("month")
+
+    // Sample data for the agent
+    const agentData = {
+        name: "Sarah Johnson",
+        email: "sarah.johnson@example.com",
+        phone: "+260 97 1234567",
+        avatar: "https://i.pravatar.cc/150?img=1",
+        role: "Senior Real Estate Agent",
+        rating: 4.8,
+        reviews: 24,
+        joinDate: "January 2021",
+        bio: "Experienced real estate agent specializing in luxury properties and residential sales with over 5 years of experience in the Lusaka market.",
+        specializations: ["Luxury Properties", "Residential Sales", "Investment Properties"],
+        languages: ["English", "Bemba", "Nyanja"],
+        socialMedia: {
+            facebook: "facebook.com/sarahjohnson",
+            twitter: "twitter.com/sarahjohnson",
+            linkedin: "linkedin.com/in/sarahjohnson",
+        },
+        performance: {
+            totalSales: "ZMW 4.2M",
+            totalCommission: "ZMW 210K",
+            activeListings: 12,
+            soldProperties: 8,
+            pendingDeals: 3,
+            conversionRate: 68,
+        },
+        goals: {
+            salesTarget: "ZMW 5M",
+            salesProgress: 84,
+            listingsTarget: 15,
+            listingsProgress: 80,
+            clientsTarget: 20,
+            clientsProgress: 65,
+        },
+    }
+
+    // Sample data for charts
+    const monthlyPerformance = [
+        { name: "Jan", sales: 450000, commission: 22500, listings: 3 },
+        { name: "Feb", sales: 320000, commission: 16000, listings: 2 },
+        { name: "Mar", sales: 580000, commission: 29000, listings: 4 },
+        { name: "Apr", sales: 620000, commission: 31000, listings: 3 },
+        { name: "May", sales: 540000, commission: 27000, listings: 3 },
+        { name: "Jun", sales: 780000, commission: 39000, listings: 5 },
+        { name: "Jul", sales: 710000, commission: 35500, listings: 4 },
+        { name: "Aug", sales: 850000, commission: 42500, listings: 5 },
+    ]
+
+    const propertyTypeData = [
+        { name: "Apartments", value: 40, color: "#4F46E5" },
+        { name: "Houses", value: 35, color: "#10B981" },
+        { name: "Villas", value: 15, color: "#8B5CF6" },
+        { name: "Land", value: 10, color: "#F59E0B" },
+    ]
+
+    // Sample data for listings
+    const activeListings = [
+        {
+            id: 1,
+            title: "Modern Apartment with Pool View",
+            address: "123 Skyline Ave, Lusaka",
+            price: "ZMW 450,000",
+            type: "Apartment",
+            status: "Active",
+            image:
+                "https://images.lifestyleasia.com/wp-content/uploads/sites/3/2020/09/15155131/9th-Floor-Infinity-Pool-Aman-Nai-Lert-Bangkok-Thailand-c-Aman-Nai-Lert-Bangkok-min-scaled.jpg",
+            beds: 2,
+            baths: 2,
+            sqft: 1200,
+            views: 243,
+            inquiries: 12,
+            daysListed: 14,
+        },
+        {
+            id: 2,
+            title: "Luxury Villa with Garden",
+            address: "456 Park Lane, Lusaka",
+            price: "ZMW 850,000",
+            type: "Villa",
+            status: "Active",
+            image:
+                "https://www.conradvillas.com/uploads/properties/116/koh-samui-luxury-villas-for-sale-bangpor-89875071.jpg",
+            beds: 4,
+            baths: 3,
+            sqft: 2800,
+            views: 187,
+            inquiries: 8,
+            daysListed: 21,
+        },
+        {
+            id: 3,
+            title: "Cozy Townhouse",
+            address: "789 Maple St, Lusaka",
+            price: "ZMW 5,500/mo",
+            type: "House",
+            status: "Active",
+            image:
+                "https://www.travelandleisure.com/thmb/iAIrOVW7yWrDG-yYB9IvY0nF-8w=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/new-river-gorge-national-park-preserve-west-virginia-NEWNATPARK0421-d92f896451bf4c388289ff3b908cc6c6.jpg",
+            beds: 3,
+            baths: 2.5,
+            sqft: 1800,
+            views: 156,
+            inquiries: 5,
+            daysListed: 7,
+        },
+    ]
+
+    // Sample data for clients
+    const recentClients = [
+        {
+            id: 1,
+            name: "John Smith",
+            email: "john.smith@example.com",
+            phone: "+260 97 1234567",
+            avatar: "https://i.pravatar.cc/150?img=11",
+            status: "Active",
+            interest: "Buying",
+            budget: "ZMW 300K - 500K",
+            lastContact: "Today",
+            notes: "Looking for a 2-bedroom apartment in central Lusaka.",
+        },
+        {
+            id: 2,
+            name: "Lisa Wong",
+            email: "lisa.wong@example.com",
+            phone: "+260 97 7654321",
+            avatar: "https://i.pravatar.cc/150?img=5",
+            status: "Active",
+            interest: "Selling",
+            budget: "ZMW 800K+",
+            lastContact: "Yesterday",
+            notes: "Wants to sell her villa by the end of the month.",
+        },
+        {
+            id: 3,
+            name: "Robert Johnson",
+            email: "robert.johnson@example.com",
+            phone: "+260 97 2468135",
+            avatar: "https://i.pravatar.cc/150?img=12",
+            status: "Pending",
+            interest: "Renting",
+            budget: "ZMW 3K - 6K/mo",
+            lastContact: "3 days ago",
+            notes: "Interested in a 3-bedroom house for his family.",
+        },
+    ]
+
+    // Sample data for upcoming tasks
+    const upcomingTasks = [
+        {
+            id: 1,
+            title: "Property Viewing - Modern Apartment",
+            date: "Today, 2:00 PM",
+            client: "John Smith",
+            location: "123 Skyline Ave, Lusaka",
+            priority: "High",
+        },
+        {
+            id: 2,
+            title: "Contract Signing - Luxury Villa",
+            date: "Tomorrow, 10:30 AM",
+            client: "Lisa Wong",
+            location: "456 Park Lane, Lusaka",
+            priority: "High",
+        },
+        {
+            id: 3,
+            title: "Property Photoshoot - Riverside Condo",
+            date: "Aug 15, 9:00 AM",
+            client: "Internal",
+            location: "78 Riverside Drive, Lusaka",
+            priority: "Medium",
+        },
+        {
+            id: 4,
+            title: "Client Meeting - Investment Options",
+            date: "Aug 16, 3:30 PM",
+            client: "Robert Johnson",
+            location: "Office",
+            priority: "Medium",
+        },
+    ]
+
+    // Sample data for recent activity
+    const recentActivity = [
+        {
+            id: 1,
+            action: "Added a new property listing",
+            time: "2 hours ago",
+            details: "Modern Apartment with Pool View",
+        },
+        {
+            id: 2,
+            action: "Responded to an inquiry",
+            time: "5 hours ago",
+            details: "From John Smith about Luxury Villa",
+        },
+        {
+            id: 3,
+            action: "Updated property details",
+            time: "Yesterday",
+            details: "Cozy Townhouse price reduced",
+        },
+        {
+            id: 4,
+            action: "Scheduled a viewing",
+            time: "Yesterday",
+            details: "With Lisa Wong for Modern Apartment",
+        },
+        {
+            id: 5,
+            action: "Closed a deal",
+            time: "3 days ago",
+            details: "Sold Riverside Condo for ZMW 420,000",
+        },
+    ]
+
+    const getPriorityBadgeStyles = (priority: string) => {
+        switch (priority) {
+            case "High":
+                return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800/30"
+            case "Medium":
+                return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800/30"
+            case "Low":
+                return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/30"
+            default:
+                return "bg-gray-100 text-gray-700 dark:bg-gray-800/50 dark:text-gray-400 border-gray-200 dark:border-gray-700/50"
+        }
+    }
+
+    const getStatusBadgeStyles = (status: string) => {
+        switch (status) {
+            case "Active":
+                return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/30"
+            case "Pending":
+                return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800/30"
+            case "Inactive":
+                return "bg-gray-100 text-gray-700 dark:bg-gray-800/50 dark:text-gray-400 border-gray-200 dark:border-gray-700/50"
+            default:
+                return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800/30"
+        }
+    }
+
+    return (
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
+            <div className="container mx-auto px-4 py-6 space-y-6">
+                {/* Agent Profile Header */}
+                <Card className="border-0 shadow-lg bg-white dark:bg-gray-800 overflow-hidden">
+                    <div className="relative h-32 md:h-48 w-full bg-gradient-to-r from-indigo-600 to-purple-600">
+                        <div className="absolute inset-0 bg-[url('/placeholder-pattern.svg')] opacity-10"></div>
+                    </div>
+                    <CardContent className="p-0">
+                        <div className="flex flex-col md:flex-row">
+                            <div className="md:w-[260px] px-6 -mt-12 relative z-10">
+                                <div className="relative aspect-square w-24 h-24 md:w-32 md:h-32 rounded-xl overflow-hidden border-4 border-white dark:border-gray-800 shadow-lg mx-auto md:mx-0">
+                                    <Image
+                                        src={agentData.avatar || "/placeholder.svg"}
+                                        alt={agentData.name}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                </div>
+
+                                <div className="mt-4 text-center md:text-left space-y-4">
+                                    <div className="flex flex-col">
+                                        <h1 className="text-xl md:text-2xl font-bold">{agentData.name}</h1>
+                                        <p className="text-indigo-600 dark:text-indigo-400 font-medium">{agentData.role}</p>
+                                        <div className="mt-2 flex items-center justify-center md:justify-start">
+                                            <div className="flex">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <Star
+                                                        key={i}
+                                                        className={`h-4 w-4 ${
+                                                            i < Math.floor(agentData.rating)
+                                                                ? "fill-amber-400 text-amber-400"
+                                                                : "text-gray-300 dark:text-gray-600"
+                                                        }`}
+                                                    />
+                                                ))}
+                                            </div>
+                                            <span className="ml-2 text-sm text-muted-foreground">({agentData.reviews} reviews)</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+                                        <Badge
+                                            variant="outline"
+                                            className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800/30"
+                                        >
+                                            <Award className="h-3 w-3 mr-1" />
+                                            Top Seller
+                                        </Badge>
+                                        <Badge
+                                            variant="outline"
+                                            className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/30"
+                                        >
+                                            <CheckCircle className="h-3 w-3 mr-1" />
+                                            Verified
+                                        </Badge>
+                                    </div>
+
+                                    <div className="pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                                                <Phone className="h-4 w-4" />
+                                            </div>
+                                            <span>{agentData.phone}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                                                <Mail className="h-4 w-4" />
+                                            </div>
+                                            <span className="text-sm">{agentData.email}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                                                <CalendarDays className="h-4 w-4" />
+                                            </div>
+                                            <span>Joined {agentData.joinDate}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex-1 p-6">
+                                <div className="flex justify-between items-start mb-6">
+                                    <h2 className="text-xl font-bold">Agent Dashboard</h2>
+                                    <div className="flex gap-2">
+                                        <Button variant="outline" size="sm">
+                                            <Settings className="h-4 w-4 mr-2" />
+                                            Settings
+                                        </Button>
+                                        <Button className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white shadow-md hover:shadow-lg transition-all">
+                                            <Plus className="h-4 w-4 mr-2" />
+                                            Add Listing
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                                    <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-sm font-medium text-muted-foreground">Total Sales</p>
+                                                    <h3 className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+                                                        {agentData.performance.totalSales}
+                                                    </h3>
+                                                </div>
+                                                <div className="rounded-full bg-indigo-100 dark:bg-indigo-900/30 p-2 text-indigo-600 dark:text-indigo-400">
+                                                    <DollarSign className="h-5 w-5" />
+                                                </div>
+                                            </div>
+                                            <div className="mt-2 flex items-center text-xs text-emerald-600">
+                                                <ArrowUpRight className="h-3 w-3 mr-1" />
+                                                <span>12% from last month</span>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                    <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-sm font-medium text-muted-foreground">Commission</p>
+                                                    <h3 className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+                                                        {agentData.performance.totalCommission}
+                                                    </h3>
+                                                </div>
+                                                <div className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 p-2 text-emerald-600 dark:text-emerald-400">
+                                                    <DollarSign className="h-5 w-5" />
+                                                </div>
+                                            </div>
+                                            <div className="mt-2 flex items-center text-xs text-emerald-600">
+                                                <ArrowUpRight className="h-3 w-3 mr-1" />
+                                                <span>8% from last month</span>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                    <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-sm font-medium text-muted-foreground">Active Listings</p>
+                                                    <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                                                        {agentData.performance.activeListings}
+                                                    </h3>
+                                                </div>
+                                                <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-2 text-blue-600 dark:text-blue-400">
+                                                    <Home className="h-5 w-5" />
+                                                </div>
+                                            </div>
+                                            <div className="mt-2 flex items-center text-xs text-emerald-600">
+                                                <ArrowUpRight className="h-3 w-3 mr-1" />
+                                                <span>3 new this month</span>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                    <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-sm font-medium text-muted-foreground">Sold Properties</p>
+                                                    <h3 className="text-xl font-bold text-purple-600 dark:text-purple-400">
+                                                        {agentData.performance.soldProperties}
+                                                    </h3>
+                                                </div>
+                                                <div className="rounded-full bg-purple-100 dark:bg-purple-900/30 p-2 text-purple-600 dark:text-purple-400">
+                                                    <CheckCircle className="h-5 w-5" />
+                                                </div>
+                                            </div>
+                                            <div className="mt-2 flex items-center text-xs text-emerald-600">
+                                                <ArrowUpRight className="h-3 w-3 mr-1" />
+                                                <span>2 this month</span>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                    <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-sm font-medium text-muted-foreground">Pending Deals</p>
+                                                    <h3 className="text-xl font-bold text-amber-600 dark:text-amber-400">
+                                                        {agentData.performance.pendingDeals}
+                                                    </h3>
+                                                </div>
+                                                <div className="rounded-full bg-amber-100 dark:bg-amber-900/30 p-2 text-amber-600 dark:text-amber-400">
+                                                    <Clock className="h-5 w-5" />
+                                                </div>
+                                            </div>
+                                            <div className="mt-2 flex items-center text-xs text-amber-600">
+                                                <Clock className="h-3 w-3 mr-1" />
+                                                <span>1 closing this week</span>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                    <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-sm font-medium text-muted-foreground">Conversion Rate</p>
+                                                    <h3 className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+                                                        {agentData.performance.conversionRate}%
+                                                    </h3>
+                                                </div>
+                                                <div className="rounded-full bg-indigo-100 dark:bg-indigo-900/30 p-2 text-indigo-600 dark:text-indigo-400">
+                                                    <TrendingUp className="h-5 w-5" />
+                                                </div>
+                                            </div>
+                                            <div className="mt-2 flex items-center text-xs text-emerald-600">
+                                                <ArrowUpRight className="h-3 w-3 mr-1" />
+                                                <span>5% from last month</span>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <h3 className="text-lg font-semibold">Performance Goals</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <Target className="h-4 w-4 text-indigo-600" />
+                                                    <span className="font-medium">Sales Target</span>
+                                                </div>
+                                                <span className="text-sm font-semibold">
+                          {agentData.performance.totalSales} / {agentData.goals.salesTarget}
+                        </span>
+                                            </div>
+                                            <Progress
+                                                value={agentData.goals.salesProgress}
+                                                className="h-2"
+                                                style={{ backgroundColor: "#f3f4f6" }}
+                                            >
+                                                <div
+                                                    className="h-full rounded-full bg-gradient-to-r from-indigo-600 to-purple-600"
+                                                    style={{ width: `${agentData.goals.salesProgress}%` }}
+                                                ></div>
+                                            </Progress>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <Home className="h-4 w-4 text-blue-600" />
+                                                    <span className="font-medium">Listings Target</span>
+                                                </div>
+                                                <span className="text-sm font-semibold">
+                          {agentData.performance.activeListings} / {agentData.goals.listingsTarget}
+                        </span>
+                                            </div>
+                                            <Progress
+                                                value={agentData.goals.listingsProgress}
+                                                className="h-2"
+                                                style={{ backgroundColor: "#f3f4f6" }}
+                                            >
+                                                <div
+                                                    className="h-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-600"
+                                                    style={{ width: `${agentData.goals.listingsProgress}%` }}
+                                                ></div>
+                                            </Progress>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <Users className="h-4 w-4 text-emerald-600" />
+                                                    <span className="font-medium">Clients Target</span>
+                                                </div>
+                                                <span className="text-sm font-semibold">13 / {agentData.goals.clientsTarget}</span>
+                                            </div>
+                                            <Progress
+                                                value={agentData.goals.clientsProgress}
+                                                className="h-2"
+                                                style={{ backgroundColor: "#f3f4f6" }}
+                                            >
+                                                <div
+                                                    className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-teal-600"
+                                                    style={{ width: `${agentData.goals.clientsProgress}%` }}
+                                                ></div>
+                                            </Progress>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Main Dashboard Content */}
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                    <TabsList className="grid w-full grid-cols-5 lg:w-auto bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+                        <TabsTrigger
+                            value="overview"
+                            className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:shadow-sm"
+                        >
+                            Overview
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="listings"
+                            className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:shadow-sm"
+                        >
+                            Listings
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="clients"
+                            className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:shadow-sm"
+                        >
+                            Clients
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="calendar"
+                            className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:shadow-sm"
+                        >
+                            Calendar
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="activity"
+                            className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:shadow-sm"
+                        >
+                            Activity
+                        </TabsTrigger>
+                    </TabsList>
+
+                    {/* Overview Tab Content */}
+                    <TabsContent value="overview" className="mt-6 space-y-6">
+                        <div className="grid gap-6 md:grid-cols-7">
+                            <Card className="col-span-7 md:col-span-4 border-0 shadow-lg bg-white dark:bg-gray-800">
+                                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                    <div>
+                                        <CardTitle className="text-xl font-bold">Monthly Performance</CardTitle>
+                                        <CardDescription>Sales and commission overview</CardDescription>
+                                    </div>
+                                    <div className="relative flex-1 sm:flex-initial">
+                                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <Calendar className="h-4 w-4 text-gray-400" />
+                                        </div>
+                                        <select
+                                            className="pl-9 pr-4 py-2 rounded-lg text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm w-full sm:w-auto focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                            value={timeRange}
+                                            onChange={(e) => setTimeRange(e.target.value)}
+                                        >
+                                            <option value="week">This Week</option>
+                                            <option value="month">This Month</option>
+                                            <option value="quarter">Last 3 Months</option>
+                                            <option value="year">This Year</option>
+                                        </select>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="pt-4">
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <LineChart
+                                            data={monthlyPerformance}
+                                            margin={{
+                                                top: 5,
+                                                right: 10,
+                                                left: 10,
+                                                bottom: 5,
+                                            }}
+                                        >
+                                            <defs>
+                                                <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.8} />
+                                                    <stop offset="95%" stopColor="#4F46E5" stopOpacity={0.1} />
+                                                </linearGradient>
+                                                <linearGradient id="colorCommission" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.8} />
+                                                    <stop offset="95%" stopColor="#10B981" stopOpacity={0.1} />
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                                            <XAxis dataKey="name" tick={{ fontSize: 12 }} tickLine={false} axisLine={{ stroke: "#e0e0e0" }} />
+                                            <YAxis
+                                                yAxisId="left"
+                                                orientation="left"
+                                                tickFormatter={(value) =>
+                                                    new Intl.NumberFormat("en-US", {
+                                                        notation: "compact",
+                                                        compactDisplay: "short",
+                                                    }).format(value)
+                                                }
+                                                tick={{ fontSize: 12 }}
+                                                tickLine={false}
+                                                axisLine={{ stroke: "#e0e0e0" }}
+                                            />
+                                            <YAxis
+                                                yAxisId="right"
+                                                orientation="right"
+                                                tickFormatter={(value) =>
+                                                    new Intl.NumberFormat("en-US", {
+                                                        notation: "compact",
+                                                        compactDisplay: "short",
+                                                    }).format(value)
+                                                }
+                                                tick={{ fontSize: 12 }}
+                                                tickLine={false}
+                                                axisLine={{ stroke: "#e0e0e0" }}
+                                            />
+                                            <Tooltip
+                                                formatter={(value, name) => {
+                                                    if (name === "sales" || name === "commission") {
+                                                        return [
+                                                            new Intl.NumberFormat("en-US", {
+                                                                style: "currency",
+                                                                currency: "ZMW",
+                                                                minimumFractionDigits: 0,
+                                                            }).format(value as number),
+                                                            name === "sales" ? "Sales" : "Commission",
+                                                        ]
+                                                    }
+                                                    return [value, name]
+                                                }}
+                                                contentStyle={{
+                                                    borderRadius: "8px",
+                                                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                                    border: "none",
+                                                }}
+                                            />
+                                            <Legend wrapperStyle={{ paddingTop: 10 }} />
+                                            <Line
+                                                yAxisId="left"
+                                                type="monotone"
+                                                dataKey="sales"
+                                                name="Sales"
+                                                stroke="#4F46E5"
+                                                strokeWidth={3}
+                                                dot={{ r: 4, strokeWidth: 2 }}
+                                                activeDot={{ r: 6, strokeWidth: 0, fill: "#4F46E5" }}
+                                            />
+                                            <Line
+                                                yAxisId="right"
+                                                type="monotone"
+                                                dataKey="commission"
+                                                name="Commission"
+                                                stroke="#10B981"
+                                                strokeWidth={2}
+                                                dot={{ r: 4, strokeWidth: 2 }}
+                                            />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </CardContent>
+                                <CardFooter className="pt-0 border-t flex justify-between items-center">
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-1">
+                                            <div className="h-3 w-3 rounded-full bg-indigo-500"></div>
+                                            <span className="text-xs text-muted-foreground">Sales</span>
+                                        </div>
+                                        <div className="h-4 w-px bg-gray-200 dark:bg-gray-700"></div>
+                                        <div className="flex items-center gap-1">
+                                            <div className="h-3 w-3 rounded-full bg-emerald-500"></div>
+                                            <span className="text-xs text-muted-foreground">Commission</span>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="gap-1 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                                    >
+                                        Download Report
+                                        <Download className="h-4 w-4 ml-1" />
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+
+                            <Card className="col-span-7 md:col-span-3 border-0 shadow-lg bg-white dark:bg-gray-800">
+                                <CardHeader>
+                                    <div className="flex justify-between items-center">
+                                        <div>
+                                            <CardTitle className="text-xl font-bold">Property Types</CardTitle>
+                                            <CardDescription>Distribution by category</CardDescription>
+                                        </div>
+                                        <Button variant="outline" size="sm" className="text-xs gap-1">
+                                            <Filter className="h-3 w-3" />
+                                            Filter
+                                        </Button>
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <PieChart>
+                                            <Pie
+                                                data={propertyTypeData}
+                                                cx="50%"
+                                                cy="50%"
+                                                labelLine={false}
+                                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                outerRadius={80}
+                                                fill="#8884d8"
+                                                dataKey="value"
+                                            >
+                                                {propertyTypeData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip
+                                                formatter={(value, name) => [`${value}%`, name]}
+                                                contentStyle={{
+                                                    borderRadius: "8px",
+                                                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                                    border: "none",
+                                                }}
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        <div className="grid gap-6 md:grid-cols-2">
+                            <Card className="border-0 shadow-lg bg-white dark:bg-gray-800">
+                                <CardHeader>
+                                    <CardTitle className="text-xl font-bold">Upcoming Tasks</CardTitle>
+                                    <CardDescription>Your schedule for the next few days</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-4">
+                                        {upcomingTasks.slice(0, 3).map((task) => (
+                                            <div
+                                                key={task.id}
+                                                className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 p-3"
+                                            >
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <div
+                                                            className={`h-2 w-2 rounded-full ${
+                                                                task.priority === "High"
+                                                                    ? "bg-red-500"
+                                                                    : task.priority === "Medium"
+                                                                        ? "bg-amber-500"
+                                                                        : "bg-emerald-500"
+                                                            }`}
+                                                        ></div>
+                                                        <p className="font-medium text-sm">{task.title}</p>
+                                                    </div>
+                                                    <div className="mt-1 flex items-center gap-4">
+                                                        <p className="text-xs text-muted-foreground flex items-center">
+                                                            <Calendar className="mr-1 h-3 w-3" />
+                                                            {task.date}
+                                                        </p>
+                                                        <p className="text-xs text-muted-foreground flex items-center">
+                                                            <User className="mr-1 h-3 w-3" />
+                                                            {task.client}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <Badge variant="outline" className={getPriorityBadgeStyles(task.priority)}>
+                                                    {task.priority}
+                                                </Badge>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                                <CardFooter className="border-t pt-4 flex justify-between">
+                                    <Button variant="ghost" size="sm" className="text-muted-foreground">
+                                        Mark all as complete
+                                    </Button>
+                                    <Button variant="ghost" size="sm" className="text-indigo-600">
+                                        View Calendar
+                                        <ChevronRight className="ml-1 h-4 w-4" />
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+
+                            <Card className="border-0 shadow-lg bg-white dark:bg-gray-800">
+                                <CardHeader>
+                                    <CardTitle className="text-xl font-bold">Recent Activity</CardTitle>
+                                    <CardDescription>Latest actions on the platform</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="relative space-y-5">
+                                        <div className="absolute left-3 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700"></div>
+                                        {recentActivity.slice(0, 4).map((activity, index) => (
+                                            <div key={activity.id} className="flex items-start gap-4 relative">
+                                                <div className="absolute left-3 -translate-x-1/2 h-6 w-6 rounded-full flex items-center justify-center z-10 bg-indigo-500">
+                                                    <CheckCircle className="h-3 w-3 text-white" />
+                                                </div>
+                                                <div className="ml-8 space-y-1 bg-gray-50 dark:bg-gray-900 rounded-lg p-3 w-full">
+                                                    <p className="text-sm">
+                                                        <span className="font-medium">You</span> {activity.action}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">{activity.time}</p>
+                                                    <p className="text-xs text-indigo-600 dark:text-indigo-400">{activity.details}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                                <CardFooter className="border-t pt-4 flex justify-center">
+                                    <Button variant="outline" size="sm" className="w-full">
+                                        View all activity
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                        </div>
+
+                        <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white">
+                            <CardContent className="p-6">
+                                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                                    <div className="space-y-2">
+                                        <h3 className="text-xl font-bold">Ready to boost your performance?</h3>
+                                        <p className="text-indigo-100">Get personalized coaching and tips to increase your sales.</p>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Button variant="ghost" className="border border-white/20 text-white hover:bg-white/10">
+                                            <FileText className="mr-2 h-4 w-4" />
+                                            Learn more
+                                        </Button>
+                                        <Button className="bg-white text-indigo-700 hover:bg-indigo-100">
+                                            <Zap className="mr-2 h-4 w-4" />
+                                            Get Started
+                                        </Button>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+
+                    {/* Listings Tab Content */}
+                    <TabsContent value="listings" className="mt-6 space-y-6">
+                        <Card className="border-0 shadow-lg bg-white dark:bg-gray-800">
+                            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                <div>
+                                    <CardTitle className="text-xl font-bold">My Listings</CardTitle>
+                                    <CardDescription>Manage your property listings</CardDescription>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                        <Input
+                                            placeholder="Search listings..."
+                                            className="pl-9 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 rounded-lg w-[200px]"
+                                        />
+                                    </div>
+                                    <Button className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white shadow-md hover:shadow-lg transition-all">
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Add Listing
+                                    </Button>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="pt-4">
+                                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                    {activeListings.map((listing) => (
+                                        <Card
+                                            key={listing.id}
+                                            className="overflow-hidden transition-all hover:shadow-lg group border-0 shadow-md bg-white dark:bg-gray-800"
+                                        >
+                                            <div className="relative">
+                                                <div className="aspect-video relative overflow-hidden">
+                                                    <Image
+                                                        src={listing.image || "/placeholder.svg"}
+                                                        alt={listing.title}
+                                                        fill
+                                                        className="object-cover transition-transform group-hover:scale-105 duration-500"
+                                                    />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                                                </div>
+
+                                                <div className="absolute top-3 left-3">
+                                                    <Badge className="bg-white/90 text-gray-800 hover:bg-white/100 backdrop-blur-sm">
+                                                        {listing.type}
+                                                    </Badge>
+                                                </div>
+
+                                                <div className="absolute top-3 right-3">
+                                                    <Badge
+                                                        className={`${
+                                                            listing.status === "Active"
+                                                                ? "bg-gradient-to-r from-emerald-600 to-emerald-500"
+                                                                : "bg-gradient-to-r from-amber-600 to-amber-500"
+                                                        } text-white shadow-sm`}
+                                                    >
+                                                        {listing.status}
+                                                    </Badge>
+                                                </div>
+
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="absolute bottom-3 right-3 h-8 w-8 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white"
+                                                >
+                                                    <Heart className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                            <CardContent className="p-4">
+                                                <h3 className="font-semibold text-lg group-hover:text-indigo-600 transition-colors">
+                                                    {listing.title}
+                                                </h3>
+                                                <div className="flex items-center text-sm text-muted-foreground mt-1">
+                                                    <MapPin className="mr-1 h-3 w-3" />
+                                                    <span>{listing.address}</span>
+                                                </div>
+
+                                                <div className="mt-4 flex items-center justify-between">
+                                                    <div>
+                                                        <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{listing.price}</p>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                        <div className="flex items-center">
+                                                            <Eye className="mr-1 h-3 w-3" />
+                                                            <span>{listing.views}</span>
+                                                        </div>
+                                                        <div className="flex items-center">
+                                                            <MessageSquare className="mr-1 h-3 w-3" />
+                                                            <span>{listing.inquiries}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="mt-4 flex items-center gap-4 text-xs">
+                                                    <div className="flex items-center gap-1">
+                                                        <Bed className="h-3 w-3 text-gray-500" />
+                                                        <span>{listing.beds} beds</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <Bath className="h-3 w-3 text-gray-500" />
+                                                        <span>{listing.baths} baths</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <Square className="h-3 w-3 text-gray-500" />
+                                                        <span>{listing.sqft} sqft</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="mt-4 flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4">
+                                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                        <Clock className="h-3 w-3" />
+                                                        <span>Listed {listing.daysListed} days ago</span>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                            <CardFooter className="p-4 pt-0 flex justify-between gap-2">
+                                                <Button variant="outline" size="sm" className="w-full border-gray-200 dark:border-gray-700">
+                                                    <Eye className="mr-1.5 h-3.5 w-3.5" /> View
+                                                </Button>
+                                                <Button variant="outline" size="sm" className="w-full border-gray-200 dark:border-gray-700">
+                                                    <Edit className="mr-1.5 h-3.5 w-3.5" /> Edit
+                                                </Button>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="outline" size="sm" className="px-2 border-gray-200 dark:border-gray-700">
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end" className="w-[160px]">
+                                                        <DropdownMenuItem>
+                                                            <Share2 className="mr-2 h-4 w-4" /> Share
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem>
+                                                            <Download className="mr-2 h-4 w-4" /> Download
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem className="text-red-600 focus:text-red-600">
+                                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </CardFooter>
+                                        </Card>
+                                    ))}
+                                </div>
+                            </CardContent>
+                            <CardFooter className="border-t pt-4 flex justify-between">
+                                <div className="text-sm text-muted-foreground">
+                                    Showing <span className="font-medium">{activeListings.length}</span> of{" "}
+                                    <span className="font-medium">{agentData.performance.activeListings}</span> listings
+                                </div>
+                                <Button variant="outline" size="sm">
+                                    View All Listings
+                                    <ChevronRight className="ml-2 h-4 w-4" />
+                                </Button>
+                            </CardFooter>
+                        </Card>
+
+                        <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white">
+                            <CardContent className="p-6">
+                                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                                    <div className="space-y-2">
+                                        <h3 className="text-xl font-bold">Need to add a new property?</h3>
+                                        <p className="text-indigo-100">Create a new listing in just a few minutes.</p>
+                                    </div>
+                                    <Button className="bg-white text-indigo-700 hover:bg-indigo-100">
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Add New Listing
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+
+                    {/* Clients Tab Content */}
+                    <TabsContent value="clients" className="mt-6 space-y-6">
+                        <Card className="border-0 shadow-lg bg-white dark:bg-gray-800">
+                            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                <div>
+                                    <CardTitle className="text-xl font-bold">My Clients</CardTitle>
+                                    <CardDescription>Manage your client relationships</CardDescription>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                        <Input
+                                            placeholder="Search clients..."
+                                            className="pl-9 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 rounded-lg w-[200px]"
+                                        />
+                                    </div>
+                                    <Button className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white shadow-md hover:shadow-lg transition-all">
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Add Client
+                                    </Button>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="pt-4">
+                                <div className="space-y-4">
+                                    {recentClients.map((client) => (
+                                        <Card key={client.id} className="border border-gray-200 dark:border-gray-700 shadow-sm">
+                                            <CardContent className="p-4">
+                                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                                    <div className="flex items-center gap-4">
+                                                        <Avatar className="h-12 w-12 border-2 border-white shadow-sm">
+                                                            <AvatarImage src={client.avatar || "/placeholder.svg"} alt={client.name} />
+                                                            <AvatarFallback>{client.name.charAt(0)}</AvatarFallback>
+                                                        </Avatar>
+                                                        <div>
+                                                            <h3 className="font-semibold">{client.name}</h3>
+                                                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-muted-foreground">
+                                                                <div className="flex items-center">
+                                                                    <Mail className="mr-1 h-3 w-3" />
+                                                                    <span>{client.email}</span>
+                                                                </div>
+                                                                <div className="flex items-center">
+                                                                    <Phone className="mr-1 h-3 w-3" />
+                                                                    <span>{client.phone}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <Badge variant="outline" className={getStatusBadgeStyles(client.status)}>
+                                                            {client.status}
+                                                        </Badge>
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 border-blue-200 dark:border-blue-800/30"
+                                                        >
+                                                            {client.interest}
+                                                        </Badge>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <div className="rounded-lg bg-gray-50 dark:bg-gray-900 p-3">
+                                                        <p className="text-xs text-muted-foreground">Budget</p>
+                                                        <p className="font-medium">{client.budget}</p>
+                                                    </div>
+                                                    <div className="rounded-lg bg-gray-50 dark:bg-gray-900 p-3">
+                                                        <p className="text-xs text-muted-foreground">Last Contact</p>
+                                                        <p className="font-medium">{client.lastContact}</p>
+                                                    </div>
+                                                    <div className="rounded-lg bg-gray-50 dark:bg-gray-900 p-3">
+                                                        <p className="text-xs text-muted-foreground">Notes</p>
+                                                        <p className="text-sm line-clamp-1">{client.notes}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-4 flex justify-end gap-2">
+                                                    <Button variant="outline" size="sm">
+                                                        <MessageSquare className="mr-1.5 h-3.5 w-3.5" /> Message
+                                                    </Button>
+                                                    <Button variant="outline" size="sm">
+                                                        <Edit className="mr-1.5 h-3.5 w-3.5" /> Edit
+                                                    </Button>
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="outline" size="sm" className="px-2">
+                                                                <MoreHorizontal className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end" className="w-[160px]">
+                                                            <DropdownMenuItem>
+                                                                <Calendar className="mr-2 h-4 w-4" /> Schedule Meeting
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem>
+                                                                <FileText className="mr-2 h-4 w-4" /> View History
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem className="text-red-600 focus:text-red-600">
+                                                                <Trash2 className="mr-2 h-4 w-4" /> Remove Client
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </div>
+                            </CardContent>
+                            <CardFooter className="border-t pt-4 flex justify-between">
+                                <div className="text-sm text-muted-foreground">
+                                    Showing <span className="font-medium">{recentClients.length}</span> of{" "}
+                                    <span className="font-medium">13</span> clients
+                                </div>
+                                <Button variant="outline" size="sm">
+                                    View All Clients
+                                    <ChevronRight className="ml-2 h-4 w-4" />
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    </TabsContent>
+
+                    {/* Calendar Tab Content */}
+                    <TabsContent value="calendar" className="mt-6 space-y-6">
+                        <Card className="border-0 shadow-lg bg-white dark:bg-gray-800">
+                            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                <div>
+                                    <CardTitle className="text-xl font-bold">My Schedule</CardTitle>
+                                    <CardDescription>Manage your appointments and tasks</CardDescription>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Button variant="outline" size="sm">
+                                        <Calendar className="mr-2 h-4 w-4" />
+                                        Today
+                                    </Button>
+                                    <Button className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white shadow-md hover:shadow-lg transition-all">
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Add Event
+                                    </Button>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="pt-4">
+                                <div className="space-y-4">
+                                    {upcomingTasks.map((task) => (
+                                        <div
+                                            key={task.id}
+                                            className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 p-4"
+                                        >
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2">
+                                                    <div
+                                                        className={`h-2 w-2 rounded-full ${
+                                                            task.priority === "High"
+                                                                ? "bg-red-500"
+                                                                : task.priority === "Medium"
+                                                                    ? "bg-amber-500"
+                                                                    : "bg-emerald-500"
+                                                        }`}
+                                                    ></div>
+                                                    <p className="font-medium">{task.title}</p>
+                                                </div>
+                                                <div className="mt-2 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                                    <p className="text-sm text-muted-foreground flex items-center">
+                                                        <Calendar className="mr-1 h-3 w-3" />
+                                                        {task.date}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground flex items-center">
+                                                        <User className="mr-1 h-3 w-3" />
+                                                        {task.client}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground flex items-center">
+                                                        <MapPin className="mr-1 h-3 w-3" />
+                                                        {task.location}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Badge variant="outline" className={getPriorityBadgeStyles(task.priority)}>
+                                                    {task.priority}
+                                                </Badge>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem>
+                                                            <Edit className="mr-2 h-4 w-4" /> Edit
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem>
+                                                            <CheckCircle className="mr-2 h-4 w-4" /> Mark as Complete
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem className="text-red-600 focus:text-red-600">
+                                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                            <CardFooter className="border-t pt-4 flex justify-between">
+                                <Button variant="ghost" size="sm" className="text-muted-foreground">
+                                    Mark all as complete
+                                </Button>
+                                <Button variant="ghost" size="sm" className="text-indigo-600">
+                                    View Full Calendar
+                                    <ChevronRight className="ml-1 h-4 w-4" />
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    </TabsContent>
+
+                    {/* Activity Tab Content */}
+                    <TabsContent value="activity" className="mt-6 space-y-6">
+                        <Card className="border-0 shadow-lg bg-white dark:bg-gray-800">
+                            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                <div>
+                                    <CardTitle className="text-xl font-bold">Recent Activity</CardTitle>
+                                    <CardDescription>Your latest actions and updates</CardDescription>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Button variant="outline" size="sm">
+                                        <Filter className="mr-2 h-4 w-4" />
+                                        Filter
+                                    </Button>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="pt-4">
+                                <div className="relative space-y-5">
+                                    <div className="absolute left-3 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700"></div>
+                                    {recentActivity.map((activity, index) => (
+                                        <div key={activity.id} className="flex items-start gap-4 relative">
+                                            <div className="absolute left-3 -translate-x-1/2 h-6 w-6 rounded-full flex items-center justify-center z-10 bg-indigo-500">
+                                                <CheckCircle className="h-3 w-3 text-white" />
+                                            </div>
+                                            <div className="ml-8 space-y-1 bg-gray-50 dark:bg-gray-900 rounded-lg p-3 w-full">
+                                                <p className="text-sm">
+                                                    <span className="font-medium">You</span> {activity.action}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">{activity.time}</p>
+                                                <p className="text-xs text-indigo-600 dark:text-indigo-400">{activity.details}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                            <CardFooter className="border-t pt-4 flex justify-center">
+                                <Button variant="outline" size="sm" className="w-full">
+                                    Load more activity
+                                </Button>
+                            </CardFooter>
+                        </Card>
+
+                        <Card className="border-0 shadow-lg bg-white dark:bg-gray-800">
+                            <CardHeader>
+                                <CardTitle className="text-xl font-bold">Notifications</CardTitle>
+                                <CardDescription>Recent system notifications</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    {[
+                                        {
+                                            id: 1,
+                                            title: "New inquiry received",
+                                            message: "You have a new inquiry for Modern Apartment with Pool View",
+                                            time: "2 hours ago",
+                                            read: false,
+                                        },
+                                        {
+                                            id: 2,
+                                            title: "Listing approved",
+                                            message: "Your listing 'Luxury Villa with Garden' has been approved",
+                                            time: "Yesterday",
+                                            read: true,
+                                        },
+                                        {
+                                            id: 3,
+                                            title: "Commission payment",
+                                            message: "Commission payment of ZMW 22,500 has been processed",
+                                            time: "3 days ago",
+                                            read: true,
+                                        },
+                                    ].map((notification) => (
+                                        <div
+                                            key={notification.id}
+                                            className={`rounded-lg p-4 ${
+                                                notification.read
+                                                    ? "bg-gray-50 dark:bg-gray-900"
+                                                    : "bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500"
+                                            }`}
+                                        >
+                                            <div className="flex justify-between items-start">
+                                                <h4 className="font-medium">{notification.title}</h4>
+                                                <span className="text-xs text-muted-foreground">{notification.time}</span>
+                                            </div>
+                                            <p className="text-sm mt-1">{notification.message}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                            <CardFooter className="border-t pt-4 flex justify-between">
+                                <Button variant="ghost" size="sm" className="text-muted-foreground">
+                                    Mark all as read
+                                </Button>
+                                <Button variant="ghost" size="sm" className="text-indigo-600">
+                                    View All Notifications
+                                    <ChevronRight className="ml-1 h-4 w-4" />
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    </TabsContent>
+                </Tabs>
+            </div>
+        </div>
+    )
+}

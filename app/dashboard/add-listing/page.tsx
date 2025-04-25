@@ -244,39 +244,45 @@ export default function AddListingPage() {
       console.log('Form values:', values);
       console.log('Selected features:', values.features);
 
-      // First, fetch all features to get their IDs
-      const featuresResponse = await fetch('/api/features');
-      if (!featuresResponse.ok) {
-        throw new Error('Failed to fetch features');
-      }
-      const allFeatures = await featuresResponse.json();
-      console.log('Available features from API:', allFeatures);
-      
-      // Create a map of feature names to their IDs
-      const featureMap = new Map(allFeatures.map((f: any) => [f.name, f.id]));
-      console.log('Feature map:', Object.fromEntries(featureMap));
-      
-      // Validate that all selected features exist
-      const invalidFeatures = values.features.filter(f => !featureMap.has(f));
-      if (invalidFeatures.length > 0) {
-        throw new Error(`Invalid features selected: ${invalidFeatures.join(', ')}`);
-      }
+      let featureConnections = [];
 
-      const featureConnections = values.features.map(featureName => {
-        const featureId = featureMap.get(featureName);
-        if (!featureId) {
-          throw new Error(`Feature ID not found for: ${featureName}`);
-        }
-        return {
-          feature: {
-            connect: {
-              id: featureId
-            }
+      // Only process features if there are any selected
+      if (values.features.length > 0) {
+        try {
+          // First, fetch all features to get their IDs
+          const featuresResponse = await fetch('/api/features');
+          if (featuresResponse.ok) {
+            const allFeatures = await featuresResponse.json();
+            console.log('Available features from API:', allFeatures);
+
+            // Create a map of feature names to their IDs
+            const featureMap = new Map(allFeatures.map((f: any) => [f.name, f.id]));
+            console.log('Feature map:', Object.fromEntries(featureMap));
+
+            // Create feature connections
+            featureConnections = values.features.map(featureName => {
+              const featureId = featureMap.get(featureName);
+              if (featureId) {
+                return {
+                  feature: {
+                    connect: {
+                      id: featureId
+                    }
+                  }
+                };
+              }
+              return null;
+            }).filter(Boolean);
+
+            console.log('Feature connections:', featureConnections);
+          } else {
+            console.error('Failed to fetch features, continuing without feature connections');
           }
-        };
-      });
-
-      console.log('Feature connections:', featureConnections);
+        } catch (featureError) {
+          console.error('Error processing features:', featureError);
+          // Continue without feature connections
+        }
+      }
 
       const requestData = {
         title: values.title,
@@ -297,7 +303,7 @@ export default function AddListingPage() {
         lotSize: values.lotSize ? Number(values.lotSize) : null,
         yearBuilt: values.yearBuilt ? Number(values.yearBuilt) : null,
         parkingSpaces: values.parkingSpaces ? Number(values.parkingSpaces) : null,
-        features: values.features.length > 0 ? {
+        features: featureConnections.length > 0 ? {
           create: featureConnections
         } : undefined,
         media: {
@@ -330,7 +336,7 @@ export default function AddListingPage() {
         title: "Listing created successfully",
         description: "Your property listing has been created.",
       });
-      router.push("/dashboard");
+      router.push("/dashboard/properties");
     } catch (error) {
       console.error('Submission error:', error);
       toast({
@@ -364,9 +370,9 @@ export default function AddListingPage() {
 
   // Remove image
   const removeImage = (index: number) => {
-    const newImages = [...images]
+    const newImages = [...form.watch("images")]
     newImages.splice(index, 1)
-    setImages(newImages)
+    form.setValue("images", newImages)
   }
 
   // Remove document
@@ -1115,9 +1121,9 @@ export default function AddListingPage() {
                   <CardContent>
                     <div className="rounded-lg border bg-card">
                       <div className="relative aspect-video w-full overflow-hidden rounded-t-lg bg-gray-100">
-                        {images.length > 0 ? (
+                        {form.watch("images").length > 0 ? (
                           <Image
-                            src={images[0] || "/placeholder.svg"}
+                            src={form.watch("images")[0] || "/placeholder.svg"}
                             alt="Property preview"
                             fill
                             className="object-cover"

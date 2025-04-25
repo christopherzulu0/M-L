@@ -76,14 +76,14 @@ export async function GET(request: Request) {
       where,
       select: {
         price: true,
-        squareFootage: true
+        squareFeet: true
       }
     })
 
     const pricePerSqFtStats = pricePerSqFt
-      .filter(p => p.squareFootage > 0)
+      .filter(p => p.squareFeet > 0)
       .map(p => ({
-        value: p.price / p.squareFootage
+        value: p.price / p.squareFeet
       }))
 
     // Get property types for mapping IDs to names

@@ -46,6 +46,7 @@ export default function DashboardLayout({
   const [progress, setProgress] = useState(13)
   const [propertiesOpen, setPropertiesOpen] = useState(false)
   const [agentsOpen, setAgentsOpen] = useState(false)
+  const [locationOpen, setLocationOpen] = useState(false)
 
   // Simulate loading progress
   useEffect(() => {
@@ -173,7 +174,7 @@ export default function DashboardLayout({
                   open={propertiesOpen} 
                   onOpenChange={setPropertiesOpen}
                 >
-                  <CollapsibleTrigger className="w-full">
+                  <CollapsibleTrigger asChild className="w-full">
                     <Button variant="ghost" className="w-full justify-start">
                       <Home className="mr-2 h-4 w-4" /> Properties
                       {propertiesOpen ? (
@@ -201,7 +202,7 @@ export default function DashboardLayout({
                   open={agentsOpen} 
                   onOpenChange={setAgentsOpen}
                 >
-                  <CollapsibleTrigger className="w-full">
+                  <CollapsibleTrigger asChild className="w-full">
                     <Button variant="ghost" className="w-full justify-start">
                       <Users className="mr-2 h-4 w-4" /> Agents
                       {agentsOpen ? (
@@ -224,6 +225,38 @@ export default function DashboardLayout({
                     </Link>
                   </CollapsibleContent>
                 </Collapsible>
+
+                {/** Start of Location */}
+                <Collapsible
+                    className="w-full"
+                    open={locationOpen}
+                    onOpenChange={setLocationOpen}
+                >
+                  <CollapsibleTrigger asChild className="w-full">
+                    <Button variant="ghost" className="w-full justify-start">
+                      <Users className="mr-2 h-4 w-4" /> Locations
+                      {locationOpen ? (
+                          <ChevronDown className="ml-auto h-4 w-4" />
+                      ) : (
+                          <ChevronRight className="ml-auto h-4 w-4" />
+                      )}
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pl-6 mt-1 space-y-1">
+                    <Link href="/dashboard/FeaturedLocations/add" passHref>
+                      <Button variant="ghost" className="w-full justify-start text-sm">
+                        Add Location
+                      </Button>
+                    </Link>
+                    <Link href="/dashboard/FeaturedLocations" passHref>
+                      <Button variant="ghost" className="w-full justify-start text-sm">
+                        Manage Locations
+                      </Button>
+                    </Link>
+                  </CollapsibleContent>
+                </Collapsible>
+                {/** End of Location*/}
+
                 <Link href="/dashboard/inquiries" passHref>
                   <Button variant="ghost" className="w-full justify-start">
                     <MessageSquare className="mr-2 h-4 w-4" /> Inquiries
@@ -244,6 +277,7 @@ export default function DashboardLayout({
                     <CheckCircle2 className="mr-2 h-4 w-4" /> Tasks
                   </Button>
                 </Link>
+
                 <Link href="/dashboard/map" passHref>
                   <Button variant="ghost" className="w-full justify-start">
                     <Map className="mr-2 h-4 w-4" /> Map View
