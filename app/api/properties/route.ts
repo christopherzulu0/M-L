@@ -1,12 +1,10 @@
-import { PrismaClient } from '@/lib/generated/prisma'
 import { NextResponse } from 'next/server'
-
-const prisma = new PrismaClient()
+import prisma from '@/lib/prisma'
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    
+
     // Pagination
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
@@ -19,7 +17,7 @@ export async function GET(request: Request) {
     const location = searchParams.get('location')
     const status = searchParams.get('status')
     const agentId = searchParams.get('agentId')
-    
+
     // Sorting
     const sortBy = searchParams.get('sortBy') || 'createdAt'
     const sortOrder = searchParams.get('sortOrder') || 'desc'
@@ -110,7 +108,8 @@ export async function POST(request: Request) {
       squareFeet,
       lotSize,
       yearBuilt,
-      parkingSpaces
+      parkingSpaces,
+      FloorPlan
     } = body
 
     console.log('Received request body:', body)
@@ -128,7 +127,7 @@ export async function POST(request: Request) {
       const existingAgent = await prisma.agent.findUnique({
         where: { id: Number(agentId) }
       });
-      
+
       if (!existingAgent) {
         return NextResponse.json(
           { error: 'Selected agent does not exist' },
@@ -153,6 +152,7 @@ export async function POST(request: Request) {
         lotSize,
         yearBuilt,
         parkingSpaces,
+        FloorPlan,
         propertyType: {
           connect: {
             id: Number(propertyTypeId)

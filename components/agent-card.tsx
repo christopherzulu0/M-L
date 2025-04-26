@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button"
 import { StarRating } from "@/components/star-rating"
 import { Facebook, Twitter, Instagram, Mail, Phone, CheckCircle2, XCircle } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 interface AgentCardProps {
+  id: number
   name: string
   agency: string
   image: string
@@ -14,7 +16,7 @@ interface AgentCardProps {
   bio: string
 }
 
-export function AgentCard({ name, agency, image, listings, rating, ratingLabel, verified, bio }: AgentCardProps) {
+export function AgentCard({ id, name, agency, image, listings, rating, ratingLabel, verified, bio }: AgentCardProps) {
   return (
     <div className="group relative overflow-hidden rounded-2xl bg-white card-shadow subtle-border">
       {/* Badges Container - Positioned absolutely relative to card */}
@@ -69,9 +71,11 @@ export function AgentCard({ name, agency, image, listings, rating, ratingLabel, 
 
         {/* Action Buttons */}
         <div className="w-full flex items-center justify-between border-t pt-3 pb-3">
-          <Button className="gradient-bg text-white transition-all hover:shadow-lg hover:brightness-110">
-            View Profile
-          </Button>
+          <Link href={`/agent/${id}`}>
+            <Button className="gradient-bg text-white transition-all hover:shadow-lg hover:brightness-110">
+              View Profile
+            </Button>
+          </Link>
           <div className="flex gap-2">
             {[Phone, Mail].map((Icon, index) => (
               <Button

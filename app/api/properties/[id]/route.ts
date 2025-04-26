@@ -6,8 +6,10 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id: paramId } = await params;
+    const id = parseInt(paramId);
     const property = await prisma.property.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         propertyType: true,
         listingType: true,
@@ -59,8 +61,10 @@ export async function PUT(
       ...updateData
     } = body
 
+    const { id: paramId } = await params;
+    const id = parseInt(paramId);
     const property = await prisma.property.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...updateData,
         title,
@@ -99,8 +103,10 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id: paramId } = await params;
+    const id = parseInt(paramId);
     await prisma.property.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return new NextResponse(null, { status: 204 })

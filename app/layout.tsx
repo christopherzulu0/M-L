@@ -4,6 +4,7 @@ import "@/app/globals.css"
 import type React from "react"
 import { ClerkProvider } from "@clerk/nextjs";
 import { UserProfileCheck } from "@/components/user-profile-check";
+import { Providers } from "./providers";
 
 export default function RootLayout({
   children,
@@ -14,10 +15,12 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body>
-          <UserProfileCheck>
-            {children}
-          </UserProfileCheck>
-          <SiteFooter />
+          <Providers>
+            <UserProfileCheck>
+              {children}
+            </UserProfileCheck>
+            <SiteFooter />
+          </Providers>
         </body>
       </html>
     </ClerkProvider>

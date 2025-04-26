@@ -124,15 +124,17 @@ const formSchema = z.object({
   agentId: z.string().optional(),
   DView: z.string().optional(),
   images: z.array(z.string()).default([]),
+  floorPlan: z.string().optional(),
+  documents: z.array(z.string()).default([]),
 })
 
 export default function AddListingPage() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("basic")
-  const [images, setImages] = useState<string[]>([])
-  const [documents, setDocuments] = useState<string[]>([])
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
+  const [isFloorPlanUploading, setIsFloorPlanUploading] = useState(false)
+  const [isDocumentUploading, setIsDocumentUploading] = useState(false)
   const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([])
   const [listingTypes, setListingTypes] = useState<ListingType[]>([])
   const [locations, setLocations] = useState<Location[]>([])
@@ -197,6 +199,49 @@ export default function AddListingPage() {
     },
   })
 
+  const { startUpload: startFloorPlanUpload } = useUploadThing("FloorPlanUploader", {
+    onClientUploadComplete: (res) => {
+      if (res && res[0]) {
+        form.setValue("floorPlan", res[0].url)
+        setIsFloorPlanUploading(false)
+        toast({
+          title: "Floor plan uploaded",
+          description: "Your floor plan has been uploaded successfully",
+        })
+      }
+    },
+    onUploadError: (error) => {
+      setIsFloorPlanUploading(false)
+      toast({
+        title: "Floor plan upload failed",
+        description: error.message,
+        variant: "destructive",
+      })
+    },
+  })
+
+  const { startUpload: startDocumentUpload } = useUploadThing("DocumentUploader", {
+    onClientUploadComplete: (res) => {
+      if (res) {
+        const documentUrls = res.map((file) => file.url)
+        form.setValue("documents", [...form.watch("documents"), ...documentUrls])
+        setIsDocumentUploading(false)
+        toast({
+          title: "Documents uploaded",
+          description: "Your documents have been uploaded successfully",
+        })
+      }
+    },
+    onUploadError: (error) => {
+      setIsDocumentUploading(false)
+      toast({
+        title: "Document upload failed",
+        description: error.message,
+        variant: "destructive",
+      })
+    },
+  })
+
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: async (acceptedFiles) => {
       setIsUploading(true)
@@ -204,6 +249,32 @@ export default function AddListingPage() {
     },
     accept: {
       'image/*': ['.png', '.jpg', '.jpeg', '.gif']
+    },
+  })
+
+  const { getRootProps: getFloorPlanRootProps, getInputProps: getFloorPlanInputProps } = useDropzone({
+    onDrop: async (acceptedFiles) => {
+      setIsFloorPlanUploading(true)
+      await startFloorPlanUpload(acceptedFiles)
+    },
+    accept: {
+      'image/*': ['.png', '.jpg', '.jpeg', '.gif']
+    },
+    maxFiles: 1,
+  })
+
+  const { getRootProps: getDocumentRootProps, getInputProps: getDocumentInputProps } = useDropzone({
+    onDrop: async (acceptedFiles) => {
+      setIsDocumentUploading(true)
+      await startDocumentUpload(acceptedFiles)
+    },
+    accept: {
+      'application/pdf': ['.pdf'],
+      'text/plain': ['.txt'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'application/vnd.ms-excel': ['.xls'],
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx']
     },
   })
 
@@ -235,6 +306,8 @@ export default function AddListingPage() {
       featured: false,
       DView: "",
       images: [],
+      floorPlan: "",
+      documents: [],
     },
   })
 
@@ -290,6 +363,7 @@ export default function AddListingPage() {
         price: values.price,
         status: values.status,
         DView: values.DView,
+        FloorPlan: values.floorPlan,
         address: values.address,
         propertyTypeId: Number(values.propertyTypeId),
         listingTypeId: Number(values.listingTypeId),
@@ -307,13 +381,24 @@ export default function AddListingPage() {
           create: featureConnections
         } : undefined,
         media: {
-          create: values.images.map((url) => ({
-            mediaType: "image",
-            filePath: url,
-            fileName: url.split('/').pop() || 'unnamed',
-            isPrimary: false,
-            sortOrder: 0
-          }))
+          create: [
+            // Add images
+            ...values.images.map((url) => ({
+              mediaType: "image",
+              filePath: url,
+              fileName: url.split('/').pop() || 'unnamed',
+              isPrimary: false,
+              sortOrder: 0
+            })),
+            // Add documents
+            ...values.documents.map((url) => ({
+              mediaType: "document",
+              filePath: url,
+              fileName: url.split('/').pop() || 'document',
+              isPrimary: false,
+              sortOrder: 0
+            }))
+          ]
         }
       };
 
@@ -347,26 +432,22 @@ export default function AddListingPage() {
     }
   }
 
-  // Handle document upload
-  const handleDocumentUpload = () => {
-    setIsUploading(true)
+  // Handle document upload progress simulation for visual feedback
+  useEffect(() => {
+    if (isDocumentUploading) {
+      const interval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval)
+            return 0
+          }
+          return prev + 5
+        })
+      }, 150)
 
-    // Simulate upload progress
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          setIsUploading(false)
-
-          // Add mock document after upload completes
-          setDocuments([...documents, "Property_Deed.pdf"])
-
-          return 0
-        }
-        return prev + 10
-      })
-    }, 300)
-  }
+      return () => clearInterval(interval)
+    }
+  }, [isDocumentUploading])
 
   // Remove image
   const removeImage = (index: number) => {
@@ -377,9 +458,9 @@ export default function AddListingPage() {
 
   // Remove document
   const removeDocument = (index: number) => {
-    const newDocuments = [...documents]
+    const newDocuments = [...form.watch("documents")]
     newDocuments.splice(index, 1)
-    setDocuments(newDocuments)
+    form.setValue("documents", newDocuments)
   }
 
   return (
@@ -876,41 +957,174 @@ export default function AddListingPage() {
 
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <h3 className="text-lg font-medium">Property Documents</h3>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={handleDocumentUpload}
-                            disabled={isUploading}
-                          >
-                            <Upload className="mr-2 h-4 w-4" /> Upload Documents
-                          </Button>
+                          <h3 className="text-lg font-medium">Floor Plan</h3>
                         </div>
 
-                        {documents.length === 0 ? (
-                          <div className="flex h-40 flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50">
-                            <FileText className="mb-2 h-10 w-10 text-gray-400" />
-                            <p className="text-sm text-gray-500">No documents uploaded yet</p>
-                            <p className="text-xs text-gray-400">
-                              Upload floor plans, property deeds, or other relevant documents
-                            </p>
-                          </div>
-                        ) : (
+                        {isFloorPlanUploading && (
                           <div className="space-y-2">
-                            {documents.map((doc, index) => (
-                              <div key={index} className="flex items-center justify-between rounded-lg border p-3">
-                                <div className="flex items-center gap-3">
-                                  <FileText className="h-5 w-5 text-blue-600" />
-                                  <span>{doc}</span>
-                                </div>
-                                <Button type="button" variant="ghost" size="sm" onClick={() => removeDocument(index)}>
-                                  <Trash2 className="h-4 w-4 text-red-500" />
-                                </Button>
-                              </div>
-                            ))}
+                            <div className="h-2 w-full rounded-full bg-gray-200">
+                              <div
+                                className="h-2 rounded-full bg-blue-600"
+                                style={{ width: `${uploadProgress}%` }}
+                              ></div>
+                            </div>
+                            <p className="text-xs text-gray-500">Uploading floor plan... {uploadProgress}%</p>
                           </div>
                         )}
+
+                        {!form.watch("floorPlan") ? (
+                          <div
+                            {...getFloorPlanRootProps()}
+                            className="flex h-40 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100"
+                          >
+                            <input {...getFloorPlanInputProps()} />
+                            <Upload className="mb-2 h-8 w-8 text-gray-400" />
+                            <p className="text-sm text-gray-500">Drag & drop floor plan image here</p>
+                            <p className="text-xs text-gray-400">or click to select file</p>
+                          </div>
+                        ) : (
+                          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border">
+                            <Image
+                              src={form.watch("floorPlan")}
+                              alt="Floor plan"
+                              fill
+                              className="object-contain"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              className="absolute right-2 top-2 h-7 w-7"
+                              onClick={() => form.setValue("floorPlan", "")}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
+                        <p className="text-xs text-gray-500">
+                          Upload a floor plan image to help potential buyers understand the property layout.
+                        </p>
+                      </div>
+
+                      <Separator />
+
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-medium">Property Documents</h3>
+                          <div className="flex space-x-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => document.getElementById('selectDocumentDialog')?.showModal()}
+                            >
+                              <FileText className="mr-2 h-4 w-4" /> Select Documents
+                            </Button>
+                          </div>
+                        </div>
+
+                        {isDocumentUploading && (
+                          <div className="space-y-2">
+                            <div className="h-2 w-full rounded-full bg-gray-200">
+                              <div
+                                className="h-2 rounded-full bg-blue-600"
+                                style={{ width: `${uploadProgress}%` }}
+                              ></div>
+                            </div>
+                            <p className="text-xs text-gray-500">Uploading documents... {uploadProgress}%</p>
+                          </div>
+                        )}
+
+                        <div
+                          {...getDocumentRootProps()}
+                          className="flex h-40 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100"
+                        >
+                          <input {...getDocumentInputProps()} />
+                          <Upload className="mb-2 h-8 w-8 text-gray-400" />
+                          <p className="text-sm text-gray-500">Drag & drop documents here</p>
+                          <p className="text-xs text-gray-400">or click to select files</p>
+                          <p className="mt-2 text-xs text-gray-500">Supported formats: PDF, DOC, DOCX, XLS, XLSX, TXT</p>
+                        </div>
+
+                        {form.watch("documents").length > 0 && (
+                          <div className="space-y-2">
+                            {form.watch("documents").map((doc, index) => {
+                              const fileName = doc.split('/').pop() || 'document';
+                              return (
+                                <div key={index} className="flex items-center justify-between rounded-lg border p-3">
+                                  <div className="flex items-center gap-3">
+                                    <FileText className="h-5 w-5 text-blue-600" />
+                                    <span>{fileName}</span>
+                                  </div>
+                                  <Button type="button" variant="ghost" size="sm" onClick={() => removeDocument(index)}>
+                                    <Trash2 className="h-4 w-4 text-red-500" />
+                                  </Button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {/* Document Selection Dialog */}
+                        <dialog id="selectDocumentDialog" className="modal rounded-lg p-6 shadow-lg">
+                          <div className="w-full max-w-md">
+                            <h3 className="mb-4 text-lg font-medium">Select Documents</h3>
+                            <p className="mb-4 text-sm text-gray-500">Choose from existing documents or upload new ones.</p>
+
+                            <div className="mb-4 space-y-2">
+                              <div className="flex items-center space-x-2">
+                                <input type="checkbox" id="doc1" className="h-4 w-4" />
+                                <label htmlFor="doc1">Property_Deed.pdf</label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <input type="checkbox" id="doc2" className="h-4 w-4" />
+                                <label htmlFor="doc2">Floor_Plan_Blueprint.pdf</label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <input type="checkbox" id="doc3" className="h-4 w-4" />
+                                <label htmlFor="doc3">Tax_Certificate.pdf</label>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-end space-x-2">
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={() => document.getElementById('selectDocumentDialog')?.close()}
+                              >
+                                Cancel
+                              </Button>
+                              <Button 
+                                type="button"
+                                onClick={() => {
+                                  // Add selected documents to form
+                                  const selectedDocs = [];
+                                  if ((document.getElementById('doc1') as HTMLInputElement)?.checked) {
+                                    selectedDocs.push("https://example.com/documents/Property_Deed.pdf");
+                                  }
+                                  if ((document.getElementById('doc2') as HTMLInputElement)?.checked) {
+                                    selectedDocs.push("https://example.com/documents/Floor_Plan_Blueprint.pdf");
+                                  }
+                                  if ((document.getElementById('doc3') as HTMLInputElement)?.checked) {
+                                    selectedDocs.push("https://example.com/documents/Tax_Certificate.pdf");
+                                  }
+
+                                  if (selectedDocs.length > 0) {
+                                    form.setValue("documents", [...form.watch("documents"), ...selectedDocs]);
+                                    toast({
+                                      title: "Documents selected",
+                                      description: `${selectedDocs.length} document(s) added to your listing`,
+                                    });
+                                  }
+
+                                  document.getElementById('selectDocumentDialog')?.close();
+                                }}
+                              >
+                                Add Selected
+                              </Button>
+                            </div>
+                          </div>
+                        </dialog>
                       </div>
                     </CardContent>
                     <CardFooter className="flex justify-between">

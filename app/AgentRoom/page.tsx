@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -69,113 +69,145 @@ import {
 export default function AgentDashboard() {
     const [activeTab, setActiveTab] = useState("overview")
     const [timeRange, setTimeRange] = useState("month")
+    const [agentData, setAgentData] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+    const [monthlyPerformance, setMonthlyPerformance] = useState([])
+    const [propertyTypeData, setPropertyTypeData] = useState([])
+    const [activeListings, setActiveListings] = useState([])
+    const [listingsLoading, setListingsLoading] = useState(false)
+    const [overviewLoading, setOverviewLoading] = useState(false)
+    const [listingsPagination, setListingsPagination] = useState({
+        totalCount: 0,
+        totalPages: 1,
+        currentPage: 1,
+        limit: 10
+    })
 
-    // Sample data for the agent
-    const agentData = {
-        name: "Sarah Johnson",
-        email: "sarah.johnson@example.com",
-        phone: "+260 97 1234567",
-        avatar: "https://i.pravatar.cc/150?img=1",
-        role: "Senior Real Estate Agent",
-        rating: 4.8,
-        reviews: 24,
-        joinDate: "January 2021",
-        bio: "Experienced real estate agent specializing in luxury properties and residential sales with over 5 years of experience in the Lusaka market.",
-        specializations: ["Luxury Properties", "Residential Sales", "Investment Properties"],
-        languages: ["English", "Bemba", "Nyanja"],
-        socialMedia: {
-            facebook: "facebook.com/sarahjohnson",
-            twitter: "twitter.com/sarahjohnson",
-            linkedin: "linkedin.com/in/sarahjohnson",
-        },
-        performance: {
-            totalSales: "ZMW 4.2M",
-            totalCommission: "ZMW 210K",
-            activeListings: 12,
-            soldProperties: 8,
-            pendingDeals: 3,
-            conversionRate: 68,
-        },
-        goals: {
-            salesTarget: "ZMW 5M",
-            salesProgress: 84,
-            listingsTarget: 15,
-            listingsProgress: 80,
-            clientsTarget: 20,
-            clientsProgress: 65,
-        },
+    // Fetch agent data for the current user
+    useEffect(() => {
+        const fetchAgentData = async () => {
+            try {
+                setLoading(true)
+                const response = await fetch('/api/agent/me')
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch agent data')
+                }
+
+                const data = await response.json()
+
+                // Add additional fields that might not be in the API response
+                const enhancedData = {
+                    ...data,
+                    reviews: data.reviews || 24,
+                    specializations: data.specialization ? 
+                        data.specialization.split(',').map(s => s.trim()) : 
+                        ["Luxury Properties", "Residential Sales", "Investment Properties"],
+                    languages: ["English", "Bemba", "Nyanja"],
+                    socialMedia: {
+                        facebook: "facebook.com/agent",
+                        twitter: "twitter.com/agent",
+                        linkedin: "linkedin.com/in/agent",
+                    },
+                    role: data.specialization || "Real Estate Agent",
+                }
+
+                setAgentData(enhancedData)
+                setError(null)
+            } catch (err) {
+                console.error('Error fetching agent data:', err)
+                setError('Failed to load agent data. Please try again later.')
+                setAgentData(null)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchAgentData()
+    }, [])
+
+    // Fetch performance data for the Overview tab
+    const fetchPerformanceData = async () => {
+        try {
+            setOverviewLoading(true)
+            const response = await fetch('/api/agent/performance')
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch performance data')
+            }
+
+            const data = await response.json()
+            setMonthlyPerformance(data)
+        } catch (err) {
+            console.error('Error fetching performance data:', err)
+            // Set empty array if there's an error
+            setMonthlyPerformance([])
+        } finally {
+            setOverviewLoading(false)
+        }
     }
 
-    // Sample data for charts
-    const monthlyPerformance = [
-        { name: "Jan", sales: 450000, commission: 22500, listings: 3 },
-        { name: "Feb", sales: 320000, commission: 16000, listings: 2 },
-        { name: "Mar", sales: 580000, commission: 29000, listings: 4 },
-        { name: "Apr", sales: 620000, commission: 31000, listings: 3 },
-        { name: "May", sales: 540000, commission: 27000, listings: 3 },
-        { name: "Jun", sales: 780000, commission: 39000, listings: 5 },
-        { name: "Jul", sales: 710000, commission: 35500, listings: 4 },
-        { name: "Aug", sales: 850000, commission: 42500, listings: 5 },
-    ]
+    // Fetch property type data for the Overview tab
+    const fetchPropertyTypeData = async () => {
+        try {
+            setOverviewLoading(true)
+            const response = await fetch('/api/agent/property-types')
 
-    const propertyTypeData = [
-        { name: "Apartments", value: 40, color: "#4F46E5" },
-        { name: "Houses", value: 35, color: "#10B981" },
-        { name: "Villas", value: 15, color: "#8B5CF6" },
-        { name: "Land", value: 10, color: "#F59E0B" },
-    ]
+            if (!response.ok) {
+                throw new Error('Failed to fetch property type data')
+            }
 
-    // Sample data for listings
-    const activeListings = [
-        {
-            id: 1,
-            title: "Modern Apartment with Pool View",
-            address: "123 Skyline Ave, Lusaka",
-            price: "ZMW 450,000",
-            type: "Apartment",
-            status: "Active",
-            image:
-                "https://images.lifestyleasia.com/wp-content/uploads/sites/3/2020/09/15155131/9th-Floor-Infinity-Pool-Aman-Nai-Lert-Bangkok-Thailand-c-Aman-Nai-Lert-Bangkok-min-scaled.jpg",
-            beds: 2,
-            baths: 2,
-            sqft: 1200,
-            views: 243,
-            inquiries: 12,
-            daysListed: 14,
-        },
-        {
-            id: 2,
-            title: "Luxury Villa with Garden",
-            address: "456 Park Lane, Lusaka",
-            price: "ZMW 850,000",
-            type: "Villa",
-            status: "Active",
-            image:
-                "https://www.conradvillas.com/uploads/properties/116/koh-samui-luxury-villas-for-sale-bangpor-89875071.jpg",
-            beds: 4,
-            baths: 3,
-            sqft: 2800,
-            views: 187,
-            inquiries: 8,
-            daysListed: 21,
-        },
-        {
-            id: 3,
-            title: "Cozy Townhouse",
-            address: "789 Maple St, Lusaka",
-            price: "ZMW 5,500/mo",
-            type: "House",
-            status: "Active",
-            image:
-                "https://www.travelandleisure.com/thmb/iAIrOVW7yWrDG-yYB9IvY0nF-8w=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/new-river-gorge-national-park-preserve-west-virginia-NEWNATPARK0421-d92f896451bf4c388289ff3b908cc6c6.jpg",
-            beds: 3,
-            baths: 2.5,
-            sqft: 1800,
-            views: 156,
-            inquiries: 5,
-            daysListed: 7,
-        },
-    ]
+            const data = await response.json()
+            setPropertyTypeData(data)
+        } catch (err) {
+            console.error('Error fetching property type data:', err)
+            // Set empty array if there's an error
+            setPropertyTypeData([])
+        } finally {
+            setOverviewLoading(false)
+        }
+    }
+
+    // Fetch listings data for the Listings tab
+    const fetchListingsData = async (page = 1) => {
+        try {
+            setListingsLoading(true)
+            const response = await fetch(`/api/agent/properties?page=${page}&limit=10`)
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch listings data')
+            }
+
+            const data = await response.json()
+            setActiveListings(data.properties)
+            setListingsPagination(data.pagination)
+        } catch (err) {
+            console.error('Error fetching listings data:', err)
+            // Set empty arrays if there's an error
+            setActiveListings([])
+            setListingsPagination({
+                totalCount: 0,
+                totalPages: 0,
+                currentPage: 1,
+                limit: 10
+            })
+        } finally {
+            setListingsLoading(false)
+        }
+    }
+
+    // Fetch data when the active tab changes
+    useEffect(() => {
+        if (activeTab === "overview") {
+            fetchPerformanceData()
+            fetchPropertyTypeData()
+        } else if (activeTab === "listings") {
+            fetchListingsData()
+        }
+    }, [activeTab])
+
+    // The following are sample data for other tabs that are not yet connected to API endpoints
 
     // Sample data for clients
     const recentClients = [
@@ -313,6 +345,39 @@ export default function AgentDashboard() {
         }
     }
 
+    // Show loading state
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600 dark:text-gray-300">Loading agent data...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Show error state
+    if (error && !agentData) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 flex items-center justify-center">
+                <div className="text-center max-w-md mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                    <div className="text-red-500 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h2 className="text-xl font-bold mb-2">Error Loading Data</h2>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">{error}</p>
+                    <Button onClick={() => window.location.reload()} className="bg-indigo-600 hover:bg-indigo-700">
+                        Try Again
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
+    // If we have data, render the dashboard
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
             <div className="container mx-auto px-4 py-6 space-y-6">
@@ -326,8 +391,8 @@ export default function AgentDashboard() {
                             <div className="md:w-[260px] px-6 -mt-12 relative z-10">
                                 <div className="relative aspect-square w-24 h-24 md:w-32 md:h-32 rounded-xl overflow-hidden border-4 border-white dark:border-gray-800 shadow-lg mx-auto md:mx-0">
                                     <Image
-                                        src={agentData.avatar || "/placeholder.svg"}
-                                        alt={agentData.name}
+                                        src={agentData?.image || "/placeholder.svg"}
+                                        alt={agentData?.name || "Agent"}
                                         fill
                                         className="object-cover"
                                     />
@@ -335,22 +400,22 @@ export default function AgentDashboard() {
 
                                 <div className="mt-4 text-center md:text-left space-y-4">
                                     <div className="flex flex-col">
-                                        <h1 className="text-xl md:text-2xl font-bold">{agentData.name}</h1>
-                                        <p className="text-indigo-600 dark:text-indigo-400 font-medium">{agentData.role}</p>
+                                        <h1 className="text-xl md:text-2xl font-bold">{agentData?.name}</h1>
+                                        <p className="text-indigo-600 dark:text-indigo-400 font-medium">{agentData?.role || agentData?.specialization || "Real Estate Agent"}</p>
                                         <div className="mt-2 flex items-center justify-center md:justify-start">
                                             <div className="flex">
                                                 {[...Array(5)].map((_, i) => (
                                                     <Star
                                                         key={i}
                                                         className={`h-4 w-4 ${
-                                                            i < Math.floor(agentData.rating)
+                                                            i < Math.floor(agentData?.rating || 0)
                                                                 ? "fill-amber-400 text-amber-400"
                                                                 : "text-gray-300 dark:text-gray-600"
                                                         }`}
                                                     />
                                                 ))}
                                             </div>
-                                            <span className="ml-2 text-sm text-muted-foreground">({agentData.reviews} reviews)</span>
+                                            <span className="ml-2 text-sm text-muted-foreground">({agentData?.reviews || 0} reviews)</span>
                                         </div>
                                     </div>
 
@@ -416,7 +481,7 @@ export default function AgentDashboard() {
                                                 <div>
                                                     <p className="text-sm font-medium text-muted-foreground">Total Sales</p>
                                                     <h3 className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
-                                                        {agentData.performance.totalSales}
+                                                        {agentData?.performance?.totalSales || "ZMW 0"}
                                                     </h3>
                                                 </div>
                                                 <div className="rounded-full bg-indigo-100 dark:bg-indigo-900/30 p-2 text-indigo-600 dark:text-indigo-400">
@@ -435,7 +500,7 @@ export default function AgentDashboard() {
                                                 <div>
                                                     <p className="text-sm font-medium text-muted-foreground">Commission</p>
                                                     <h3 className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
-                                                        {agentData.performance.totalCommission}
+                                                        {agentData?.performance?.totalCommission || "ZMW 0"}
                                                     </h3>
                                                 </div>
                                                 <div className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 p-2 text-emerald-600 dark:text-emerald-400">
@@ -454,7 +519,7 @@ export default function AgentDashboard() {
                                                 <div>
                                                     <p className="text-sm font-medium text-muted-foreground">Active Listings</p>
                                                     <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                                                        {agentData.performance.activeListings}
+                                                        {agentData?.performance?.activeListings || 0}
                                                     </h3>
                                                 </div>
                                                 <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-2 text-blue-600 dark:text-blue-400">
@@ -473,7 +538,7 @@ export default function AgentDashboard() {
                                                 <div>
                                                     <p className="text-sm font-medium text-muted-foreground">Sold Properties</p>
                                                     <h3 className="text-xl font-bold text-purple-600 dark:text-purple-400">
-                                                        {agentData.performance.soldProperties}
+                                                        {agentData?.performance?.soldProperties || 0}
                                                     </h3>
                                                 </div>
                                                 <div className="rounded-full bg-purple-100 dark:bg-purple-900/30 p-2 text-purple-600 dark:text-purple-400">
@@ -492,7 +557,7 @@ export default function AgentDashboard() {
                                                 <div>
                                                     <p className="text-sm font-medium text-muted-foreground">Pending Deals</p>
                                                     <h3 className="text-xl font-bold text-amber-600 dark:text-amber-400">
-                                                        {agentData.performance.pendingDeals}
+                                                        {agentData?.performance?.pendingDeals || 0}
                                                     </h3>
                                                 </div>
                                                 <div className="rounded-full bg-amber-100 dark:bg-amber-900/30 p-2 text-amber-600 dark:text-amber-400">
@@ -511,7 +576,7 @@ export default function AgentDashboard() {
                                                 <div>
                                                     <p className="text-sm font-medium text-muted-foreground">Conversion Rate</p>
                                                     <h3 className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
-                                                        {agentData.performance.conversionRate}%
+                                                        {agentData?.performance?.conversionRate || 0}%
                                                     </h3>
                                                 </div>
                                                 <div className="rounded-full bg-indigo-100 dark:bg-indigo-900/30 p-2 text-indigo-600 dark:text-indigo-400">
@@ -536,17 +601,17 @@ export default function AgentDashboard() {
                                                     <span className="font-medium">Sales Target</span>
                                                 </div>
                                                 <span className="text-sm font-semibold">
-                          {agentData.performance.totalSales} / {agentData.goals.salesTarget}
+                          {agentData?.performance?.totalSales || "ZMW 0"} / {agentData?.goals?.salesTarget || "ZMW 0"}
                         </span>
                                             </div>
                                             <Progress
-                                                value={agentData.goals.salesProgress}
+                                                value={agentData?.goals?.salesProgress || 0}
                                                 className="h-2"
                                                 style={{ backgroundColor: "#f3f4f6" }}
                                             >
                                                 <div
                                                     className="h-full rounded-full bg-gradient-to-r from-indigo-600 to-purple-600"
-                                                    style={{ width: `${agentData.goals.salesProgress}%` }}
+                                                    style={{ width: `${agentData?.goals?.salesProgress || 0}%` }}
                                                 ></div>
                                             </Progress>
                                         </div>
@@ -557,17 +622,17 @@ export default function AgentDashboard() {
                                                     <span className="font-medium">Listings Target</span>
                                                 </div>
                                                 <span className="text-sm font-semibold">
-                          {agentData.performance.activeListings} / {agentData.goals.listingsTarget}
+                          {agentData?.performance?.activeListings || 0} / {agentData?.goals?.listingsTarget || 0}
                         </span>
                                             </div>
                                             <Progress
-                                                value={agentData.goals.listingsProgress}
+                                                value={agentData?.goals?.listingsProgress || 0}
                                                 className="h-2"
                                                 style={{ backgroundColor: "#f3f4f6" }}
                                             >
                                                 <div
                                                     className="h-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-600"
-                                                    style={{ width: `${agentData.goals.listingsProgress}%` }}
+                                                    style={{ width: `${agentData?.goals?.listingsProgress || 0}%` }}
                                                 ></div>
                                             </Progress>
                                         </div>
@@ -577,16 +642,18 @@ export default function AgentDashboard() {
                                                     <Users className="h-4 w-4 text-emerald-600" />
                                                     <span className="font-medium">Clients Target</span>
                                                 </div>
-                                                <span className="text-sm font-semibold">13 / {agentData.goals.clientsTarget}</span>
+                                                <span className="text-sm font-semibold">
+                                                    {agentData?.clientsCount || 0} / {agentData?.goals?.clientsTarget || 0}
+                                                </span>
                                             </div>
                                             <Progress
-                                                value={agentData.goals.clientsProgress}
+                                                value={agentData?.goals?.clientsProgress || 0}
                                                 className="h-2"
                                                 style={{ backgroundColor: "#f3f4f6" }}
                                             >
                                                 <div
                                                     className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-teal-600"
-                                                    style={{ width: `${agentData.goals.clientsProgress}%` }}
+                                                    style={{ width: `${agentData?.goals?.clientsProgress || 0}%` }}
                                                 ></div>
                                             </Progress>
                                         </div>
@@ -658,96 +725,102 @@ export default function AgentDashboard() {
                                     </div>
                                 </CardHeader>
                                 <CardContent className="pt-4">
-                                    <ResponsiveContainer width="100%" height={300}>
-                                        <LineChart
-                                            data={monthlyPerformance}
-                                            margin={{
-                                                top: 5,
-                                                right: 10,
-                                                left: 10,
-                                                bottom: 5,
-                                            }}
-                                        >
-                                            <defs>
-                                                <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.8} />
-                                                    <stop offset="95%" stopColor="#4F46E5" stopOpacity={0.1} />
-                                                </linearGradient>
-                                                <linearGradient id="colorCommission" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.8} />
-                                                    <stop offset="95%" stopColor="#10B981" stopOpacity={0.1} />
-                                                </linearGradient>
-                                            </defs>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-                                            <XAxis dataKey="name" tick={{ fontSize: 12 }} tickLine={false} axisLine={{ stroke: "#e0e0e0" }} />
-                                            <YAxis
-                                                yAxisId="left"
-                                                orientation="left"
-                                                tickFormatter={(value) =>
-                                                    new Intl.NumberFormat("en-US", {
-                                                        notation: "compact",
-                                                        compactDisplay: "short",
-                                                    }).format(value)
-                                                }
-                                                tick={{ fontSize: 12 }}
-                                                tickLine={false}
-                                                axisLine={{ stroke: "#e0e0e0" }}
-                                            />
-                                            <YAxis
-                                                yAxisId="right"
-                                                orientation="right"
-                                                tickFormatter={(value) =>
-                                                    new Intl.NumberFormat("en-US", {
-                                                        notation: "compact",
-                                                        compactDisplay: "short",
-                                                    }).format(value)
-                                                }
-                                                tick={{ fontSize: 12 }}
-                                                tickLine={false}
-                                                axisLine={{ stroke: "#e0e0e0" }}
-                                            />
-                                            <Tooltip
-                                                formatter={(value, name) => {
-                                                    if (name === "sales" || name === "commission") {
-                                                        return [
-                                                            new Intl.NumberFormat("en-US", {
-                                                                style: "currency",
-                                                                currency: "ZMW",
-                                                                minimumFractionDigits: 0,
-                                                            }).format(value as number),
-                                                            name === "sales" ? "Sales" : "Commission",
-                                                        ]
+                                    {overviewLoading ? (
+                                        <div className="flex items-center justify-center h-[300px]">
+                                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                                        </div>
+                                    ) : (
+                                        <ResponsiveContainer width="100%" height={300}>
+                                            <LineChart
+                                                data={monthlyPerformance}
+                                                margin={{
+                                                    top: 5,
+                                                    right: 10,
+                                                    left: 10,
+                                                    bottom: 5,
+                                                }}
+                                            >
+                                                <defs>
+                                                    <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.8} />
+                                                        <stop offset="95%" stopColor="#4F46E5" stopOpacity={0.1} />
+                                                    </linearGradient>
+                                                    <linearGradient id="colorCommission" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.8} />
+                                                        <stop offset="95%" stopColor="#10B981" stopOpacity={0.1} />
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                                                <XAxis dataKey="name" tick={{ fontSize: 12 }} tickLine={false} axisLine={{ stroke: "#e0e0e0" }} />
+                                                <YAxis
+                                                    yAxisId="left"
+                                                    orientation="left"
+                                                    tickFormatter={(value) =>
+                                                        new Intl.NumberFormat("en-US", {
+                                                            notation: "compact",
+                                                            compactDisplay: "short",
+                                                        }).format(value)
                                                     }
-                                                    return [value, name]
-                                                }}
-                                                contentStyle={{
-                                                    borderRadius: "8px",
-                                                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                                                    border: "none",
-                                                }}
-                                            />
-                                            <Legend wrapperStyle={{ paddingTop: 10 }} />
-                                            <Line
-                                                yAxisId="left"
-                                                type="monotone"
-                                                dataKey="sales"
-                                                name="Sales"
-                                                stroke="#4F46E5"
-                                                strokeWidth={3}
-                                                dot={{ r: 4, strokeWidth: 2 }}
-                                                activeDot={{ r: 6, strokeWidth: 0, fill: "#4F46E5" }}
-                                            />
-                                            <Line
-                                                yAxisId="right"
-                                                type="monotone"
-                                                dataKey="commission"
-                                                name="Commission"
-                                                stroke="#10B981"
-                                                strokeWidth={2}
-                                                dot={{ r: 4, strokeWidth: 2 }}
-                                            />
-                                        </LineChart>
-                                    </ResponsiveContainer>
+                                                    tick={{ fontSize: 12 }}
+                                                    tickLine={false}
+                                                    axisLine={{ stroke: "#e0e0e0" }}
+                                                />
+                                                <YAxis
+                                                    yAxisId="right"
+                                                    orientation="right"
+                                                    tickFormatter={(value) =>
+                                                        new Intl.NumberFormat("en-US", {
+                                                            notation: "compact",
+                                                            compactDisplay: "short",
+                                                        }).format(value)
+                                                    }
+                                                    tick={{ fontSize: 12 }}
+                                                    tickLine={false}
+                                                    axisLine={{ stroke: "#e0e0e0" }}
+                                                />
+                                                <Tooltip
+                                                    formatter={(value, name) => {
+                                                        if (name === "sales" || name === "commission") {
+                                                            return [
+                                                                new Intl.NumberFormat("en-US", {
+                                                                    style: "currency",
+                                                                    currency: "ZMW",
+                                                                    minimumFractionDigits: 0,
+                                                                }).format(value as number),
+                                                                name === "sales" ? "Sales" : "Commission",
+                                                            ]
+                                                        }
+                                                        return [value, name]
+                                                    }}
+                                                    contentStyle={{
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                                        border: "none",
+                                                    }}
+                                                />
+                                                <Legend wrapperStyle={{ paddingTop: 10 }} />
+                                                <Line
+                                                    yAxisId="left"
+                                                    type="monotone"
+                                                    dataKey="sales"
+                                                    name="Sales"
+                                                    stroke="#4F46E5"
+                                                    strokeWidth={3}
+                                                    dot={{ r: 4, strokeWidth: 2 }}
+                                                    activeDot={{ r: 6, strokeWidth: 0, fill: "#4F46E5" }}
+                                                />
+                                                <Line
+                                                    yAxisId="right"
+                                                    type="monotone"
+                                                    dataKey="commission"
+                                                    name="Commission"
+                                                    stroke="#10B981"
+                                                    strokeWidth={2}
+                                                    dot={{ r: 4, strokeWidth: 2 }}
+                                                />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    )}
                                 </CardContent>
                                 <CardFooter className="pt-0 border-t flex justify-between items-center">
                                     <div className="flex items-center gap-2">
@@ -786,32 +859,38 @@ export default function AgentDashboard() {
                                     </div>
                                 </CardHeader>
                                 <CardContent>
-                                    <ResponsiveContainer width="100%" height={300}>
-                                        <PieChart>
-                                            <Pie
-                                                data={propertyTypeData}
-                                                cx="50%"
-                                                cy="50%"
-                                                labelLine={false}
-                                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                                                outerRadius={80}
-                                                fill="#8884d8"
-                                                dataKey="value"
-                                            >
-                                                {propertyTypeData.map((entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={entry.color} />
-                                                ))}
-                                            </Pie>
-                                            <Tooltip
-                                                formatter={(value, name) => [`${value}%`, name]}
-                                                contentStyle={{
-                                                    borderRadius: "8px",
-                                                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                                                    border: "none",
-                                                }}
-                                            />
-                                        </PieChart>
-                                    </ResponsiveContainer>
+                                    {overviewLoading ? (
+                                        <div className="flex items-center justify-center h-[300px]">
+                                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                                        </div>
+                                    ) : (
+                                        <ResponsiveContainer width="100%" height={300}>
+                                            <PieChart>
+                                                <Pie
+                                                    data={propertyTypeData}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    labelLine={false}
+                                                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                    outerRadius={80}
+                                                    fill="#8884d8"
+                                                    dataKey="value"
+                                                >
+                                                    {propertyTypeData.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip
+                                                    formatter={(value, name) => [`${value}`, name]}
+                                                    contentStyle={{
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                                        border: "none",
+                                                    }}
+                                                />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    )}
                                 </CardContent>
                             </Card>
                         </div>
@@ -948,136 +1027,174 @@ export default function AgentDashboard() {
                                 </div>
                             </CardHeader>
                             <CardContent className="pt-4">
-                                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                                    {activeListings.map((listing) => (
-                                        <Card
-                                            key={listing.id}
-                                            className="overflow-hidden transition-all hover:shadow-lg group border-0 shadow-md bg-white dark:bg-gray-800"
-                                        >
-                                            <div className="relative">
-                                                <div className="aspect-video relative overflow-hidden">
-                                                    <Image
-                                                        src={listing.image || "/placeholder.svg"}
-                                                        alt={listing.title}
-                                                        fill
-                                                        className="object-cover transition-transform group-hover:scale-105 duration-500"
-                                                    />
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                                                </div>
+                                {listingsLoading ? (
+                                    <div className="flex items-center justify-center h-[300px]">
+                                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                                    </div>
+                                ) : activeListings.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-[300px] text-center">
+                                        <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-3 mb-4">
+                                            <Home className="h-6 w-6 text-gray-400" />
+                                        </div>
+                                        <h3 className="text-lg font-medium mb-2">No listings found</h3>
+                                        <p className="text-sm text-muted-foreground mb-4">You don't have any active listings yet.</p>
+                                        <Button className="bg-gradient-to-r from-indigo-600 to-indigo-500">
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            Add Your First Listing
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                        {activeListings.map((listing) => (
+                                            <Card
+                                                key={listing.id}
+                                                className="overflow-hidden transition-all hover:shadow-lg group border-0 shadow-md bg-white dark:bg-gray-800"
+                                            >
+                                                <div className="relative">
+                                                    <div className="aspect-video relative overflow-hidden">
+                                                        <Image
+                                                            src={listing.image || "/placeholder.svg"}
+                                                            alt={listing.title}
+                                                            fill
+                                                            className="object-cover transition-transform group-hover:scale-105 duration-500"
+                                                        />
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                                                    </div>
 
-                                                <div className="absolute top-3 left-3">
-                                                    <Badge className="bg-white/90 text-gray-800 hover:bg-white/100 backdrop-blur-sm">
-                                                        {listing.type}
-                                                    </Badge>
-                                                </div>
+                                                    <div className="absolute top-3 left-3">
+                                                        <Badge className="bg-white/90 text-gray-800 hover:bg-white/100 backdrop-blur-sm">
+                                                            {listing.type}
+                                                        </Badge>
+                                                    </div>
 
-                                                <div className="absolute top-3 right-3">
-                                                    <Badge
-                                                        className={`${
-                                                            listing.status === "Active"
-                                                                ? "bg-gradient-to-r from-emerald-600 to-emerald-500"
-                                                                : "bg-gradient-to-r from-amber-600 to-amber-500"
-                                                        } text-white shadow-sm`}
+                                                    <div className="absolute top-3 right-3">
+                                                        <Badge
+                                                            className={`${
+                                                                listing.status === "Active"
+                                                                    ? "bg-gradient-to-r from-emerald-600 to-emerald-500"
+                                                                    : "bg-gradient-to-r from-amber-600 to-amber-500"
+                                                            } text-white shadow-sm`}
+                                                        >
+                                                            {listing.status}
+                                                        </Badge>
+                                                    </div>
+
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="absolute bottom-3 right-3 h-8 w-8 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white"
                                                     >
-                                                        {listing.status}
-                                                    </Badge>
+                                                        <Heart className="h-4 w-4" />
+                                                    </Button>
                                                 </div>
-
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="absolute bottom-3 right-3 h-8 w-8 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white"
-                                                >
-                                                    <Heart className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                            <CardContent className="p-4">
-                                                <h3 className="font-semibold text-lg group-hover:text-indigo-600 transition-colors">
-                                                    {listing.title}
-                                                </h3>
-                                                <div className="flex items-center text-sm text-muted-foreground mt-1">
-                                                    <MapPin className="mr-1 h-3 w-3" />
-                                                    <span>{listing.address}</span>
-                                                </div>
-
-                                                <div className="mt-4 flex items-center justify-between">
-                                                    <div>
-                                                        <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{listing.price}</p>
+                                                <CardContent className="p-4">
+                                                    <h3 className="font-semibold text-lg group-hover:text-indigo-600 transition-colors">
+                                                        {listing.title}
+                                                    </h3>
+                                                    <div className="flex items-center text-sm text-muted-foreground mt-1">
+                                                        <MapPin className="mr-1 h-3 w-3" />
+                                                        <span>{listing.address}</span>
                                                     </div>
-                                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                        <div className="flex items-center">
-                                                            <Eye className="mr-1 h-3 w-3" />
-                                                            <span>{listing.views}</span>
+
+                                                    <div className="mt-4 flex items-center justify-between">
+                                                        <div>
+                                                            <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{listing.price}</p>
                                                         </div>
-                                                        <div className="flex items-center">
-                                                            <MessageSquare className="mr-1 h-3 w-3" />
-                                                            <span>{listing.inquiries}</span>
+                                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                            <div className="flex items-center">
+                                                                <Eye className="mr-1 h-3 w-3" />
+                                                                <span>{listing.views}</span>
+                                                            </div>
+                                                            <div className="flex items-center">
+                                                                <MessageSquare className="mr-1 h-3 w-3" />
+                                                                <span>{listing.inquiries}</span>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                <div className="mt-4 flex items-center gap-4 text-xs">
-                                                    <div className="flex items-center gap-1">
-                                                        <Bed className="h-3 w-3 text-gray-500" />
-                                                        <span>{listing.beds} beds</span>
+                                                    <div className="mt-4 flex items-center gap-4 text-xs">
+                                                        <div className="flex items-center gap-1">
+                                                            <Bed className="h-3 w-3 text-gray-500" />
+                                                            <span>{listing.beds} beds</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <Bath className="h-3 w-3 text-gray-500" />
+                                                            <span>{listing.baths} baths</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <Square className="h-3 w-3 text-gray-500" />
+                                                            <span>{listing.sqft} sqft</span>
+                                                        </div>
                                                     </div>
-                                                    <div className="flex items-center gap-1">
-                                                        <Bath className="h-3 w-3 text-gray-500" />
-                                                        <span>{listing.baths} baths</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-1">
-                                                        <Square className="h-3 w-3 text-gray-500" />
-                                                        <span>{listing.sqft} sqft</span>
-                                                    </div>
-                                                </div>
 
-                                                <div className="mt-4 flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4">
-                                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                                        <Clock className="h-3 w-3" />
-                                                        <span>Listed {listing.daysListed} days ago</span>
+                                                    <div className="mt-4 flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4">
+                                                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                            <Clock className="h-3 w-3" />
+                                                            <span>Listed {listing.daysListed} days ago</span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </CardContent>
-                                            <CardFooter className="p-4 pt-0 flex justify-between gap-2">
-                                                <Button variant="outline" size="sm" className="w-full border-gray-200 dark:border-gray-700">
-                                                    <Eye className="mr-1.5 h-3.5 w-3.5" /> View
-                                                </Button>
-                                                <Button variant="outline" size="sm" className="w-full border-gray-200 dark:border-gray-700">
-                                                    <Edit className="mr-1.5 h-3.5 w-3.5" /> Edit
-                                                </Button>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="outline" size="sm" className="px-2 border-gray-200 dark:border-gray-700">
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="w-[160px]">
-                                                        <DropdownMenuItem>
-                                                            <Share2 className="mr-2 h-4 w-4" /> Share
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem>
-                                                            <Download className="mr-2 h-4 w-4" /> Download
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuSeparator />
-                                                        <DropdownMenuItem className="text-red-600 focus:text-red-600">
-                                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </CardFooter>
-                                        </Card>
-                                    ))}
-                                </div>
+                                                </CardContent>
+                                                <CardFooter className="p-4 pt-0 flex justify-between gap-2">
+                                                    <Button variant="outline" size="sm" className="w-full border-gray-200 dark:border-gray-700">
+                                                        <Eye className="mr-1.5 h-3.5 w-3.5" /> View
+                                                    </Button>
+                                                    <Button variant="outline" size="sm" className="w-full border-gray-200 dark:border-gray-700">
+                                                        <Edit className="mr-1.5 h-3.5 w-3.5" /> Edit
+                                                    </Button>
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="outline" size="sm" className="px-2 border-gray-200 dark:border-gray-700">
+                                                                <MoreHorizontal className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end" className="w-[160px]">
+                                                            <DropdownMenuItem>
+                                                                <Share2 className="mr-2 h-4 w-4" /> Share
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem>
+                                                                <Download className="mr-2 h-4 w-4" /> Download
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem className="text-red-600 focus:text-red-600">
+                                                                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </CardFooter>
+                                            </Card>
+                                        ))}
+                                    </div>
+                                )}
                             </CardContent>
-                            <CardFooter className="border-t pt-4 flex justify-between">
+                            <CardFooter className="border-t pt-4 flex flex-col sm:flex-row justify-between gap-4">
                                 <div className="text-sm text-muted-foreground">
                                     Showing <span className="font-medium">{activeListings.length}</span> of{" "}
-                                    <span className="font-medium">{agentData.performance.activeListings}</span> listings
+                                    <span className="font-medium">{listingsPagination.totalCount}</span> listings
                                 </div>
-                                <Button variant="outline" size="sm">
-                                    View All Listings
-                                    <ChevronRight className="ml-2 h-4 w-4" />
-                                </Button>
+                                {listingsPagination.totalPages > 1 && (
+                                    <div className="flex items-center gap-2">
+                                        <Button 
+                                            variant="outline" 
+                                            size="sm" 
+                                            disabled={listingsPagination.currentPage === 1 || listingsLoading}
+                                            onClick={() => fetchListingsData(listingsPagination.currentPage - 1)}
+                                        >
+                                            Previous
+                                        </Button>
+                                        <div className="text-sm">
+                                            Page <span className="font-medium">{listingsPagination.currentPage}</span> of{" "}
+                                            <span className="font-medium">{listingsPagination.totalPages}</span>
+                                        </div>
+                                        <Button 
+                                            variant="outline" 
+                                            size="sm"
+                                            disabled={listingsPagination.currentPage === listingsPagination.totalPages || listingsLoading}
+                                            onClick={() => fetchListingsData(listingsPagination.currentPage + 1)}
+                                        >
+                                            Next
+                                        </Button>
+                                    </div>
+                                )}
                             </CardFooter>
                         </Card>
 

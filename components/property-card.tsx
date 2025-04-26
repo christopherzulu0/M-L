@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Building2, Heart, Share2, BedSingle, Bath, Ruler } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 interface PropertyCardProps {
   image: string
@@ -15,9 +16,10 @@ interface PropertyCardProps {
     baths?: number
     sqft?: number
   }
+  propertyId?: number | string
 }
 
-export function PropertyCard({ image, title, address, price, period, type, badges, features }: PropertyCardProps) {
+export function PropertyCard({ image, title, address, price, period, type, badges, features, propertyId }: PropertyCardProps) {
   return (
     <div className="group relative overflow-hidden rounded-xl border bg-card hover-card hover-lift">
       <div className="relative aspect-[4/3]">
@@ -92,9 +94,17 @@ export function PropertyCard({ image, title, address, price, period, type, badge
             <span className="text-lg font-bold text-blue-600">{price}</span>
             {period && <span className="text-sm text-muted-foreground">/{period}</span>}
           </div>
-          <Button variant="outline" size="sm" className="shadow-sm transition-all hover:bg-blue-50 hover:text-blue-600">
-            View Details
-          </Button>
+          {propertyId ? (
+            <Link href={`/listing-single/${propertyId}`}>
+              <Button variant="outline" size="sm" className="shadow-sm transition-all hover:bg-blue-50 hover:text-blue-600">
+                View Details
+              </Button>
+            </Link>
+          ) : (
+            <Button variant="outline" size="sm" className="shadow-sm transition-all hover:bg-blue-50 hover:text-blue-600">
+              View Details
+            </Button>
+          )}
         </div>
       </div>
     </div>

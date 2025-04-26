@@ -103,6 +103,7 @@ model Property {
   title          String    @db.VarChar(255)
   description    String?
   DView          String?
+  FloorPlan      String?
   propertyTypeId Int       @map("property_type_id")
   listingTypeId  Int       @map("listing_type_id")
   price          Decimal   @db.Decimal(15, 2)

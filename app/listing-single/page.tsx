@@ -169,6 +169,7 @@ export default function ListingSingle({ params }: { params: { id: string } }) {
             {[1, 2, 3].map((item) => (
               <PropertyCard
                 key={item}
+                propertyId={item}
                 image="/placeholder.svg"
                 title="Cozy Studio Apartment"
                 address="456 Elm St, New York, NY 10002"

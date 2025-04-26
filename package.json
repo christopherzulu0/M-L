@@ -15,6 +15,8 @@
     "@clerk/nextjs": "^6.18.0",
     "@emotion/is-prop-valid": "latest",
     "@hookform/resolvers": "^3.9.1",
+    "@tanstack/react-query": "^5.28.0",
+    "@tanstack/react-query-devtools": "^5.28.0",
     "@mdx-js/loader": "latest",
     "@mdx-js/react": "latest",
     "@next/mdx": "latest",

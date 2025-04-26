@@ -1,4 +1,8 @@
+"use client";
+
 import Image from "next/image"
+import Link from "next/link"
+import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -6,6 +10,7 @@ import { StarRating } from "@/components/star-rating"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
+import { useAgent } from "@/hooks/useAgent"
 import {
   Phone,
   Mail,
@@ -35,16 +40,45 @@ import {
   Square,
 } from "lucide-react"
 
-type Props = {
-  params: { id: string }
-  searchParams: { [key: string]: string | string[] | undefined }
-}
+export default function AgentSingle() {
+  // Get the ID parameter from the URL
+  const params = useParams();
+  const id = params.id as string;
 
-export default async function AgentSingle(props: Props) {
-  const { id } = props.params
+  // Fetch agent data using React Query
+  const { data: agent, isLoading, isError, error } = useAgent(id);
 
-  // Fetch agent data here based on id
-  // For now we'll just return the UI
+  // Handle loading state
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 pt-6 pb-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center items-center h-96">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+            <p className="ml-4 text-lg text-muted-foreground">Loading agent data...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // Handle error state
+  if (isError) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 pt-6 pb-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center items-center h-96 flex-col">
+            <div className="text-red-500 text-xl mb-4">Error loading agent data</div>
+            <p className="text-muted-foreground">{error instanceof Error ? error.message : 'Unknown error'}</p>
+            <Button className="mt-4" onClick={() => window.location.reload()}>
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
       <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 pt-6 pb-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -58,7 +92,7 @@ export default async function AgentSingle(props: Props) {
               Agents
             </a>
             <ChevronRight className="h-4 w-4 mx-2" />
-            <span className="text-foreground font-medium">Andy Sposty</span>
+            <span className="text-foreground font-medium">{agent.name}</span>
           </div>
 
           {/* Agent Header */}
@@ -73,8 +107,8 @@ export default async function AgentSingle(props: Props) {
                 <div className="md:w-[260px] px-8 -mt-16 relative z-10">
                   <div className="relative aspect-square w-full rounded-xl overflow-hidden border-4 border-white dark:border-gray-800 shadow-lg">
                     <Image
-                        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/agents-kw5QiaoD5tLQ5ImzVbAFMWwolWxIF7.png"
-                        alt="Andy Sposty"
+                        src={agent.image}
+                        alt={agent.name}
                         fill
                         className="object-cover"
                     />
@@ -87,11 +121,11 @@ export default async function AgentSingle(props: Props) {
 
                   <div className="mt-4 space-y-4">
                     <div className="flex flex-col">
-                      <h1 className="text-2xl font-bold">Andy Sposty</h1>
-                      <p className="text-indigo-600 dark:text-indigo-400 font-medium">Mavers RealEstate Agency</p>
+                      <h1 className="text-2xl font-bold">{agent.name}</h1>
+                      <p className="text-indigo-600 dark:text-indigo-400 font-medium">{agent.agency}</p>
                       <div className="mt-2 flex items-center">
-                        <StarRating rating={4} label="Good" />
-                        <span className="ml-2 text-sm text-muted-foreground">(24 reviews)</span>
+                        <StarRating rating={agent.rating} label={agent.ratingLabel} />
+                        <span className="ml-2 text-sm text-muted-foreground">({agent.totalListings} listings)</span>
                       </div>
                     </div>
 
@@ -124,19 +158,19 @@ export default async function AgentSingle(props: Props) {
                         <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
                           <Phone className="h-4 w-4" />
                         </div>
-                        <span>+7(123)987654</span>
+                        <span>{agent.phone}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                           <Mail className="h-4 w-4" />
                         </div>
-                        <span className="text-sm">MaversRealEstate@domain.com</span>
+                        <span className="text-sm">{agent.email}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                           <MapPin className="h-4 w-4" />
                         </div>
-                        <span>70 Bright St New York, USA</span>
+                        <span>{agent.address}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
@@ -183,25 +217,25 @@ export default async function AgentSingle(props: Props) {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
                       <CardContent className="p-4 text-center">
-                        <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">156</div>
+                        <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{agent.rating.toFixed(1)}</div>
                         <div className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                           <Eye className="h-3 w-3" />
-                          Profile Views
+                          Rating
                         </div>
                       </CardContent>
                     </Card>
                     <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
                       <CardContent className="p-4 text-center">
-                        <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">24</div>
+                        <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{agent.totalSales}</div>
                         <div className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                           <MessageSquare className="h-3 w-3" />
-                          Reviews
+                          Total Sales
                         </div>
                       </CardContent>
                     </Card>
                     <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
                       <CardContent className="p-4 text-center">
-                        <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">16</div>
+                        <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{agent.totalListings}</div>
                         <div className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                           <Home className="h-3 w-3" />
                           Active Listings
@@ -210,10 +244,10 @@ export default async function AgentSingle(props: Props) {
                     </Card>
                     <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
                       <CardContent className="p-4 text-center">
-                        <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">98%</div>
+                        <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">K{agent.totalRevenue.toLocaleString()}</div>
                         <div className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                           <CheckCircle className="h-3 w-3" />
-                          Success Rate
+                          Total Revenue
                         </div>
                       </CardContent>
                     </Card>
@@ -247,36 +281,22 @@ export default async function AgentSingle(props: Props) {
                           <div>
                             <h3 className="text-lg font-semibold mb-3">About This Agent</h3>
                             <p className="text-muted-foreground mb-4 leading-relaxed">
-                              Vivamus vel lacus lacinia, condimentum nunc non, iaculis diam. Proin in mollis augue, eget
-                              fermentum quam. Donec semper purus ut ante tempus gravida. Quisque et ante orci. Sed
-                              venenatis turpis mi, non varius justo scelerisque id.
-                            </p>
-                            <p className="text-muted-foreground leading-relaxed">
-                              Placerat in egestas erat imperdiet sed euismod. Erat pellentesque adipiscing commodo elit at
-                              imperdiet dui accumsan sit. Quam viverra orci sagittis eu volutpat odio facilisis.
+                              {agent.bio}
                             </p>
                           </div>
 
                           <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
                             <h3 className="text-lg font-semibold mb-3">Specializations</h3>
                             <div className="grid grid-cols-2 gap-4">
-                              <div className="flex items-center gap-2">
-                                <CheckCircle className="h-4 w-4 text-emerald-500" />
-                                <span>Luxury Properties</span>
+                                <div className="flex items-center gap-2">
+                                  <CheckCircle className="h-4 w-4 text-emerald-500" />
+                                  <span>{agent.specialization}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <CheckCircle className="h-4 w-4 text-emerald-500" />
+                                  <span>License: {agent.licenseNumber}</span>
+                                </div>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <CheckCircle className="h-4 w-4 text-emerald-500" />
-                                <span>Commercial Real Estate</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <CheckCircle className="h-4 w-4 text-emerald-500" />
-                                <span>Residential Sales</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <CheckCircle className="h-4 w-4 text-emerald-500" />
-                                <span>Investment Properties</span>
-                              </div>
-                            </div>
                           </div>
 
                           <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
@@ -333,15 +353,23 @@ export default async function AgentSingle(props: Props) {
 
                     <TabsContent value="listings" className="mt-0">
                       <div className="grid gap-6">
-                        {[1, 2, 3].map((item) => (
-                            <Card key={item} className="border-0 shadow-md overflow-hidden">
+                        {agent.properties && agent.properties.length > 0 ? (
+                          agent.properties.map((property) => (
+                            <Card key={property.id} className="border-0 shadow-md overflow-hidden">
                               <CardContent className="p-0">
                                 <div className="flex flex-col sm:flex-row">
                                   <div className="relative sm:w-[240px] h-[200px] sm:h-auto">
-                                    <Image src="/placeholder.jpg" alt="Property" fill className="object-cover" />
+                                    <Image 
+                                      src={property.image || "https://digiestateorg.wordpress.com/wp-content/uploads/2023/11/ask-us-1024x583-1.jpg"} 
+                                      alt={property.title} 
+                                      fill 
+                                      className="object-cover" 
+                                    />
                                     <div className="absolute top-2 left-2 flex gap-2">
-                                      <Badge className="bg-blue-600">Sale</Badge>
-                                      <Badge className="bg-indigo-600">Featured</Badge>
+                                      <Badge className="bg-blue-600">{property.listingType}</Badge>
+                                      {property.propertyType && (
+                                        <Badge className="bg-indigo-600">{property.propertyType}</Badge>
+                                      )}
                                     </div>
                                     <Button
                                         variant="ghost"
@@ -354,46 +382,53 @@ export default async function AgentSingle(props: Props) {
                                   <div className="p-5 flex-1">
                                     <div className="flex justify-between">
                                       <div>
-                                        <h3 className="text-lg font-semibold">Luxury Family Home</h3>
+                                        <h3 className="text-lg font-semibold">{property.title}</h3>
                                         <div className="flex items-center text-sm text-muted-foreground mt-1">
                                           <MapPin className="mr-1 h-3 w-3" />
-                                          <span>40 Journal Square, NJ, USA</span>
+                                          <span>{property.address}</span>
                                         </div>
                                       </div>
                                       <div>
-                                        <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">$320,000</p>
+                                        <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">K{property.price.toLocaleString()}</p>
                                       </div>
                                     </div>
 
                                     <div className="flex gap-6 mt-4">
                                       <div className="flex items-center gap-1">
                                         <Bed className="h-4 w-4 text-muted-foreground" />
-                                        <span>4 Beds</span>
+                                        <span>{property.bedrooms} Beds</span>
                                       </div>
                                       <div className="flex items-center gap-1">
                                         <Bath className="h-4 w-4 text-muted-foreground" />
-                                        <span>2 Baths</span>
+                                        <span>{property.bathrooms} Baths</span>
                                       </div>
                                       <div className="flex items-center gap-1">
                                         <Square className="h-4 w-4 text-muted-foreground" />
-                                        <span>460 sqft</span>
+                                        <span>{property.squareFeet} sqft</span>
                                       </div>
                                     </div>
 
                                     <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
                                         <Clock className="h-3 w-3" />
-                                        <span>Listed 2 weeks ago</span>
+                                        <span>Listed {new Date(property.createdAt).toLocaleDateString()}</span>
                                       </div>
-                                      <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700">
-                                        View Details
-                                      </Button>
+                                      <Link href={`/listing-single/${property.id}`}>
+                                        <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700">
+                                          View Details
+                                        </Button>
+                                      </Link>
                                     </div>
                                   </div>
                                 </div>
                               </CardContent>
                             </Card>
-                        ))}
+                          ))
+                        ) : (
+                          <div className="text-center py-10">
+                            <p className="text-muted-foreground">No properties listed by this agent yet.</p>
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex justify-center mt-6">

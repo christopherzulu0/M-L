@@ -39,11 +39,46 @@ export const ourFileRouter = {
     }),
 
   //Location image picture
-  // Agent profile picture uploader
   LocationImageUploader: f({
     image: {
       maxFileSize: "4MB",
       maxFileCount: 1,
+    },
+  })
+      .middleware(async () => {
+        return { userId: "user" };
+      })
+      .onUploadComplete(async ({ metadata, file }) => {
+        return { url: file.url };
+      }),
+
+  //FloorPlan
+  FloorPlanUploader: f({
+    image: {
+      maxFileSize: "4MB",
+      maxFileCount: 1,
+    },
+  })
+      .middleware(async () => {
+        return { userId: "user" };
+      })
+      .onUploadComplete(async ({ metadata, file }) => {
+        return { url: file.url };
+      }),
+
+  //Document Uploader
+  DocumentUploader: f({
+    pdf: {
+      maxFileSize: "16MB",
+      maxFileCount: 5,
+    },
+    text: {
+      maxFileSize: "16MB",
+      maxFileCount: 5,
+    },
+    image: {
+      maxFileSize: "16MB",
+      maxFileCount: 5,
     },
   })
       .middleware(async () => {

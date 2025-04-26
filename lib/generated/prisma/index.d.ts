@@ -8768,6 +8768,7 @@ export namespace Prisma {
     title: string | null
     description: string | null
     DView: string | null
+    FloorPlan: string | null
     propertyTypeId: number | null
     listingTypeId: number | null
     price: Decimal | null
@@ -8798,6 +8799,7 @@ export namespace Prisma {
     title: string | null
     description: string | null
     DView: string | null
+    FloorPlan: string | null
     propertyTypeId: number | null
     listingTypeId: number | null
     price: Decimal | null
@@ -8828,6 +8830,7 @@ export namespace Prisma {
     title: number
     description: number
     DView: number
+    FloorPlan: number
     propertyTypeId: number
     listingTypeId: number
     price: number
@@ -8898,6 +8901,7 @@ export namespace Prisma {
     title?: true
     description?: true
     DView?: true
+    FloorPlan?: true
     propertyTypeId?: true
     listingTypeId?: true
     price?: true
@@ -8928,6 +8932,7 @@ export namespace Prisma {
     title?: true
     description?: true
     DView?: true
+    FloorPlan?: true
     propertyTypeId?: true
     listingTypeId?: true
     price?: true
@@ -8958,6 +8963,7 @@ export namespace Prisma {
     title?: true
     description?: true
     DView?: true
+    FloorPlan?: true
     propertyTypeId?: true
     listingTypeId?: true
     price?: true
@@ -9075,6 +9081,7 @@ export namespace Prisma {
     title: string
     description: string | null
     DView: string | null
+    FloorPlan: string | null
     propertyTypeId: number
     listingTypeId: number
     price: Decimal
@@ -9124,6 +9131,7 @@ export namespace Prisma {
     title?: boolean
     description?: boolean
     DView?: boolean
+    FloorPlan?: boolean
     propertyTypeId?: boolean
     listingTypeId?: boolean
     price?: boolean
@@ -9165,6 +9173,7 @@ export namespace Prisma {
     title?: boolean
     description?: boolean
     DView?: boolean
+    FloorPlan?: boolean
     propertyTypeId?: boolean
     listingTypeId?: boolean
     price?: boolean
@@ -9200,6 +9209,7 @@ export namespace Prisma {
     title?: boolean
     description?: boolean
     DView?: boolean
+    FloorPlan?: boolean
     propertyTypeId?: boolean
     listingTypeId?: boolean
     price?: boolean
@@ -9235,6 +9245,7 @@ export namespace Prisma {
     title?: boolean
     description?: boolean
     DView?: boolean
+    FloorPlan?: boolean
     propertyTypeId?: boolean
     listingTypeId?: boolean
     price?: boolean
@@ -9260,7 +9271,7 @@ export namespace Prisma {
     soldRentedAt?: boolean
   }
 
-  export type PropertyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "DView" | "propertyTypeId" | "listingTypeId" | "price" | "priceType" | "address" | "locationId" | "latitude" | "longitude" | "bedrooms" | "bathrooms" | "squareFeet" | "lotSize" | "yearBuilt" | "parkingSpaces" | "status" | "featured" | "agentId" | "ownerId" | "views" | "createdAt" | "updatedAt" | "publishedAt" | "soldRentedAt", ExtArgs["result"]["property"]>
+  export type PropertyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "DView" | "FloorPlan" | "propertyTypeId" | "listingTypeId" | "price" | "priceType" | "address" | "locationId" | "latitude" | "longitude" | "bedrooms" | "bathrooms" | "squareFeet" | "lotSize" | "yearBuilt" | "parkingSpaces" | "status" | "featured" | "agentId" | "ownerId" | "views" | "createdAt" | "updatedAt" | "publishedAt" | "soldRentedAt", ExtArgs["result"]["property"]>
   export type PropertyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     propertyType?: boolean | PropertyTypeDefaultArgs<ExtArgs>
     listingType?: boolean | ListingTypeDefaultArgs<ExtArgs>
@@ -9308,6 +9319,7 @@ export namespace Prisma {
       title: string
       description: string | null
       DView: string | null
+      FloorPlan: string | null
       propertyTypeId: number
       listingTypeId: number
       price: Prisma.Decimal
@@ -9768,6 +9780,7 @@ export namespace Prisma {
     readonly title: FieldRef<"Property", 'String'>
     readonly description: FieldRef<"Property", 'String'>
     readonly DView: FieldRef<"Property", 'String'>
+    readonly FloorPlan: FieldRef<"Property", 'String'>
     readonly propertyTypeId: FieldRef<"Property", 'Int'>
     readonly listingTypeId: FieldRef<"Property", 'Int'>
     readonly price: FieldRef<"Property", 'Decimal'>
@@ -23160,6 +23173,7 @@ export namespace Prisma {
     title: 'title',
     description: 'description',
     DView: 'DView',
+    FloorPlan: 'FloorPlan',
     propertyTypeId: 'propertyTypeId',
     listingTypeId: 'listingTypeId',
     price: 'price',
@@ -23902,6 +23916,7 @@ export namespace Prisma {
     title?: StringFilter<"Property"> | string
     description?: StringNullableFilter<"Property"> | string | null
     DView?: StringNullableFilter<"Property"> | string | null
+    FloorPlan?: StringNullableFilter<"Property"> | string | null
     propertyTypeId?: IntFilter<"Property"> | number
     listingTypeId?: IntFilter<"Property"> | number
     price?: DecimalFilter<"Property"> | Decimal | DecimalJsLike | number | string
@@ -23942,6 +23957,7 @@ export namespace Prisma {
     title?: SortOrder
     description?: SortOrderInput | SortOrder
     DView?: SortOrderInput | SortOrder
+    FloorPlan?: SortOrderInput | SortOrder
     propertyTypeId?: SortOrder
     listingTypeId?: SortOrder
     price?: SortOrder
@@ -23985,6 +24001,7 @@ export namespace Prisma {
     title?: StringFilter<"Property"> | string
     description?: StringNullableFilter<"Property"> | string | null
     DView?: StringNullableFilter<"Property"> | string | null
+    FloorPlan?: StringNullableFilter<"Property"> | string | null
     propertyTypeId?: IntFilter<"Property"> | number
     listingTypeId?: IntFilter<"Property"> | number
     price?: DecimalFilter<"Property"> | Decimal | DecimalJsLike | number | string
@@ -24025,6 +24042,7 @@ export namespace Prisma {
     title?: SortOrder
     description?: SortOrderInput | SortOrder
     DView?: SortOrderInput | SortOrder
+    FloorPlan?: SortOrderInput | SortOrder
     propertyTypeId?: SortOrder
     listingTypeId?: SortOrder
     price?: SortOrder
@@ -24063,6 +24081,7 @@ export namespace Prisma {
     title?: StringWithAggregatesFilter<"Property"> | string
     description?: StringNullableWithAggregatesFilter<"Property"> | string | null
     DView?: StringNullableWithAggregatesFilter<"Property"> | string | null
+    FloorPlan?: StringNullableWithAggregatesFilter<"Property"> | string | null
     propertyTypeId?: IntWithAggregatesFilter<"Property"> | number
     listingTypeId?: IntWithAggregatesFilter<"Property"> | number
     price?: DecimalWithAggregatesFilter<"Property"> | Decimal | DecimalJsLike | number | string
@@ -25423,6 +25442,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     price: Decimal | DecimalJsLike | number | string
     priceType?: string
     address: string
@@ -25458,6 +25478,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     propertyTypeId: number
     listingTypeId: number
     price: Decimal | DecimalJsLike | number | string
@@ -25492,6 +25513,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -25527,6 +25549,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     propertyTypeId?: IntFieldUpdateOperationsInput | number
     listingTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -25562,6 +25585,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     propertyTypeId: number
     listingTypeId: number
     price: Decimal | DecimalJsLike | number | string
@@ -25591,6 +25615,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -25616,6 +25641,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     propertyTypeId?: IntFieldUpdateOperationsInput | number
     listingTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -27113,6 +27139,7 @@ export namespace Prisma {
     title?: SortOrder
     description?: SortOrder
     DView?: SortOrder
+    FloorPlan?: SortOrder
     propertyTypeId?: SortOrder
     listingTypeId?: SortOrder
     price?: SortOrder
@@ -27162,6 +27189,7 @@ export namespace Prisma {
     title?: SortOrder
     description?: SortOrder
     DView?: SortOrder
+    FloorPlan?: SortOrder
     propertyTypeId?: SortOrder
     listingTypeId?: SortOrder
     price?: SortOrder
@@ -27192,6 +27220,7 @@ export namespace Prisma {
     title?: SortOrder
     description?: SortOrder
     DView?: SortOrder
+    FloorPlan?: SortOrder
     propertyTypeId?: SortOrder
     listingTypeId?: SortOrder
     price?: SortOrder
@@ -29178,6 +29207,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     price: Decimal | DecimalJsLike | number | string
     priceType?: string
     address: string
@@ -29212,6 +29242,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     propertyTypeId: number
     listingTypeId: number
     price: Decimal | DecimalJsLike | number | string
@@ -29426,6 +29457,7 @@ export namespace Prisma {
     title?: StringFilter<"Property"> | string
     description?: StringNullableFilter<"Property"> | string | null
     DView?: StringNullableFilter<"Property"> | string | null
+    FloorPlan?: StringNullableFilter<"Property"> | string | null
     propertyTypeId?: IntFilter<"Property"> | number
     listingTypeId?: IntFilter<"Property"> | number
     price?: DecimalFilter<"Property"> | Decimal | DecimalJsLike | number | string
@@ -29596,6 +29628,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     price: Decimal | DecimalJsLike | number | string
     priceType?: string
     address: string
@@ -29630,6 +29663,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     propertyTypeId: number
     listingTypeId: number
     price: Decimal | DecimalJsLike | number | string
@@ -29932,6 +29966,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     price: Decimal | DecimalJsLike | number | string
     priceType?: string
     address: string
@@ -29966,6 +30001,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     listingTypeId: number
     price: Decimal | DecimalJsLike | number | string
     priceType?: string
@@ -30025,6 +30061,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     price: Decimal | DecimalJsLike | number | string
     priceType?: string
     address: string
@@ -30059,6 +30096,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     propertyTypeId: number
     price: Decimal | DecimalJsLike | number | string
     priceType?: string
@@ -30118,6 +30156,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     price: Decimal | DecimalJsLike | number | string
     priceType?: string
     address: string
@@ -30152,6 +30191,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     propertyTypeId: number
     listingTypeId: number
     price: Decimal | DecimalJsLike | number | string
@@ -30882,6 +30922,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     price: Decimal | DecimalJsLike | number | string
     priceType?: string
     address: string
@@ -30916,6 +30957,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     propertyTypeId: number
     listingTypeId: number
     price: Decimal | DecimalJsLike | number | string
@@ -30985,6 +31027,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -31019,6 +31062,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     propertyTypeId?: IntFieldUpdateOperationsInput | number
     listingTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -31078,6 +31122,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     price: Decimal | DecimalJsLike | number | string
     priceType?: string
     address: string
@@ -31112,6 +31157,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     propertyTypeId: number
     listingTypeId: number
     price: Decimal | DecimalJsLike | number | string
@@ -31161,6 +31207,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -31195,6 +31242,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     propertyTypeId?: IntFieldUpdateOperationsInput | number
     listingTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -31228,6 +31276,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     price: Decimal | DecimalJsLike | number | string
     priceType?: string
     address: string
@@ -31262,6 +31311,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     propertyTypeId: number
     listingTypeId: number
     price: Decimal | DecimalJsLike | number | string
@@ -31355,6 +31405,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -31389,6 +31440,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     propertyTypeId?: IntFieldUpdateOperationsInput | number
     listingTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -31472,6 +31524,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     price: Decimal | DecimalJsLike | number | string
     priceType?: string
     address: string
@@ -31506,6 +31559,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     propertyTypeId: number
     listingTypeId: number
     price: Decimal | DecimalJsLike | number | string
@@ -31643,6 +31697,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -31677,6 +31732,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     propertyTypeId?: IntFieldUpdateOperationsInput | number
     listingTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -31904,6 +31960,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     price: Decimal | DecimalJsLike | number | string
     priceType?: string
     address: string
@@ -31938,6 +31995,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     propertyTypeId: number
     listingTypeId: number
     price: Decimal | DecimalJsLike | number | string
@@ -31987,6 +32045,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -32021,6 +32080,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     propertyTypeId?: IntFieldUpdateOperationsInput | number
     listingTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -32243,6 +32303,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     propertyTypeId: number
     listingTypeId: number
     price: Decimal | DecimalJsLike | number | string
@@ -32308,6 +32369,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -32342,6 +32404,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     propertyTypeId?: IntFieldUpdateOperationsInput | number
     listingTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -32376,6 +32439,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     propertyTypeId?: IntFieldUpdateOperationsInput | number
     listingTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -32513,6 +32577,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     propertyTypeId: number
     listingTypeId: number
     price: Decimal | DecimalJsLike | number | string
@@ -32582,6 +32647,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -32616,6 +32682,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     propertyTypeId?: IntFieldUpdateOperationsInput | number
     listingTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -32650,6 +32717,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     propertyTypeId?: IntFieldUpdateOperationsInput | number
     listingTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -32799,6 +32867,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     listingTypeId: number
     price: Decimal | DecimalJsLike | number | string
     priceType?: string
@@ -32827,6 +32896,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -32861,6 +32931,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     listingTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
@@ -32895,6 +32966,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     listingTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
@@ -32924,6 +32996,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     propertyTypeId: number
     price: Decimal | DecimalJsLike | number | string
     priceType?: string
@@ -32952,6 +33025,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -32986,6 +33060,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     propertyTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
@@ -33020,6 +33095,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     propertyTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
@@ -33049,6 +33125,7 @@ export namespace Prisma {
     title: string
     description?: string | null
     DView?: string | null
+    FloorPlan?: string | null
     propertyTypeId: number
     listingTypeId: number
     price: Decimal | DecimalJsLike | number | string
@@ -33077,6 +33154,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     priceType?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
@@ -33111,6 +33189,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     propertyTypeId?: IntFieldUpdateOperationsInput | number
     listingTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -33145,6 +33224,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     DView?: NullableStringFieldUpdateOperationsInput | string | null
+    FloorPlan?: NullableStringFieldUpdateOperationsInput | string | null
     propertyTypeId?: IntFieldUpdateOperationsInput | number
     listingTypeId?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string

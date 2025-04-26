@@ -6,8 +6,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id: paramId } = await params;
     const media = await prisma.propertyMedia.findMany({
-      where: { propertyId: params.id },
+      where: { propertyId: paramId },
       orderBy: { order: 'asc' }
     })
 
@@ -25,6 +26,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id: paramId } = await params;
     const body = await request.json()
     const { url, type, order = 0, caption } = body
 
@@ -34,7 +36,7 @@ export async function POST(
         type,
         order,
         caption,
-        property: { connect: { id: params.id } }
+        property: { connect: { id: paramId } }
       }
     })
 
@@ -52,6 +54,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id: paramId } = await params;
     const body = await request.json()
     const updates = body.map((item: any) => 
       prisma.propertyMedia.update({
@@ -61,7 +64,7 @@ export async function PUT(
     )
 
     await prisma.$transaction(updates)
-    
+
     return new NextResponse(null, { status: 204 })
   } catch (error) {
     return NextResponse.json(
@@ -76,6 +79,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id: paramId } = await params;
     const { searchParams } = new URL(request.url)
     const mediaId = searchParams.get('mediaId')
 

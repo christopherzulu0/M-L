@@ -7,6 +7,8 @@ const isPublicRoute = createRouteMatcher([
     "/sign-up(.*)",
     "/api/uploadthing(.*)",
     "/api/dashboard(.*)",
+    "/api/agent/[id](.*)"
+    // Note: /api/agent/me is NOT public and requires authentication
 ]);
 
 // Define routes that should be ignored
