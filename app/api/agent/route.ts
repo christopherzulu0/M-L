@@ -1,7 +1,48 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@/lib/generated/prisma";
+import prisma from "@/lib/prisma";
 
-const prisma = new PrismaClient();
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+
+    // Create a user first
+    const user = await prisma.user.create({
+      data: {
+        email: body.email || `agent${Date.now()}@example.com`,
+        firstName: body.firstName || 'John',
+        lastName: body.lastName || 'Doe',
+        phone: body.phone || '+260123456789',
+        role: 'agent',
+        profileImage: body.profileImage || 'https://i.pravatar.cc/150?img=1',
+        // Create the associated agent
+        agent: {
+          create: {
+            bio: body.bio || 'Experienced real estate agent',
+            specialization: body.specialization || 'Residential',
+            licenseNumber: body.licenseNumber || `LIC-${Date.now()}`,
+            commissionRate: 5.0,
+            rating: 4.5,
+            status: 'active'
+          }
+        }
+      },
+      include: {
+        agent: true
+      }
+    });
+
+    return NextResponse.json({
+      message: 'Agent created successfully',
+      user: user
+    }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating agent:', error);
+    return NextResponse.json(
+      { error: 'Failed to create agent' },
+      { status: 500 }
+    );
+  }
+}
 
 export async function GET() {
   try {

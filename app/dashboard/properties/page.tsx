@@ -72,8 +72,15 @@ export default function PropertiesPage() {
         }
 
         const propertiesData = await propertiesResponse.json()
-        setProperties(propertiesData.properties)
-        setTotalPages(propertiesData.pagination.pages)
+        // Check if the response is an array (direct properties) or an object with pagination
+        if (Array.isArray(propertiesData)) {
+          setProperties(propertiesData)
+          setTotalPages(1) // Default to 1 page if no pagination info
+        } else {
+          // Handle case where response includes pagination info
+          setProperties(propertiesData.properties || [])
+          setTotalPages(propertiesData.pagination?.pages || 1)
+        }
 
         // Fetch stats
         const statsResponse = await fetch("/api/properties/stats")
@@ -160,25 +167,25 @@ export default function PropertiesPage() {
               [
                 {
                   title: "Total Properties",
-                  value: stats.overview.totalProperties.toString(),
+                  value: stats.overview?.totalProperties?.toString() || "0",
                   icon: <Home className="h-5 w-5" />,
                   color: "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400",
                 },
                 {
                   title: "For Sale",
-                  value: stats.distributions.status.find((s: any) => s.status === "For Sale")?._count.toString() || "0",
+                  value: stats.distributions?.status?.find((s: any) => s.status === "For Sale")?._count?.toString() || "0",
                   icon: <Tag className="h-5 w-5" />,
                   color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400",
                 },
                 {
                   title: "For Rent",
-                  value: stats.distributions.status.find((s: any) => s.status === "For Rent")?._count.toString() || "0",
+                  value: stats.distributions?.status?.find((s: any) => s.status === "For Rent")?._count?.toString() || "0",
                   icon: <Building className="h-5 w-5" />,
                   color: "bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400",
                 },
                 {
                   title: "Average Price",
-                  value: `K ${Math.round(stats.overview.averagePrice).toLocaleString()}`,
+                  value: `K ${Math.round(stats.overview?.averagePrice || 0).toLocaleString()}`,
                   icon: <DollarSign className="h-5 w-5" />,
                   color: "bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400",
                 },
@@ -377,7 +384,7 @@ export default function PropertiesPage() {
                 <p className="text-sm text-red-500">Error: {error}</p>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  Showing <span className="font-medium">{properties.length}</span> of <span className="font-medium">{stats.overview.totalProperties}</span> properties
+                  Showing <span className="font-medium">{properties.length}</span> of <span className="font-medium">{stats.overview?.totalProperties || 0}</span> properties
                 </p>
               )}
               <div className="flex gap-2">

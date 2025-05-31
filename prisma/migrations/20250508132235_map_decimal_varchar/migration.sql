@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "properties" ALTER COLUMN "latitude" SET DATA TYPE VARCHAR(255),
+ALTER COLUMN "longitude" SET DATA TYPE VARCHAR(255);

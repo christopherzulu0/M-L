@@ -1,214 +1,99 @@
-import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
+import { NextRequest, NextResponse } from 'next/server'
+import { PrismaClient } from '@/lib/generated/prisma'
+import { auth } from '@clerk/nextjs/server'
 
-export async function GET(request: Request) {
+const prisma = new PrismaClient()
+
+// GET /api/properties - Get properties with optional filtering
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
+    // Authentication is optional for this endpoint
+    const { userId } = await auth()
 
-    // Pagination
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
-    const skip = (page - 1) * limit
-
-    // Filtering
-    const minPrice = parseFloat(searchParams.get('minPrice') || '0')
-    const maxPrice = parseFloat(searchParams.get('maxPrice') || '999999999')
-    const propertyType = searchParams.get('propertyType')
-    const location = searchParams.get('location')
+    // Get query parameters
+    const searchParams = request.nextUrl.searchParams
     const status = searchParams.get('status')
-    const agentId = searchParams.get('agentId')
-
-    // Sorting
-    const sortBy = searchParams.get('sortBy') || 'createdAt'
-    const sortOrder = searchParams.get('sortOrder') || 'desc'
+    const propertyTypeId = searchParams.get('propertyTypeId')
+    const listingTypeId = searchParams.get('listingTypeId')
+    const locationId = searchParams.get('locationId')
+    const minPrice = searchParams.get('minPrice')
+    const maxPrice = searchParams.get('maxPrice')
+    const limit = searchParams.get('limit')
 
     // Build where clause
-    const where: any = {
-      price: {
-        gte: minPrice,
-        lte: maxPrice
+    const where: any = {}
+
+    if (status) {
+      where.status = status
+    }
+
+    if (propertyTypeId) {
+      where.propertyTypeId = parseInt(propertyTypeId)
+    }
+
+    if (listingTypeId) {
+      where.listingTypeId = parseInt(listingTypeId)
+    }
+
+    if (locationId) {
+      where.locationId = parseInt(locationId)
+    }
+
+    if (minPrice) {
+      where.price = {
+        ...where.price,
+        gte: parseFloat(minPrice)
       }
     }
 
-    if (propertyType) where.propertyTypeId = parseInt(propertyType)
-    if (location) where.locationId = parseInt(location)
-    if (status) where.status = status
-    if (agentId) where.agentId = parseInt(agentId)
-
-    // Execute query
-    const [properties, total] = await Promise.all([
-      prisma.property.findMany({
-        skip,
-        take: limit,
-        where,
-        orderBy: {
-          [sortBy]: sortOrder
-        },
-        include: {
-          propertyType: true,
-          listingType: true,
-          location: true,
-          agent: {
-            include: {
-              user: {
-                select: {
-                  firstName: true,
-                  lastName: true,
-                  email: true,
-                  phone: true,
-                  profileImage: true
-                }
-              }
-            }
-          },
-          features: {
-            include: {
-              feature: true
-            }
-          },
-          media: true
-        }
-      }),
-      prisma.property.count({ where })
-    ])
-
-    return NextResponse.json({
-      properties,
-      pagination: {
-        total,
-        pages: Math.ceil(total / limit),
-        current: page
-      }
-    })
-  } catch (error) {
-    return NextResponse.json({ error: 'Error fetching properties' }, { status: 500 })
-  }
-}
-
-export async function POST(request: Request) {
-  try {
-    const body = await request.json()
-    const {
-      title,
-      description,
-      price,
-      status,
-      propertyTypeId,
-      listingTypeId,
-      locationId,
-      agentId,
-      features,
-      media,
-      DView,
-      address,
-      latitude,
-      longitude,
-      bedrooms,
-      bathrooms,
-      squareFeet,
-      lotSize,
-      yearBuilt,
-      parkingSpaces,
-      FloorPlan
-    } = body
-
-    console.log('Received request body:', body)
-
-    // Validate required fields
-    if (!title || !propertyTypeId || !listingTypeId || !locationId || !address) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
-    }
-
-    // Check if agent exists if agentId is provided
-    if (agentId) {
-      const existingAgent = await prisma.agent.findUnique({
-        where: { id: Number(agentId) }
-      });
-
-      if (!existingAgent) {
-        return NextResponse.json(
-          { error: 'Selected agent does not exist' },
-          { status: 400 }
-        );
+    if (maxPrice) {
+      where.price = {
+        ...where.price,
+        lte: parseFloat(maxPrice)
       }
     }
 
-    const property = await prisma.property.create({
-      data: {
-        title,
-        description,
-        price: typeof price === 'string' ? parseFloat(price) : price,
-        status,
-        DView,
-        address,
-        latitude,
-        longitude,
-        bedrooms,
-        bathrooms,
-        squareFeet,
-        lotSize,
-        yearBuilt,
-        parkingSpaces,
-        FloorPlan,
-        propertyType: {
-          connect: {
-            id: Number(propertyTypeId)
+    // Query properties
+    const properties = await prisma.property.findMany({
+      where,
+      include: {
+        listingType: {
+          select: {
+            id: true,
+            name: true
           }
         },
-        listingType: {
-          connect: {
-            id: Number(listingTypeId)
+        propertyType: {
+          select: {
+            id: true,
+            name: true
           }
         },
         location: {
-          connect: {
-            id: Number(locationId)
+          select: {
+            id: true,
+            name: true,
+            city: true,
+            country: true
           }
         },
-        agent: agentId ? {
-          connect: {
-            id: Number(agentId)
+        media: {
+          select: {
+            id: true,
+            filePath: true,
+            isPrimary: true
           }
-        } : undefined,
-        features: features?.create?.length ? {
-          create: features.create
-        } : undefined,
-        media: media
+        }
       },
-      include: {
-        propertyType: true,
-        listingType: true,
-        location: true,
-        agent: {
-          include: {
-            user: {
-              select: {
-                firstName: true,
-                lastName: true,
-                email: true,
-                phone: true
-              }
-            }
-          }
-        },
-        features: {
-          include: {
-            feature: true
-          }
-        },
-        media: true
-      }
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: limit ? parseInt(limit) : undefined
     })
 
-    return NextResponse.json(property, { status: 201 })
+    return NextResponse.json({ properties })
   } catch (error) {
-    console.error('Property creation error:', error)
-    return NextResponse.json(
-      { error: 'Error creating property' },
-      { status: 500 }
-    )
+    console.error('Error fetching properties:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

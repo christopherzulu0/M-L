@@ -26,29 +26,45 @@ export default function FeaturedLocations() {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/locations')
-        
+        // Add a timeout to the fetch request
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+        const response = await fetch('/api/locations', {
+          signal: controller.signal,
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        });
+
+        clearTimeout(timeoutId);
+
         if (!response.ok) {
-          throw new Error('Failed to fetch locations')
+          throw new Error(`Failed to fetch locations: ${response.status} ${response.statusText}`);
         }
-        
-        const data = await response.json()
+
+        const data = await response.json();
         // Filter to only featured locations and sort by order
         const featuredLocations = data
           .filter((location: Location) => location.featured)
-          .sort((a: Location, b: Location) => a.order - b.order)
-        
-        setLocations(featuredLocations)
-        setLoading(false)
-      } catch (error) {
-        console.error('Error fetching locations:', error)
-        setError('Failed to load locations')
-        setLoading(false)
-      }
-    }
+          .sort((a: Location, b: Location) => a.order - b.order);
 
-    fetchLocations()
-  }, [])
+        setLocations(featuredLocations);
+        setLoading(false);
+      } catch (error: any) {
+        console.error('Error fetching locations:', error);
+        // Provide more specific error message based on the error
+        if (error.name === 'AbortError') {
+          setError('Request timed out. Please try again.');
+        } else {
+          setError(error.message || 'Failed to load locations');
+        }
+        setLoading(false);
+      }
+    };
+
+    fetchLocations();
+  }, []);
 
   if (error) {
     return (

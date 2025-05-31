@@ -1,45 +1,48 @@
 "use client"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { useAgentPerformance } from "@/hooks/useAgentPerformance"
 
-const data = [
-    {
-        name: "Sarah J.",
-        properties: 24,
-        sales: 4.2,
-        rating: 4.8,
-    },
-    {
-        name: "Michael C.",
-        properties: 18,
-        sales: 3.1,
-        rating: 4.5,
-    },
-    {
-        name: "Emily R.",
-        properties: 12,
-        sales: 2.8,
-        rating: 4.7,
-    },
-    {
-        name: "David M.",
-        properties: 9,
-        sales: 1.5,
-        rating: 4.2,
-    },
-    {
-        name: "Grace B.",
-        properties: 15,
-        sales: 2.3,
-        rating: 4.6,
-    },
-]
+interface AgentsAnalyticsProps {
+    timePeriod: string;
+}
 
-export default function AgentsAnalytics() {
+export default function AgentsAnalytics({ timePeriod }: AgentsAnalyticsProps) {
+    // Fetch agent performance data using the custom hook
+    const { 
+        data: performanceData, 
+        isLoading, 
+        error 
+    } = useAgentPerformance(timePeriod)
+
+    // Handle loading state
+    if (isLoading) {
+        return (
+            <div className="h-[400px] w-full flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+                    <p className="text-muted-foreground">Loading performance data...</p>
+                </div>
+            </div>
+        )
+    }
+
+    // Handle error state
+    if (error) {
+        return (
+            <div className="h-[400px] w-full flex items-center justify-center">
+                <div className="text-center text-red-600 dark:text-red-400">
+                    <p className="font-medium">Error loading performance data</p>
+                    <p className="text-sm mt-1">{error.message}</p>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="h-[400px] w-full">
             <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                    data={data}
+                    data={performanceData}
                     margin={{
                         top: 20,
                         right: 30,

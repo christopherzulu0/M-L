@@ -40,7 +40,7 @@ export default function BuyersGuidePage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
+    <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
       <h1 className="text-5xl font-bold mb-12 text-center text-gray-800">Buyer's Guide</h1>
       <div className="mb-8">
         <div className="flex items-center bg-white shadow-md rounded-lg p-4">

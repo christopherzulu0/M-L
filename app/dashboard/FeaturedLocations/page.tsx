@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -50,106 +50,84 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-// Using the same data structure as in FeaturedLocations.tsx
-const featuredLocations = [
-    {
-        id: 1,
-        name: "Kitwe",
-        count: 305,
-        image:
-            "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8d2hpdGUlMjBob3VzZXxlbnwwfHwwfHw%3D&w=1000&q=80",
-        featured: true,
-        description: "A vibrant city with a rich mining history and diverse property market.",
-        region: "Copperbelt",
-        dateAdded: "2023-01-15",
-        growth: "+12%",
-        avgPrice: "ZMW 450,000",
-    },
-    {
-        id: 2,
-        name: "Lusaka",
-        count: 258,
-        image:
-            "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fGhvdXNlfGVufDB8fDB8fA%3D%3D&w=1000&q=80",
-        featured: true,
-        description: "The capital city with modern developments and premium real estate options.",
-        region: "Central",
-        dateAdded: "2023-01-10",
-        growth: "+8%",
-        avgPrice: "ZMW 850,000",
-    },
-    {
-        id: 3,
-        name: "Ndola",
-        count: 196,
-        image:
-            "https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8aG91c2V8ZW58MHx8MHx8&w=1000&q=80",
-        featured: true,
-        description: "A commercial hub with growing residential neighborhoods and investment opportunities.",
-        region: "Copperbelt",
-        dateAdded: "2023-02-05",
-        growth: "+15%",
-        avgPrice: "ZMW 420,000",
-    },
-    {
-        id: 4,
-        name: "Livingstone",
-        count: 152,
-        image:
-            "https://images.unsplash.com/photo-1598228723793-52759bba239c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTd8fGhvdXNlfGVufDB8fDB8fA%3D%3D&w=1000&q=80",
-        featured: true,
-        description: "Tourist destination with unique properties near Victoria Falls and the Zambezi River.",
-        region: "Southern",
-        dateAdded: "2023-02-20",
-        growth: "+5%",
-        avgPrice: "ZMW 650,000",
-    },
-    {
-        id: 5,
-        name: "Kabwe",
-        count: 87,
-        image:
-            "https://images.unsplash.com/photo-1576941089067-2de3c901e126?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTV8fGhvdXNlfGVufDB8fDB8fA%3D%3D&w=1000&q=80",
-        featured: false,
-        description: "Historical mining town with affordable housing options.",
-        region: "Central",
-        dateAdded: "2023-03-12",
-        growth: "+3%",
-        avgPrice: "ZMW 320,000",
-    },
-    {
-        id: 6,
-        name: "Chingola",
-        count: 65,
-        image:
-            "https://images.unsplash.com/photo-1575517111839-3a3843ee7f5d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjB8fGhvdXNlfGVufDB8fDB8fA%3D%3D&w=1000&q=80",
-        featured: false,
-        description: "Mining community with a range of residential properties.",
-        region: "Copperbelt",
-        dateAdded: "2023-03-25",
-        growth: "+2%",
-        avgPrice: "ZMW 280,000",
-    },
-]
+interface Location {
+    id: number
+    name: string
+    region: string
+    description: string
+    featured: boolean
+    image: string
+    count: number
+    createdAt: string
+    growth: string
+    avgPrice: string
+}
 
-const regionStats = [
-    { name: "Copperbelt", count: 566, growth: "+10%", avgPrice: "ZMW 380,000" },
-    { name: "Central", count: 345, growth: "+7%", avgPrice: "ZMW 620,000" },
-    { name: "Southern", count: 152, growth: "+5%", avgPrice: "ZMW 650,000" },
-    { name: "Lusaka", count: 258, growth: "+8%", avgPrice: "ZMW 850,000" },
-]
+interface RegionStat {
+    name: string
+    count: number
+    growth: string
+    avgPrice: string
+}
 
 export default function LocationsPage() {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
     const [searchQuery, setSearchQuery] = useState("")
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     const [showDeleteDialog, setShowDeleteDialog] = useState(false)
     const [locationToDelete, setLocationToDelete] = useState<number | null>(null)
-    const [sortBy, setSortBy] = useState<"name" | "count" | "dateAdded">("name")
+    const [sortBy, setSortBy] = useState<"name" | "count" | "createdAt">("name")
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
     const [activeTab, setActiveTab] = useState("all")
+    const [locations, setLocations] = useState<Location[]>([])
+    const [regionStats, setRegionStats] = useState<RegionStat[]>([])
+    const [error, setError] = useState<string | null>(null)
 
-    const handleSort = (field: "name" | "count" | "dateAdded") => {
+    useEffect(() => {
+        fetchLocations()
+        fetchRegionStats()
+    }, [searchQuery, sortBy, sortOrder, activeTab])
+
+    const fetchLocations = async () => {
+        try {
+            setIsLoading(true)
+            setError(null)
+            const params = new URLSearchParams({
+                search: searchQuery,
+                sortBy,
+                sortOrder,
+                featured: activeTab === "featured" ? "true" : activeTab === "standard" ? "false" : ""
+            })
+            const response = await fetch(`/api/featured-locations?${params}`)
+            if (!response.ok) {
+                throw new Error('Failed to fetch locations')
+            }
+            const data = await response.json()
+            setLocations(data)
+        } catch (error) {
+            console.error("Error fetching locations:", error)
+            setError("Failed to load locations. Please try again later.")
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const fetchRegionStats = async () => {
+        try {
+            setError(null)
+            const response = await fetch("/api/featured-locations/region-stats")
+            if (!response.ok) {
+                throw new Error('Failed to fetch region stats')
+            }
+            const data = await response.json()
+            setRegionStats(data)
+        } catch (error) {
+            console.error("Error fetching region stats:", error)
+            setError("Failed to load region statistics. Please try again later.")
+        }
+    }
+
+    const handleSort = (field: "name" | "count" | "createdAt") => {
         if (sortBy === field) {
             setSortOrder(sortOrder === "asc" ? "desc" : "asc")
         } else {
@@ -158,43 +136,29 @@ export default function LocationsPage() {
         }
     }
 
-    const sortedLocations = [...featuredLocations].sort((a, b) => {
-        if (sortBy === "name") {
-            return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
-        } else if (sortBy === "count") {
-            return sortOrder === "asc" ? a.count - b.count : b.count - a.count
-        } else {
-            return sortOrder === "asc"
-                ? new Date(a.dateAdded).getTime() - new Date(b.dateAdded).getTime()
-                : new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime()
-        }
-    })
-
-    const filteredLocations = sortedLocations.filter((location) => {
-        if (activeTab === "featured" && !location.featured) return false
-        if (activeTab === "standard" && location.featured) return false
-
-        return (
-            location.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            location.region.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            location.description.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-    })
-
     const handleDeleteClick = (id: number) => {
         setLocationToDelete(id)
         setShowDeleteDialog(true)
     }
 
-    const handleDeleteConfirm = () => {
-        setIsLoading(true)
-        // Simulate API call
-        setTimeout(() => {
-            console.log(`Deleting location ${locationToDelete}`)
+    const handleDeleteConfirm = async () => {
+        try {
+            setIsLoading(true)
+            setError(null)
+            const response = await fetch(`/api/featured-locations/${locationToDelete}`, {
+                method: "DELETE"
+            })
+            if (!response.ok) {
+                throw new Error('Failed to delete location')
+            }
+            await fetchLocations()
+        } catch (error) {
+            console.error("Error deleting location:", error)
+            setError("Failed to delete location. Please try again later.")
+        } finally {
             setIsLoading(false)
             setShowDeleteDialog(false)
-            // In a real app, you would remove the item from the array
-        }, 1000)
+        }
     }
 
     const getStatusBadgeStyles = (featured: boolean) => {
@@ -219,6 +183,20 @@ export default function LocationsPage() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
             <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
+                {/* Error message */}
+                {error && (
+                    <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800/30 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
+                        {error}
+                    </div>
+                )}
+
+                {/* Loading state */}
+                {isLoading && (
+                    <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+                    </div>
+                )}
+
                 {/* Page Header */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
@@ -231,7 +209,7 @@ export default function LocationsPage() {
                         className="shrink-0 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white shadow-md hover:shadow-lg transition-all"
                         asChild
                     >
-                        <Link href="/dashboard/locations/add">
+                        <Link href="/dashboard/FeaturedLocations/add">
                             <Plus className="mr-2 h-4 w-4" /> Add Location
                         </Link>
                     </Button>
@@ -316,16 +294,13 @@ export default function LocationsPage() {
                                         <DropdownMenuItem onClick={() => handleSort("count")}>
                                             <span>Property Count {sortBy === "count" && (sortOrder === "asc" ? "↑" : "↓")}</span>
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => handleSort("dateAdded")}>
-                                            <span>Date Added {sortBy === "dateAdded" && (sortOrder === "asc" ? "↑" : "↓")}</span>
+                                        <DropdownMenuItem onClick={() => handleSort("createdAt")}>
+                                            <span>Date Added {sortBy === "createdAt" && (sortOrder === "asc" ? "↑" : "↓")}</span>
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
 
-                                <Button variant="outline" size="sm" className="border-gray-200 dark:border-gray-700">
-                                    <Download className="mr-2 h-4 w-4" />
-                                    Export
-                                </Button>
+
                             </div>
                         </div>
 
@@ -355,7 +330,7 @@ export default function LocationsPage() {
 
                             <div className="flex items-center gap-3 mt-4 sm:mt-0">
                                 <div className="text-sm text-muted-foreground mr-2 hidden sm:block">
-                                    {filteredLocations.length} location{filteredLocations.length !== 1 ? "s" : ""}
+                                    {locations.length} location{locations.length !== 1 ? "s" : ""}
                                 </div>
                                 <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-1 flex items-center">
                                     <Button
@@ -382,7 +357,7 @@ export default function LocationsPage() {
                     </CardContent>
                 </Card>
 
-                {filteredLocations.length === 0 ? (
+                {locations.length === 0 ? (
                     <Card className="border-0 shadow-md bg-white dark:bg-gray-800">
                         <CardContent className="flex flex-col items-center justify-center py-12">
                             <div className="rounded-full bg-gray-100 dark:bg-gray-900 p-3 mb-4">
@@ -410,7 +385,7 @@ export default function LocationsPage() {
                     </Card>
                 ) : viewMode === "grid" ? (
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        {filteredLocations.map((location) => (
+                        {locations.map((location) => (
                             <Card
                                 key={location.id}
                                 className="overflow-hidden transition-all hover:shadow-lg group border-0 shadow-md bg-white dark:bg-gray-800"
@@ -462,7 +437,7 @@ export default function LocationsPage() {
                                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                                         <div className="flex items-center">
                                             <Calendar className="mr-1 h-3 w-3" />
-                                            Added {new Date(location.dateAdded).toLocaleDateString()}
+                                            Added {location.createdAt ? new Date(location.createdAt).toLocaleDateString() : "N/A"}
                                         </div>
                                         <div className="flex items-center">
                                             <Clock className="mr-1 h-3 w-3" />
@@ -472,12 +447,12 @@ export default function LocationsPage() {
                                 </CardContent>
                                 <CardFooter className="p-4 pt-0 flex justify-between gap-2 border-t border-gray-100 dark:border-gray-700 mt-3">
                                     <Button variant="outline" size="sm" className="w-full border-gray-200 dark:border-gray-700" asChild>
-                                        <Link href={`/dashboard/locations/${location.id}`}>
+                                        <Link href={`/dashboard/FeaturedLocations/${location.id}`}>
                                             <Eye className="mr-1.5 h-3.5 w-3.5" /> View
                                         </Link>
                                     </Button>
                                     <Button variant="outline" size="sm" className="w-full border-gray-200 dark:border-gray-700" asChild>
-                                        <Link href={`/dashboard/locations/edit/${location.id}`}>
+                                        <Link href={`/dashboard/FeaturedLocations/edit/${location.id}`}>
                                             <Edit className="mr-1.5 h-3.5 w-3.5" /> Edit
                                         </Link>
                                     </Button>
@@ -489,7 +464,7 @@ export default function LocationsPage() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end" className="w-[160px]">
                                             <DropdownMenuItem asChild>
-                                                <Link href={`/dashboard/locations/${location.id}`} className="cursor-pointer">
+                                                <Link href={`/dashboard/FeaturedLocations/${location.id}`} className="cursor-pointer">
                                                     <Map className="mr-2 h-4 w-4" /> View Map
                                                 </Link>
                                             </DropdownMenuItem>
@@ -531,12 +506,13 @@ export default function LocationsPage() {
                                             </TableHead>
                                             <TableHead className="w-[100px]">Status</TableHead>
                                             <TableHead className="w-[100px]">Growth</TableHead>
+                                            <TableHead className="w-[120px]">Average Price</TableHead>
                                             <TableHead className="w-[120px]">
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
                                                     className="-ml-3 h-8 data-[state=open]:bg-accent"
-                                                    onClick={() => handleSort("dateAdded")}
+                                                    onClick={() => handleSort("createdAt")}
                                                 >
                                                     Date Added
                                                     <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
@@ -546,7 +522,7 @@ export default function LocationsPage() {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {filteredLocations.map((location) => (
+                                        {locations.map((location) => (
                                             <TableRow key={location.id} className="group">
                                                 <TableCell>
                                                     <div className="flex items-center gap-3">
@@ -592,14 +568,19 @@ export default function LocationsPage() {
                                                         {location.growth}
                                                     </div>
                                                 </TableCell>
-                                                <TableCell>{new Date(location.dateAdded).toLocaleDateString()}</TableCell>
+                                                <TableCell>
+                                                    <div className="font-medium text-indigo-600 dark:text-indigo-400">
+                                                        {location.avgPrice}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>{location.createdAt ? new Date(location.createdAt).toLocaleDateString() : "N/A"}</TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex justify-end">
                                                         <TooltipProvider>
                                                             <Tooltip>
                                                                 <TooltipTrigger asChild>
                                                                     <Button variant="ghost" size="icon" asChild className="h-8 w-8">
-                                                                        <Link href={`/dashboard/locations/${location.id}`}>
+                                                                        <Link href={`/dashboard/FeaturedLocations/${location.id}`}>
                                                                             <Eye className="h-4 w-4" />
                                                                             <span className="sr-only">View</span>
                                                                         </Link>
@@ -615,7 +596,7 @@ export default function LocationsPage() {
                                                             <Tooltip>
                                                                 <TooltipTrigger asChild>
                                                                     <Button variant="ghost" size="icon" asChild className="h-8 w-8">
-                                                                        <Link href={`/dashboard/locations/edit/${location.id}`}>
+                                                                        <Link href={`/dashboard/FeaturedLocations/edit/${location.id}`}>
                                                                             <Edit className="h-4 w-4" />
                                                                             <span className="sr-only">Edit</span>
                                                                         </Link>
@@ -645,7 +626,7 @@ export default function LocationsPage() {
                                                             </TooltipProvider>
                                                             <DropdownMenuContent align="end">
                                                                 <DropdownMenuItem asChild>
-                                                                    <Link href={`/dashboard/locations/${location.id}`} className="cursor-pointer">
+                                                                    <Link href={`/dashboard/FeaturedLocations/${location.id}`} className="cursor-pointer">
                                                                         <Map className="mr-2 h-4 w-4" /> View Map
                                                                     </Link>
                                                                 </DropdownMenuItem>

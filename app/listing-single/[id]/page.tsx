@@ -13,6 +13,7 @@ import { Bed, Bath, Square, MapPin, Phone, Mail, Share2, Heart, Printer } from "
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import dynamic from "next/dynamic"
+import {SiteHeader} from "@/components/site-header";
 
 const MapWithNoSSR = dynamic(() => import("@/components/map"), { ssr: false })
 
@@ -30,6 +31,8 @@ interface Property {
   parkingSpaces: number | null
   FloorPlan: string | null
   DView: string | null
+  latitude: string | null
+  longitude: string | null
   listingType: {
     id?: number
     name: string
@@ -78,6 +81,7 @@ export default function ListingSingle({ params }: { params: { id: string } }) {
   const [images, setImages] = useState<string[]>([])
   const [similarProperties, setSimilarProperties] = useState<Property[]>([])
   const [isSimilarLoading, setIsSimilarLoading] = useState(true)
+  const [showDirections, setShowDirections] = useState(false)
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -144,6 +148,13 @@ export default function ListingSingle({ params }: { params: { id: string } }) {
 
         const data = await response.json()
 
+        // Check if data has properties array
+        if (!data.properties || !Array.isArray(data.properties)) {
+          console.error("Expected properties array in response but got:", data)
+          setSimilarProperties([])
+          return
+        }
+
         // Filter out the current property
         const filtered = data.properties.filter((p: Property) => p.id !== property.id)
 
@@ -161,354 +172,386 @@ export default function ListingSingle({ params }: { params: { id: string } }) {
   }, [property])
 
   return (
-    <main className="bg-gray-50">
-      {isLoading ? (
-        // Loading state
-        <section className="relative py-20">
-          <PatternBackground />
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="animate-pulse">
-              <div className="h-10 w-3/4 bg-gray-200 rounded mb-4"></div>
-              <div className="h-6 w-1/2 bg-gray-200 rounded mb-8"></div>
-              <div className="grid gap-8 md:grid-cols-3">
-                <div className="md:col-span-2">
-                  <div className="aspect-video bg-gray-200 rounded-lg"></div>
-                </div>
-                <div>
-                  <div className="h-64 bg-gray-200 rounded-lg"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      ) : property ? (
-        // Property found
-        <>
-          <section className="relative py-20">
-            <PatternBackground />
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="mb-8">
-                <h1 className="text-4xl font-bold mb-2">{property.title}</h1>
-                <p className="text-xl text-muted-foreground flex items-center">
-                  <MapPin className="w-5 h-5 mr-2" /> {property.address}
-                </p>
-              </div>
-              <div className="grid gap-8 md:grid-cols-3">
-                <div className="md:col-span-2 space-y-4">
-                  <div className="relative aspect-video rounded-lg overflow-hidden">
-                    <Image src={activeImage || "/placeholder.svg"} alt="Property Image" fill className="object-cover" />
-                  </div>
-                  <div className="flex gap-4 overflow-x-auto pb-2">
-                    {images.map((img, index) => (
-                      <Image
-                        key={index}
-                        src={img || "/placeholder.svg"}
-                        alt={`Property Image ${index + 1}`}
-                        width={100}
-                        height={75}
-                        className="rounded-md cursor-pointer hover:opacity-75 transition-opacity"
-                        onClick={() => setActiveImage(img)}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="bg-white rounded-lg p-6 shadow-md">
-                    <h2 className="text-3xl font-bold mb-4">
-                      ZMW {property.price.toLocaleString()}
-                      {property.listingType.name === "For Rent" ? " / month" : ""}
-                    </h2>
-                    <div className="flex justify-between mb-4">
-                      {property.bedrooms !== null && (
-                        <div className="flex items-center">
-                          <Bed className="w-5 h-5 mr-2" />
-                          <span>{property.bedrooms} {property.bedrooms === 1 ? 'Bedroom' : 'Bedrooms'}</span>
-                        </div>
-                      )}
-                      {property.bathrooms !== null && (
-                        <div className="flex items-center">
-                          <Bath className="w-5 h-5 mr-2" />
-                          <span>{property.bathrooms} {property.bathrooms === 1 ? 'Bathroom' : 'Bathrooms'}</span>
-                        </div>
-                      )}
-                      {property.squareFeet !== null && (
-                        <div className="flex items-center">
-                          <Square className="w-5 h-5 mr-2" />
-                          <span>{property.squareFeet.toLocaleString()} sqft</span>
-                        </div>
-                      )}
-                    </div>
-                    <Button className="w-full mb-4">Schedule a Tour</Button>
-                    <div className="flex justify-between">
-                      <Button variant="outline" className="flex-1 mr-2">
-                        <Phone className="w-4 h-4 mr-2" /> Call
-                      </Button>
-                      <Button variant="outline" className="flex-1 ml-2">
-                        <Mail className="w-4 h-4 mr-2" /> Email
-                      </Button>
+      <>
+        {/*<SiteHeader/>*/}
+        <main className="bg-gray-50 pt-24">
+          {isLoading ? (
+              // Loading state
+              <section className="relative py-20">
+                <PatternBackground />
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                  <div className="animate-pulse">
+                    <div className="h-10 w-3/4 bg-gray-200 rounded mb-4"></div>
+                    <div className="h-6 w-1/2 bg-gray-200 rounded mb-8"></div>
+                    <div className="grid gap-8 md:grid-cols-3">
+                      <div className="md:col-span-2">
+                        <div className="aspect-video bg-gray-200 rounded-lg"></div>
+                      </div>
+                      <div>
+                        <div className="h-64 bg-gray-200 rounded-lg"></div>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex justify-between">
-                    <Button variant="ghost">
-                      <Share2 className="w-4 h-4 mr-2" /> Share
-                    </Button>
-                    <Button variant="ghost">
-                      <Heart className="w-4 h-4 mr-2" /> Save
-                    </Button>
-                    <Button variant="ghost">
-                      <Printer className="w-4 h-4 mr-2" /> Print
-                    </Button>
-                  </div>
                 </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Property Details */}
-          <section className="py-20">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <Tabs defaultValue="details" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="details">Details</TabsTrigger>
-                  <TabsTrigger value="floorplan">Floor Plan</TabsTrigger>
-                  <TabsTrigger value="map">Map</TabsTrigger>
-                  <TabsTrigger value="3d-view">3D View</TabsTrigger>
-                </TabsList>
-                <TabsContent value="details">
-                  <Card>
-                    <CardContent className="pt-6">
-                      <div className="grid gap-8 md:grid-cols-3">
-                        <div className="md:col-span-2">
-                          <h2 className="text-2xl font-bold mb-4">Property Details</h2>
-                          <p className="mb-4">
-                            {property.description || "No description available."}
-                          </p>
-
-                          <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                              <h3 className="text-lg font-semibold">Property Type</h3>
-                              <p>{property.propertyType.name}</p>
-                            </div>
-                            <div>
-                              <h3 className="text-lg font-semibold">Listing Type</h3>
-                              <p>{property.listingType.name}</p>
-                            </div>
-                            {property.yearBuilt && (
-                              <div>
-                                <h3 className="text-lg font-semibold">Year Built</h3>
-                                <p>{property.yearBuilt}</p>
-                              </div>
+              </section>
+          ) : property ? (
+              // Property found
+              <>
+                <section className="relative py-20">
+                  <PatternBackground />
+                  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className="mb-8">
+                      <h1 className="text-4xl font-bold mb-2">{property.title}</h1>
+                      <p className="text-xl text-muted-foreground flex items-center">
+                        <MapPin className="w-5 h-5 mr-2" /> {property.address}
+                      </p>
+                    </div>
+                    <div className="grid gap-8 grid-cols-1 md:grid-cols-3">
+                      <div className="md:col-span-2 space-y-4">
+                        <div className="relative aspect-video rounded-lg overflow-hidden">
+                          <Image src={activeImage || "/placeholder.svg"} alt="Property Image" fill className="object-cover" />
+                        </div>
+                        <div className="flex gap-2 sm:gap-4 overflow-x-auto pb-2 -mx-2 px-2">
+                          {images.map((img, index) => (
+                              <Image
+                                  key={index}
+                                  src={img || "/placeholder.svg"}
+                                  alt={`Property Image ${index + 1}`}
+                                  width={80}
+                                  height={60}
+                                  className="rounded-md cursor-pointer hover:opacity-75 transition-opacity flex-shrink-0 sm:w-[100px] sm:h-[75px]"
+                                  onClick={() => setActiveImage(img)}
+                              />
+                          ))}
+                        </div>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="bg-white rounded-lg p-4 sm:p-6 shadow-md">
+                          <h2 className="text-2xl sm:text-3xl font-bold mb-4">
+                            ZMW {property.price.toLocaleString()}
+                            {property.listingType.name === "For Rent" ? " / month" : ""}
+                          </h2>
+                          <div className="grid grid-cols-1 sm:flex sm:justify-between gap-2 mb-4">
+                            {property.bedrooms !== null && (
+                                <div className="flex items-center">
+                                  <Bed className="w-5 h-5 mr-2" />
+                                  <span>{property.bedrooms} {property.bedrooms === 1 ? 'Bedroom' : 'Bedrooms'}</span>
+                                </div>
                             )}
-                            {property.parkingSpaces !== null && (
-                              <div>
-                                <h3 className="text-lg font-semibold">Parking Spaces</h3>
-                                <p>{property.parkingSpaces}</p>
-                              </div>
+                            {property.bathrooms !== null && (
+                                <div className="flex items-center">
+                                  <Bath className="w-5 h-5 mr-2" />
+                                  <span>{property.bathrooms} {property.bathrooms === 1 ? 'Bathroom' : 'Bathrooms'}</span>
+                                </div>
+                            )}
+                            {property.squareFeet !== null && (
+                                <div className="flex items-center">
+                                  <Square className="w-5 h-5 mr-2" />
+                                  <span>{property.squareFeet.toLocaleString()} sqft</span>
+                                </div>
                             )}
                           </div>
-
-                          <h3 className="text-xl font-semibold mb-2">Features</h3>
-                          {property.features && property.features.length > 0 ? (
-                            <ul className="list-disc list-inside mb-4">
-                              {property.features.map((item) => (
-                                <li key={item.feature.id}>{item.feature.name}</li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="mb-4">No features listed.</p>
-                          )}
-
-                          <h3 className="text-xl font-semibold mb-2">Location</h3>
-                          <p className="mb-4">
-                            {property.location.name}, {property.location.city}, {property.location.country}
-                          </p>
+                          <Button className="w-full mb-4">Schedule a Tour</Button>
+                          <div className="flex justify-between">
+                            <Button variant="outline" className="flex-1 mr-2 text-xs sm:text-sm">
+                              <Phone className="w-4 h-4 mr-1 sm:mr-2" /> Call
+                            </Button>
+                            <Button variant="outline" className="flex-1 ml-2 text-xs sm:text-sm">
+                              <Mail className="w-4 h-4 mr-1 sm:mr-2" /> Email
+                            </Button>
+                          </div>
                         </div>
-                        <div>
-                          <h2 className="text-2xl font-bold mb-4">Contact Agent</h2>
-                          <div className="bg-white rounded-lg p-6 shadow-md">
-                            {property.agent ? (
-                              <div className="flex items-center mb-4">
-                                <Image
-                                  src={property.agent.user.profileImage || "/placeholder.svg"}
-                                  alt={`${property.agent.user.firstName} ${property.agent.user.lastName}`}
-                                  width={64}
-                                  height={64}
-                                  className="rounded-full mr-4"
-                                />
-                                <div>
-                                  <h3 className="font-semibold">{property.agent.user.firstName} {property.agent.user.lastName}</h3>
-                                  <p className="text-sm text-muted-foreground">Real Estate Agent</p>
-                                  {property.agent.user.phone && (
-                                    <p className="text-sm">{property.agent.user.phone}</p>
+                        <div className="flex justify-between">
+                          <Button variant="ghost" className="text-xs sm:text-sm p-2 sm:p-3">
+                            <Share2 className="w-4 h-4 mr-1 sm:mr-2" /> Share
+                          </Button>
+                          <Button variant="ghost" className="text-xs sm:text-sm p-2 sm:p-3">
+                            <Heart className="w-4 h-4 mr-1 sm:mr-2" /> Save
+                          </Button>
+                          <Button variant="ghost" className="text-xs sm:text-sm p-2 sm:p-3">
+                            <Printer className="w-4 h-4 mr-1 sm:mr-2" /> Print
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Property Details */}
+                <section className="py-20">
+                  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <Tabs defaultValue="details" className="w-full">
+                      <TabsList className="flex w-full overflow-x-auto snap-x snap-mandatory py-1 sm:grid sm:grid-cols-4">
+                        <TabsTrigger value="details" className="flex-1 min-w-[100px] snap-start text-xs sm:text-sm">Details</TabsTrigger>
+                        <TabsTrigger value="floorplan" className="flex-1 min-w-[100px] snap-start text-xs sm:text-sm">Floor Plan</TabsTrigger>
+                        <TabsTrigger value="map" className="flex-1 min-w-[100px] snap-start text-xs sm:text-sm">Map</TabsTrigger>
+                        <TabsTrigger value="3d-view" className="flex-1 min-w-[100px] snap-start text-xs sm:text-sm">3D View</TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="details">
+                        <Card>
+                          <CardContent className="pt-4 sm:pt-6">
+                            <div className="grid gap-8 grid-cols-1 md:grid-cols-3">
+                              <div className="md:col-span-2">
+                                <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Property Details</h2>
+                                <p className="mb-4 text-sm sm:text-base">
+                                  {property.description || "No description available."}
+                                </p>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
+                                  <div className="bg-gray-50 p-3 rounded-lg">
+                                    <h3 className="text-base sm:text-lg font-semibold">Property Type</h3>
+                                    <p className="text-sm sm:text-base">{property.propertyType.name}</p>
+                                  </div>
+                                  <div className="bg-gray-50 p-3 rounded-lg">
+                                    <h3 className="text-base sm:text-lg font-semibold">Listing Type</h3>
+                                    <p className="text-sm sm:text-base">{property.listingType.name}</p>
+                                  </div>
+                                  {property.yearBuilt && (
+                                      <div className="bg-gray-50 p-3 rounded-lg">
+                                        <h3 className="text-base sm:text-lg font-semibold">Year Built</h3>
+                                        <p className="text-sm sm:text-base">{property.yearBuilt}</p>
+                                      </div>
+                                  )}
+                                  {property.parkingSpaces !== null && (
+                                      <div className="bg-gray-50 p-3 rounded-lg">
+                                        <h3 className="text-base sm:text-lg font-semibold">Parking Spaces</h3>
+                                        <p className="text-sm sm:text-base">{property.parkingSpaces}</p>
+                                      </div>
                                   )}
                                 </div>
+
+                                <h3 className="text-lg sm:text-xl font-semibold mb-2">Features</h3>
+                                {property.features && property.features.length > 0 ? (
+                                    <ul className="list-disc list-inside mb-4 grid grid-cols-1 sm:grid-cols-2 gap-1 text-sm sm:text-base">
+                                      {property.features.map((item) => (
+                                          <li key={item.feature.id}>{item.feature.name}</li>
+                                      ))}
+                                    </ul>
+                                ) : (
+                                    <p className="mb-4 text-sm sm:text-base">No features listed.</p>
+                                )}
+
+                                <h3 className="text-lg sm:text-xl font-semibold mb-2">Location</h3>
+                                <p className="mb-4 text-sm sm:text-base">
+                                  {property.location.name}, {property.location.city}, {property.location.country}
+                                </p>
                               </div>
-                            ) : (
-                              <div className="flex items-center mb-4">
-                                <Image
-                                  src="/placeholder.svg"
-                                  alt="Agent"
-                                  width={64}
-                                  height={64}
-                                  className="rounded-full mr-4"
-                                />
-                                <div>
-                                  <h3 className="font-semibold">Contact Us</h3>
-                                  <p className="text-sm text-muted-foreground">No agent assigned</p>
+                              <div>
+                                <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Contact Agent</h2>
+                                <div className="bg-white rounded-lg p-4 sm:p-6 shadow-md">
+                                  {property.agent ? (
+                                      <div className="flex items-center mb-4">
+                                        <Image
+                                            src={property.agent.user.profileImage || "/placeholder.svg"}
+                                            alt={`${property.agent.user.firstName} ${property.agent.user.lastName}`}
+                                            width={48}
+                                            height={48}
+                                            className="rounded-full mr-3 sm:mr-4 sm:w-[64px] sm:h-[64px]"
+                                        />
+                                        <div>
+                                          <h3 className="font-semibold text-sm sm:text-base">{property.agent.user.firstName} {property.agent.user.lastName}</h3>
+                                          <p className="text-xs sm:text-sm text-muted-foreground">Real Estate Agent</p>
+                                          {property.agent.user.phone && (
+                                              <p className="text-xs sm:text-sm">{property.agent.user.phone}</p>
+                                          )}
+                                        </div>
+                                      </div>
+                                  ) : (
+                                      <div className="flex items-center mb-4">
+                                        <Image
+                                            src="/placeholder.svg"
+                                            alt="Agent"
+                                            width={48}
+                                            height={48}
+                                            className="rounded-full mr-3 sm:mr-4 sm:w-[64px] sm:h-[64px]"
+                                        />
+                                        <div>
+                                          <h3 className="font-semibold text-sm sm:text-base">Contact Us</h3>
+                                          <p className="text-xs sm:text-sm text-muted-foreground">No agent assigned</p>
+                                        </div>
+                                      </div>
+                                  )}
+                                  <form className="space-y-3 sm:space-y-4">
+                                    <Input placeholder="Your Name" className="text-sm" />
+                                    <Input type="email" placeholder="Your Email" className="text-sm" />
+                                    <Input type="tel" placeholder="Your Phone" className="text-sm" />
+                                    <Textarea placeholder="Your Message" rows={3} className="text-sm" />
+                                    <Button className="w-full text-sm sm:text-base">Send Message</Button>
+                                  </form>
                                 </div>
                               </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+                      <TabsContent value="floorplan">
+                        <Card>
+                          <CardContent className="pt-6">
+                            <h2 className="text-2xl font-bold mb-4">Floor Plan</h2>
+                            <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
+                              {property.FloorPlan ? (
+                                  <Image src={property.FloorPlan} alt="Floor Plan" fill className="object-contain" />
+                              ) : (
+                                  <Image src="/placeholder.svg?text=Floor+Plan" alt="Floor Plan" fill className="object-contain" />
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+                      <TabsContent value="map">
+                        <Card>
+                          <CardContent className="pt-6">
+                            <div className="flex justify-between items-center mb-4">
+                              <h2 className="text-2xl font-bold">Location</h2>
+                              <Button
+                                  onClick={() => setShowDirections(!showDirections)}
+                                  variant={showDirections ? "default" : "outline"}
+                                  className="flex items-center"
+                              >
+                                <MapPin className="w-4 h-4 mr-2" />
+                                {showDirections ? "Hide Directions" : "Get Directions"}
+                              </Button>
+                            </div>
+                            {showDirections && (
+                                <div className="mb-4 p-3 bg-blue-50 rounded-md text-sm">
+                                  <p>Directions will be calculated from your current location to this property.</p>
+                                  <p className="mt-1 text-muted-foreground">Note: You may need to allow location access in your browser.</p>
+                                </div>
                             )}
-                            <form className="space-y-4">
-                              <Input placeholder="Your Name" />
-                              <Input type="email" placeholder="Your Email" />
-                              <Input type="tel" placeholder="Your Phone" />
-                              <Textarea placeholder="Your Message" rows={4} />
-                              <Button className="w-full">Send Message</Button>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                <TabsContent value="floorplan">
-                  <Card>
-                    <CardContent className="pt-6">
-                      <h2 className="text-2xl font-bold mb-4">Floor Plan</h2>
-                      <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
-                        {property.FloorPlan ? (
-                          <Image src={property.FloorPlan} alt="Floor Plan" fill className="object-contain" />
-                        ) : (
-                          <Image src="/placeholder.svg?text=Floor+Plan" alt="Floor Plan" fill className="object-contain" />
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                <TabsContent value="map">
-                  <Card>
-                    <CardContent className="pt-6">
-                      <h2 className="text-2xl font-bold mb-4">Location</h2>
-                      <div className="h-[400px]">
-                        <MapWithNoSSR />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                <TabsContent value="3d-view">
-                  <Card>
-                    <CardContent className="pt-6">
-                      <h2 className="text-2xl font-bold mb-4">3D View</h2>
-                      <div className="relative aspect-video rounded-lg overflow-hidden">
-                        {property.DView ? (
-                          <iframe
-                            src={property.DView}
-                            width="100%"
-                            height="100%"
-                            frameBorder="0"
-                            allowFullScreen
-                          ></iframe>
-                        ) : (
-                          <div className="flex items-center justify-center h-full bg-gray-100">
-                            <p className="text-muted-foreground">No 3D view available for this property</p>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
-            </div>
-          </section>
-
-          {/* Similar Properties */}
-          <section className="py-20 bg-gray-100">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <SectionHeader title="Similar Properties" subtitle="You might also like these properties" />
-              <div className="mt-12 grid gap-8 md:grid-cols-3">
-                {isSimilarLoading ? (
-                  // Loading state for similar properties
-                  Array(3).fill(0).map((_, index) => (
-                    <div key={index} className="animate-pulse">
-                      <div className="aspect-[4/3] bg-gray-200 rounded-lg mb-4"></div>
-                      <div className="h-4 w-3/4 bg-gray-200 rounded mb-2"></div>
-                      <div className="h-4 w-1/2 bg-gray-200 rounded mb-4"></div>
-                      <div className="h-6 w-1/3 bg-gray-200 rounded"></div>
-                    </div>
-                  ))
-                ) : similarProperties.length > 0 ? (
-                  // Render actual similar properties
-                  similarProperties.map((property) => {
-                    // Get primary image or fallback
-                    const primaryImage = property.media?.find(m => m.isPrimary)?.filePath ||
-                                        (property.media?.length ? property.media[0].filePath : "/placeholder.svg");
-
-                    return (
-                      <PropertyCard
-                        key={property.id}
-                        propertyId={property.id}
-                        image={primaryImage}
-                        title={property.title}
-                        address={property.address}
-                        price={`ZMW ${property.price.toLocaleString()}`}
-                        period={property.listingType.name === "For Rent" ? "month" : undefined}
-                        type={property.propertyType.name}
-                        badges={[property.listingType.name.replace("For ", "")]}
-                        features={{
-                          beds: property.bedrooms,
-                          baths: property.bathrooms,
-                          sqft: property.squareFeet
-                        }}
-                      />
-                    );
-                  })
-                ) : (
-                  // No similar properties found
-                  <div className="md:col-span-3 text-center py-8">
-                    <p className="text-muted-foreground">No similar properties found.</p>
+                            <div className="h-[400px]">
+                              <MapWithNoSSR
+                                  latitude={property.latitude}
+                                  longitude={property.longitude}
+                                  address={property.address}
+                                  showDirections={showDirections}
+                              />
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+                      <TabsContent value="3d-view">
+                        <Card>
+                          <CardContent className="pt-6">
+                            <h2 className="text-2xl font-bold mb-4">3D View</h2>
+                            <div className="relative aspect-video rounded-lg overflow-hidden">
+                              {property.DView ? (
+                                  <iframe
+                                      src={property.DView}
+                                      width="100%"
+                                      height="100%"
+                                      frameBorder="0"
+                                      allowFullScreen
+                                  ></iframe>
+                              ) : (
+                                  <div className="flex items-center justify-center h-full bg-gray-100">
+                                    <p className="text-muted-foreground">No 3D view available for this property</p>
+                                  </div>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+                    </Tabs>
                   </div>
-                )}
-              </div>
-            </div>
-          </section>
+                </section>
 
-          {/* Reviews Section */}
-          <section className="py-20">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <SectionHeader title="Property Reviews" subtitle="What our clients say about this property" />
-              <div className="mt-12 grid gap-8 md:grid-cols-2">
-                {[1, 2, 3, 4].map((index) => (
-                  <div key={index} className="bg-white rounded-lg p-6 shadow-md">
-                    <div className="flex items-center mb-4">
-                      <Image src="/placeholder.svg" alt="Reviewer" width={48} height={48} className="rounded-full mr-4" />
-                      <div>
-                        <h3 className="font-semibold">Jane Smith</h3>
-                        <p className="text-sm text-muted-foreground">Tenant</p>
-                      </div>
+                {/* Similar Properties */}
+                <section className="py-12 sm:py-16 lg:py-20 bg-gray-100">
+                  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <SectionHeader title="Similar Properties" subtitle="You might also like these properties" />
+                    <div className="mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+                      {isSimilarLoading ? (
+                          // Loading state for similar properties
+                          Array(3).fill(0).map((_, index) => (
+                              <div key={index} className="animate-pulse bg-white p-3 rounded-lg shadow-sm">
+                                <div className="aspect-[4/3] bg-gray-200 rounded-lg mb-4"></div>
+                                <div className="h-4 w-3/4 bg-gray-200 rounded mb-2"></div>
+                                <div className="h-4 w-1/2 bg-gray-200 rounded mb-4"></div>
+                                <div className="h-6 w-1/3 bg-gray-200 rounded"></div>
+                              </div>
+                          ))
+                      ) : similarProperties.length > 0 ? (
+                          // Render actual similar properties
+                          similarProperties.map((property) => {
+                            // Get primary image or fallback
+                            const primaryImage = property.media?.find(m => m.isPrimary)?.filePath ||
+                                (property.media?.length ? property.media[0].filePath : "/placeholder.svg");
+
+                            return (
+                                <div key={property.id} className="hover:shadow-md transition-shadow duration-200 bg-white rounded-lg overflow-hidden">
+                                  <PropertyCard
+                                      propertyId={property.id}
+                                      image={primaryImage}
+                                      title={property.title}
+                                      address={property.address}
+                                      price={`ZMW ${property.price.toLocaleString()}`}
+                                      period={property.listingType.name === "For Rent" ? "month" : undefined}
+                                      type={property.propertyType.name}
+                                      badges={[property.listingType.name.replace("For ", "")]}
+                                      features={{
+                                        beds: property.bedrooms,
+                                        baths: property.bathrooms,
+                                        sqft: property.squareFeet
+                                      }}
+                                  />
+                                </div>
+                            );
+                          })
+                      ) : (
+                          // No similar properties found
+                          <div className="col-span-full text-center py-8 bg-white rounded-lg shadow-sm">
+                            <p className="text-muted-foreground">No similar properties found.</p>
+                          </div>
+                      )}
                     </div>
-                    <StarRating rating={5} label="Excellent" className="mb-2" />
-                    <p className="text-muted-foreground">
-                      "I absolutely love living in this apartment. The location is perfect, and the amenities are top-notch.
-                      The management team is responsive and always keeps the building in great condition."
-                    </p>
                   </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        </>
-      ) : (
-        // Property not found
-        <section className="relative py-20">
-          <PatternBackground />
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center py-12">
-              <h2 className="text-2xl font-bold mb-4">Property Not Found</h2>
-              <p className="text-muted-foreground">The property you're looking for could not be found.</p>
-            </div>
-          </div>
-        </section>
-      )}
-    </main>
+                </section>
+
+                {/* Reviews Section */}
+                <section className="py-12 sm:py-16 lg:py-20">
+                  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <SectionHeader title="Property Reviews" subtitle="What our clients say about this property" />
+                    <div className="mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                      {[1, 2, 3, 4].map((index) => (
+                          <div key={index} className="bg-white rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+                            <div className="flex items-center mb-3 sm:mb-4">
+                              <Image
+                                src="/placeholder.svg"
+                                alt="Reviewer"
+                                width={40}
+                                height={40}
+                                className="rounded-full mr-3 sm:mr-4 sm:w-[48px] sm:h-[48px]"
+                              />
+                              <div>
+                                <h3 className="font-semibold text-sm sm:text-base">Jane Smith</h3>
+                                <p className="text-xs sm:text-sm text-muted-foreground">Tenant</p>
+                              </div>
+                            </div>
+                            <StarRating rating={5} label="Excellent" className="mb-2" />
+                            <p className="text-sm sm:text-base text-muted-foreground">
+                              "I absolutely love living in this apartment. The location is perfect, and the amenities are top-notch.
+                              The management team is responsive and always keeps the building in great condition."
+                            </p>
+                          </div>
+                      ))}
+                    </div>
+                  </div>
+                </section>
+              </>
+          ) : (
+              // Property not found
+              <section className="relative py-20">
+                <PatternBackground />
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                  <div className="text-center py-12">
+                    <h2 className="text-2xl font-bold mb-4">Property Not Found</h2>
+                    <p className="text-muted-foreground">The property you're looking for could not be found.</p>
+                  </div>
+                </div>
+              </section>
+          )}
+        </main>
+      </>
+
   )
 }

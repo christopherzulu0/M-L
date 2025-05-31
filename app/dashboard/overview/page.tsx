@@ -45,129 +45,189 @@ import {
   AlertCircle,
   UserPlus,
   Send,
+  Loader2,
 } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation"
+
+interface Property {
+  id: number
+  image: string
+  title: string
+  address: string
+  price: string
+  beds: number
+  baths: number
+  sqft: number
+  status: string
+  listed: string
+  rating: number
+  views: number
+}
+
+interface PropertyType {
+  name: string
+  value: number
+  percentage: number
+}
+
+interface SalesData {
+  name: string
+  total: number
+  previous: number
+}
+
+interface Stats {
+    totalProperties: number;
+    propertiesGrowth: number;
+    totalRevenue: string;
+    activeAgents: number;
+    newInquiries: number;
+    revenueGrowth: number;
+    agentsGrowth: number;
+    inquiriesGrowth: number;
+}
+
+function getTypeColor(typeName: string): string {
+  const colors: { [key: string]: string } = {
+    "Apartments": "#4F46E5",
+    "Houses": "#10B981",
+    "Villas": "#8B5CF6",
+    "Commercial": "#F59E0B",
+    "Land": "#EC4899",
+    "Other": "#6B7280"
+  }
+  return colors[typeName] || "#6B7280"
+}
+
+function getStatusBadgeStyles(status: string): string {
+  switch (status) {
+    case "For Sale":
+      return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800/30"
+    case "For Rent":
+      return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/30"
+    case "New":
+      return "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/30"
+    case "Pending":
+      return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800/30"
+    case "Responded":
+      return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/30"
+    default:
+      return "bg-gray-100 text-gray-700 dark:bg-gray-800/50 dark:text-gray-400 border-gray-200 dark:border-gray-700/50"
+  }
+}
 
 export default function OverviewPage() {
   const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState("bar")
+  const [recentProperties, setRecentProperties] = useState<Property[]>([])
+  const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([])
+  const [salesData, setSalesData] = useState<SalesData[]>([])
+  const [stats, setStats] = useState<Stats>({
+    totalProperties: 0,
+    propertiesGrowth: 0,
+    totalRevenue: 'ZMW 0',
+    activeAgents: 0,
+    newInquiries: 0,
+    revenueGrowth: 0,
+    agentsGrowth: 0,
+    inquiriesGrowth: 0
+  })
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Sample data for charts
-  const salesData = [
-    { name: "Jan", total: 1200000, previous: 900000 },
-    { name: "Feb", total: 900000, previous: 800000 },
-    { name: "Mar", total: 1600000, previous: 1400000 },
-    { name: "Apr", total: 1700000, previous: 1300000 },
-    { name: "May", total: 1400000, previous: 1200000 },
-    { name: "Jun", total: 2100000, previous: 1800000 },
-    { name: "Jul", total: 1900000, previous: 1600000 },
-    { name: "Aug", total: 2300000, previous: 2000000 },
-  ]
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [propertiesRes, typesRes, salesRes, statsRes] = await Promise.all([
+          fetch('/api/overviews/recent-properties'),
+          fetch('/api/overviews/property-types'),
+          fetch('/api/overviews/sales'),
+          fetch('/api/overviews/stats')
+        ])
 
-  const recentProperties = [
-    {
-      id: 1,
-      image:
-          "https://images.lifestyleasia.com/wp-content/uploads/sites/3/2020/09/15155131/9th-Floor-Infinity-Pool-Aman-Nai-Lert-Bangkok-Thailand-c-Aman-Nai-Lert-Bangkok-min-scaled.jpg",
-      title: "Modern Apartment with Pool View",
-      address: "123 Skyline Ave, Downtown",
-      price: "ZMW 450,000",
-      beds: 2,
-      baths: 2,
-      sqft: 1200,
-      status: "For Sale",
-      listed: "2 days ago",
-      rating: 4.8,
-      views: 243,
-    },
-    {
-      id: 2,
-      image:
-          "https://www.travelandleisure.com/thmb/iAIrOVW7yWrDG-yYB9IvY0nF-8w=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/new-river-gorge-national-park-preserve-west-virginia-NEWNATPARK0421-d92f896451bf4c388289ff3b908cc6c6.jpg",
-      title: "Luxury Villa with Garden",
-      address: "456 Park Lane, Suburbia",
-      price: "ZMW 850,000",
-      beds: 4,
-      baths: 3,
-      sqft: 2800,
-      status: "For Sale",
-      listed: "1 week ago",
-      rating: 4.5,
-      views: 187,
-    },
-    {
-      id: 3,
-      image:
-          "https://www.travelandleisure.com/thmb/iAIrOVW7yWrDG-yYB9IvY0nF-8w=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/new-river-gorge-national-park-preserve-west-virginia-NEWNATPARK0421-d92f896451bf4c388289ff3b908cc6c6.jpg",
-      title: "Cozy Townhouse",
-      address: "789 Maple St, Riverside",
-      price: "ZMW 5,500/mo",
-      beds: 3,
-      baths: 2.5,
-      sqft: 1800,
-      status: "For Rent",
-      listed: "3 days ago",
-      rating: 4.2,
-      views: 156,
-    },
-  ]
+        if (!propertiesRes.ok || !typesRes.ok || !salesRes.ok || !statsRes.ok) {
+          throw new Error('Failed to fetch data')
+        }
 
-  const propertyTypeData = [
-    { name: "Apartments", value: 120, color: "#4F46E5" },
-    { name: "Houses", value: 80, color: "#10B981" },
-    { name: "Villas", value: 25, color: "#8B5CF6" },
-    { name: "Commercial", value: 23, color: "#F59E0B" },
-  ]
+        const propertiesData = await propertiesRes.json()
+        const typesData = await typesRes.json()
+        const salesData = await salesRes.json()
+        const statsData = await statsRes.json()
 
-  if (!mounted) {
-    return null
+        setRecentProperties(propertiesData)
+        setPropertyTypes(typesData)
+        setSalesData(salesData)
+        setStats(statsData)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // Calculate total properties from propertyTypes
+  const totalProperties = propertyTypes.reduce((sum, type) => sum + type.value, 0)
+
+  // Monitor stats changes
+  useEffect(() => {
+    // Stats state has been updated
+  }, [stats]);
+
+  if (!mounted || loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+      </div>
+    )
   }
 
   return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
         {/* Top Navigation Bar */}
-        <div className="sticky top-0 z-30 w-full backdrop-blur-md bg-white/80 dark:bg-gray-950/80 border-b border-gray-200 dark:border-gray-800">
-          <div className="container mx-auto px-4">
-            <div className="flex h-16 items-center justify-between">
-              <div className="flex items-center gap-2 md:gap-4">
-                <Button variant="ghost" size="icon" className="md:hidden">
-                  <Menu className="h-5 w-5" />
-                </Button>
-                <div className="hidden md:flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-md bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
-                    <Home className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="font-bold text-lg">EstateHub</span>
-                </div>
-                <div className="relative hidden md:flex items-center">
-                  <Search className="absolute left-3 h-4 w-4 text-gray-400" />
-                  <input
-                      type="text"
-                      placeholder="Search properties, agents..."
-                      className="pl-9 pr-4 py-2 rounded-full text-sm bg-gray-100 dark:bg-gray-800 border-none focus:ring-2 focus:ring-indigo-500 w-64"
-                  />
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
-                </Button>
-                <Avatar className="h-8 w-8 border-2 border-white shadow-sm">
-                  <AvatarImage src="/placeholder.svg" />
-                  <AvatarFallback>JD</AvatarFallback>
-                </Avatar>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/*<div className="sticky top-0 z-30 w-full backdrop-blur-md bg-white/80 dark:bg-gray-950/80 border-b border-gray-200 dark:border-gray-800">*/}
+        {/*  <div className="container mx-auto px-4">*/}
+        {/*    <div className="flex h-16 items-center justify-between">*/}
+        {/*      <div className="flex items-center gap-2 md:gap-4">*/}
+        {/*        <Button variant="ghost" size="icon" className="md:hidden">*/}
+        {/*          <Menu className="h-5 w-5" />*/}
+        {/*        </Button>*/}
+        {/*        <div className="hidden md:flex items-center gap-2">*/}
+        {/*          <div className="h-8 w-8 rounded-md bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">*/}
+        {/*            <Home className="h-4 w-4 text-white" />*/}
+        {/*          </div>*/}
+        {/*          <span className="font-bold text-lg">ML</span>*/}
+        {/*        </div>*/}
+        {/*        <div className="relative hidden md:flex items-center">*/}
+        {/*          <Search className="absolute left-3 h-4 w-4 text-gray-400" />*/}
+        {/*          <input*/}
+        {/*              type="text"*/}
+        {/*              placeholder="Search properties, agents..."*/}
+        {/*              className="pl-9 pr-4 py-2 rounded-full text-sm bg-gray-100 dark:bg-gray-800 border-none focus:ring-2 focus:ring-indigo-500 w-64"*/}
+        {/*          />*/}
+        {/*        </div>*/}
+        {/*      </div>*/}
+        {/*      <div className="flex items-center gap-3">*/}
+        {/*        <Button variant="ghost" size="icon" className="relative">*/}
+        {/*          <Bell className="h-5 w-5" />*/}
+        {/*          <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>*/}
+        {/*        </Button>*/}
+        {/*        <Avatar className="h-8 w-8 border-2 border-white shadow-sm">*/}
+        {/*          <AvatarImage src="/placeholder.svg" />*/}
+        {/*          <AvatarFallback>JD</AvatarFallback>*/}
+        {/*        </Avatar>*/}
+        {/*      </div>*/}
+        {/*    </div>*/}
+        {/*  </div>*/}
+        {/*</div>*/}
 
         <div className="container mx-auto px-4 py-6 space-y-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -200,36 +260,36 @@ export default function OverviewPage() {
             {[
               {
                 title: "Total Properties",
-                value: "248",
-                change: "+12%",
-                trend: "up",
+                value: stats.totalProperties.toString(),
+                change: `${stats.propertiesGrowth >= 0 ? "+" : ""}${stats.propertiesGrowth.toFixed(1)}%`,
+                trend: stats.propertiesGrowth >= 0 ? "up" : "down",
                 icon: <Home className="h-5 w-5" />,
                 color: "from-blue-600 to-indigo-600",
                 lightColor: "bg-blue-50 text-blue-600",
               },
               {
                 title: "Total Revenue",
-                value: "ZMW 2.4M",
-                change: "+8%",
-                trend: "up",
+                value: stats.totalRevenue,
+                change: `${stats.revenueGrowth >= 0 ? "+" : ""}${stats.revenueGrowth.toFixed(1)}%`,
+                trend: stats.revenueGrowth >= 0 ? "up" : "down",
                 icon: <DollarSign className="h-5 w-5" />,
                 color: "from-emerald-600 to-teal-600",
                 lightColor: "bg-emerald-50 text-emerald-600",
               },
               {
                 title: "Active Agents",
-                value: "24",
-                change: "+4%",
-                trend: "up",
+                value: stats.activeAgents.toString(),
+                change: `${stats.agentsGrowth >= 0 ? "+" : ""}${stats.agentsGrowth.toFixed(1)}%`,
+                trend: stats.agentsGrowth >= 0 ? "up" : "down",
                 icon: <Users className="h-5 w-5" />,
                 color: "from-purple-600 to-violet-600",
                 lightColor: "bg-purple-50 text-purple-600",
               },
               {
                 title: "New Inquiries",
-                value: "38",
-                change: "-3%",
-                trend: "down",
+                value: stats.newInquiries.toString(),
+                change: `${stats.inquiriesGrowth >= 0 ? "+" : ""}${stats.inquiriesGrowth.toFixed(1)}%`,
+                trend: stats.inquiriesGrowth >= 0 ? "up" : "down",
                 icon: <MessageSquare className="h-5 w-5" />,
                 color: "from-amber-600 to-orange-600",
                 lightColor: "bg-amber-50 text-amber-600",
@@ -327,12 +387,12 @@ export default function OverviewPage() {
                             axisLine={{ stroke: "#e0e0e0" }}
                         />
                         <Tooltip
-                            formatter={(value) =>
+                            formatter={(value: any) =>
                                 new Intl.NumberFormat("en-US", {
                                   style: "currency",
                                   currency: "ZMW",
                                   minimumFractionDigits: 0,
-                                }).format(value)
+                                }).format(Number(value))
                             }
                             contentStyle={{
                               borderRadius: "8px",
@@ -391,12 +451,12 @@ export default function OverviewPage() {
                             axisLine={{ stroke: "#e0e0e0" }}
                         />
                         <Tooltip
-                            formatter={(value) =>
+                            formatter={(value: any) =>
                                 new Intl.NumberFormat("en-US", {
                                   style: "currency",
                                   currency: "ZMW",
                                   minimumFractionDigits: 0,
-                                }).format(value)
+                                }).format(Number(value))
                             }
                             contentStyle={{
                               borderRadius: "8px",
@@ -488,8 +548,8 @@ export default function OverviewPage() {
                             <div className="flex items-center justify-between">
                               <p className="font-semibold line-clamp-1">{property.title}</p>
                               <Badge
-                                  variant={property.status === "For Sale" ? "default" : "secondary"}
-                                  className="ml-2 shrink-0 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600"
+                                  variant="outline"
+                                  className={`ml-2 shrink-0 ${getStatusBadgeStyles(property.status)}`}
                               >
                                 {property.status}
                               </Badge>
@@ -527,8 +587,9 @@ export default function OverviewPage() {
               </CardContent>
               <CardFooter className="border-t pt-4 flex justify-center">
                 <Button
-                    onClick={()=>router.push("/dashboard/properties")}
-                    className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white shadow-md hover:shadow-lg transition-all">
+                    onClick={() => router.push("/dashboard/properties")}
+                    className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white shadow-md hover:shadow-lg transition-all"
+                >
                   View all properties
                 </Button>
               </CardFooter>
@@ -543,31 +604,30 @@ export default function OverviewPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-5">
-                  {propertyTypeData.map((item, index) => (
+                  {propertyTypes.map((item, index) => (
                       <div key={index} className="space-y-2">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <div className="h-4 w-4 rounded-full" style={{ backgroundColor: item.color }}></div>
+                          <div className="h-4 w-4 rounded-full" style={{ backgroundColor: getTypeColor(item.name) }}></div>
                             <span className="font-medium">{item.name}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="font-semibold">{item.value}</span>
                             <span className="text-xs px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-gray-700 text-muted-foreground">
-                          {Math.round((item.value / propertyTypeData.reduce((acc, curr) => acc + curr.value, 0)) * 100)}
-                              %
+                            {item.percentage}%
                         </span>
                           </div>
                         </div>
                         <Progress
-                            value={(item.value / propertyTypeData.reduce((acc, curr) => acc + curr.value, 0)) * 100}
+                        value={item.percentage}
                             className="h-2"
                             style={{ backgroundColor: "#f3f4f6" }}
                         >
                           <div
                               className="h-full rounded-full"
                               style={{
-                                width: `${(item.value / propertyTypeData.reduce((acc, curr) => acc + curr.value, 0)) * 100}%`,
-                                backgroundColor: item.color,
+                            width: `${item.percentage}%`,
+                            backgroundColor: getTypeColor(item.name),
                               }}
                           ></div>
                         </Progress>
@@ -658,41 +718,7 @@ export default function OverviewPage() {
               </CardContent>
             </Card>
 
-            <Card className="col-span-1 lg:col-span-1 border-0 shadow-lg bg-white dark:bg-gray-800">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold">Performance Metrics</CardTitle>
-                <CardDescription>Key performance indicators</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {[
-                    { title: "Conversion Rate", value: "8.5%", change: "+2.1%", status: "positive" },
-                    { title: "Avg. Time on Market", value: "32 days", change: "-4 days", status: "positive" },
-                    { title: "Inquiry Response Rate", value: "94%", change: "+3%", status: "positive" },
-                    { title: "Customer Satisfaction", value: "4.8/5", change: "+0.2", status: "positive" },
-                  ].map((metric, index) => (
-                      <div key={index} className="rounded-lg bg-gray-50 dark:bg-gray-900 p-4">
-                        <div className="flex items-center justify-between">
-                          <p className="font-medium">{metric.title}</p>
-                          <Badge
-                              variant={metric.status === "positive" ? "default" : "destructive"}
-                              className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300"
-                          >
-                            {metric.change}
-                          </Badge>
-                        </div>
-                        <p className="mt-2 text-2xl font-bold">{metric.value}</p>
-                        <div className="mt-2 h-1.5 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                          <div
-                              className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400"
-                              style={{ width: `${Number.parseInt(metric.value) * 10 || 75}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">

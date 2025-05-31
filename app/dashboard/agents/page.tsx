@@ -3,6 +3,7 @@
 import { DropdownMenuGroup } from "@/components/ui/dropdown-menu"
 
 import { useState, useEffect } from "react"
+import { useAgentsStats } from "@/hooks/useAgentsStats"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -46,6 +47,7 @@ import {
   Settings,
   FileText,
   Share2,
+  X,
 } from "lucide-react"
 import AgentsAnalytics from "@/app/dashboard/AgentsAnalytics"
 
@@ -55,59 +57,92 @@ export default function AgentsPage() {
   const [agents, setAgents] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [timePeriod, setTimePeriod] = useState("This Month")
 
-  useEffect(() => {
-    const fetchAgents = async () => {
-      try {
-        setIsLoading(true)
-        const response = await fetch('/api/agents')
+  // Search and filter states
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedFilters, setSelectedFilters] = useState({
+    performance: null, // "Top Performers", "Commercial Specialists", "Residential Specialists"
+    location: null, // "Lusaka", "Ndola", "Kitwe"
+  })
+  const [sortOption, setSortOption] = useState(null) // "Highest Rating", "Most Sales", "Most Properties", "Recently Active"
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch agents')
-        }
+  // Fetch agent stats using React Query
+  const { 
+    data: agentStats, 
+    isLoading: isStatsLoading, 
+    error: statsError 
+  } = useAgentsStats()
 
-        const data = await response.json()
+  // Fetch agents data
+  const fetchAgents = async () => {
+    try {
+      setIsLoading(true)
+      console.log('Fetching agents from API...')
+      const response = await fetch('/api/agents')
 
-        // Transform the data to match the expected format
-        const formattedAgents = data.map(agent => ({
-          id: agent.id,
-          name: `${agent.user.firstName} ${agent.user.lastName}`,
-          email: agent.user.email,
-          phone: agent.user.phone || 'N/A',
-          avatar: agent.user.profileImage || `https://i.pravatar.cc/150?img=${agent.id}`,
-          properties: agent.propertyCount || Math.floor(Math.random() * 25) + 5,
-          sales: `ZMW ${((Math.random() * 5) + 1).toFixed(1)}M`,
-          rating: agent.rating || (Math.random() * (5 - 3.5) + 3.5).toFixed(1),
-          status: agent.status || 'Active',
-          location: agent.location || 'Lusaka, Zambia',
-          specialty: agent.specialization || 'Residential',
-          joined: agent.joinDate ? new Date(agent.joinDate).toLocaleDateString() : '1 year ago',
-          performance: agent.performance || (Math.random() > 0.7 ? 'Excellent' : Math.random() > 0.4 ? 'Good' : 'Average'),
-          lastActive: agent.lastActive || (Math.random() > 0.5 ? 'Today' : Math.random() > 0.3 ? 'Yesterday' : '1 week ago'),
-          verified: agent.verified !== undefined ? agent.verified : true,
-          featured: agent.featured !== undefined ? agent.featured : Math.random() > 0.7,
-        }))
-
-        setAgents(formattedAgents)
-        setError(null)
-      } catch (err) {
-        console.error('Error fetching agents:', err)
-        setError(err.message)
-      } finally {
-        setIsLoading(false)
+      if (!response.ok) {
+        throw new Error('Failed to fetch agents')
       }
-    }
 
+      const data = await response.json()
+      console.log('API response:', data)
+
+      // Extract the agents array from the response
+      const agentsData = data.agents || []
+      console.log('Extracted agents array:', agentsData)
+
+      // Transform the data to match the expected format
+      console.log('Transforming agents data...')
+      const formattedAgents = agentsData.map(agent => ({
+        id: agent.id,
+        name: `${agent.user.firstName} ${agent.user.lastName}`,
+        email: agent.user.email,
+        phone: agent.user.phone || 'N/A',
+        avatar: agent.user.profileImage || `https://i.pravatar.cc/150?img=${agent.id}`,
+        properties: agent.propertyCount || Math.floor(Math.random() * 25) + 5,
+        sales: agent.soldPropertyCount ? `ZMW ${(agent.soldPropertyCount * 0.5).toFixed(1)}M` : `ZMW 0.0M`,
+        rating: agent.rating || (Math.random() * (5 - 3.5) + 3.5).toFixed(1),
+        status: agent.status || 'Active',
+        location: agent.location || 'Lusaka, Zambia',
+        specialty: agent.specialization || 'Residential',
+        joined: agent.joinDate ? new Date(agent.joinDate).toLocaleDateString() : '1 year ago',
+        performance: agent.soldPropertyCount ? 
+          (agent.soldPropertyCount > 10 ? 'Excellent' : 
+           agent.soldPropertyCount > 5 ? 'Good' : 
+           agent.soldPropertyCount > 0 ? 'Average' : 'Poor') : 'Average',
+        lastActive: agent.lastActive || (Math.random() > 0.5 ? 'Today' : Math.random() > 0.3 ? 'Yesterday' : '1 week ago'),
+        verified: agent.verified !== undefined ? agent.verified : true,
+        featured: agent.featured !== undefined ? agent.featured : Math.random() > 0.7,
+      }))
+
+      console.log('Formatted agents data:', formattedAgents);
+      setAgents(formattedAgents)
+      console.log('Agents state set with', formattedAgents.length, 'agents')
+      setError(null)
+    } catch (err) {
+      console.error('Error fetching agents:', err)
+      setError(err.message)
+    } finally {
+      setIsLoading(false)
+      console.log('Loading state set to false')
+    }
+  }
+
+  // Fetch agents on component mount
+  useEffect(() => {
     fetchAgents()
   }, [])
 
   const getStatusBadgeStyles = (status: string) => {
-    switch (status) {
-      case "Active":
+    const statusLower = status?.toLowerCase() || '';
+
+    switch (statusLower) {
+      case "active":
         return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/30"
-      case "New":
+      case "new":
         return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800/30"
-      case "Inactive":
+      case "inactive":
         return "bg-gray-100 text-gray-700 dark:bg-gray-800/50 dark:text-gray-400 border-gray-200 dark:border-gray-700/50"
       default:
         return "bg-gray-100 text-gray-700 dark:bg-gray-800/50 dark:text-gray-400 border-gray-200 dark:border-gray-700/50"
@@ -127,20 +162,109 @@ export default function AgentsPage() {
     }
   }
 
-  const filteredAgents =
-      activeTab === "all"
-          ? agents
-          : agents.filter((agent) =>
-              activeTab === "active"
-                  ? agent.status === "Active"
-                  : activeTab === "new"
-                      ? agent.status === "New"
-                      : activeTab === "inactive"
-                          ? agent.status === "Inactive"
-                          : activeTab === "featured"
-                              ? agent.featured
-                              : true,
-          )
+  // Helper function to apply search filter
+  const applySearchFilter = (agent) => {
+    if (!searchTerm || searchTerm.trim() === '') return true;
+
+    const searchLower = searchTerm.toLowerCase().trim();
+    console.log('Searching for:', searchLower);
+    console.log('Agent:', agent.name, agent.email, agent.location);
+
+    // Ensure agent properties exist before trying to search them
+    const agentName = agent.name ? agent.name.toLowerCase() : '';
+    const agentEmail = agent.email ? agent.email.toLowerCase() : '';
+    const agentLocation = agent.location ? agent.location.toLowerCase() : '';
+
+    const nameMatch = agentName.includes(searchLower);
+    const emailMatch = agentEmail.includes(searchLower);
+    const locationMatch = agentLocation.includes(searchLower);
+
+    console.log('Matches:', { nameMatch, emailMatch, locationMatch });
+
+    return nameMatch || emailMatch || locationMatch;
+  };
+
+  // Helper function to apply performance filter
+  const applyPerformanceFilter = (agent) => {
+    if (!selectedFilters.performance) return true;
+
+    switch (selectedFilters.performance) {
+      case "Top Performers":
+        return agent.performance === "Excellent" || agent.performance === "Good";
+      case "Commercial Specialists":
+        return agent.specialty === "Commercial";
+      case "Residential Specialists":
+        return agent.specialty === "Residential";
+      default:
+        return true;
+    }
+  };
+
+  // Helper function to apply location filter
+  const applyLocationFilter = (agent) => {
+    if (!selectedFilters.location) return true;
+
+    return agent.location.includes(selectedFilters.location);
+  };
+
+  // Apply tab filters first
+  console.log('Starting filtering process with', agents.length, 'agents');
+  console.log('Active tab:', activeTab);
+
+  let filteredAgents = activeTab === "all"
+    ? agents
+    : agents.filter((agent) =>
+        activeTab === "active"
+          ? agent.status?.toLowerCase() === "active"
+          : activeTab === "new"
+            ? agent.status?.toLowerCase() === "new"
+            : activeTab === "inactive"
+              ? agent.status?.toLowerCase() === "inactive"
+              : activeTab === "featured"
+                ? agent.featured
+                : true,
+      );
+
+  console.log('After tab filter:', filteredAgents.length, 'out of', agents.length);
+  console.log('First agent after tab filter:', filteredAgents[0] || 'No agents after tab filter');
+
+  // Apply search and additional filters
+  const afterSearchFilter = filteredAgents.filter(applySearchFilter);
+  console.log('After search filter:', afterSearchFilter.length, 'out of', filteredAgents.length);
+
+  const afterPerformanceFilter = afterSearchFilter.filter(applyPerformanceFilter);
+  console.log('After performance filter:', afterPerformanceFilter.length, 'out of', afterSearchFilter.length);
+
+  const afterLocationFilter = afterPerformanceFilter.filter(applyLocationFilter);
+  console.log('After location filter:', afterLocationFilter.length, 'out of', afterPerformanceFilter.length);
+
+  filteredAgents = afterLocationFilter;
+
+  console.log('Final filtered agents:', filteredAgents.length, 'out of', agents.length);
+  console.log('First agent in final filtered list:', filteredAgents[0] || 'No agents in final filtered list');
+
+  // Apply sorting
+  if (sortOption) {
+    filteredAgents = [...filteredAgents].sort((a, b) => {
+      switch (sortOption) {
+        case "Highest Rating":
+          return parseFloat(b.rating) - parseFloat(a.rating);
+        case "Most Sales":
+          // Extract numeric value from sales string (e.g., "ZMW 2.5M" -> 2.5)
+          const aSales = parseFloat(a.sales.replace(/[^0-9.]/g, ''));
+          const bSales = parseFloat(b.sales.replace(/[^0-9.]/g, ''));
+          return bSales - aSales;
+        case "Most Properties":
+          return b.properties - a.properties;
+        case "Recently Active":
+          // Sort by lastActive (assuming "Today" is most recent, then "Yesterday", etc.)
+          const activityOrder = { "Today": 0, "Yesterday": 1, "1 week ago": 2 };
+          return (activityOrder[a.lastActive] || 99) - (activityOrder[b.lastActive] || 99);
+        default:
+          return 0;
+      }
+    });
+  }
 
   if (isLoading) {
     return (
@@ -196,14 +320,14 @@ export default function AgentsPage() {
               <p className="text-muted-foreground">View and manage your real estate agents</p>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all"
-              >
-                <Filter className="mr-2 h-4 w-4" />
-                Filter
-              </Button>
+              {/*<Button*/}
+              {/*    variant="outline"*/}
+              {/*    size="sm"*/}
+              {/*    className="border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all"*/}
+              {/*>*/}
+              {/*  <Filter className="mr-2 h-4 w-4" />*/}
+              {/*  Filter*/}
+              {/*</Button>*/}
               <Button
                   size="sm"
                   className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white shadow-md hover:shadow-lg transition-all"
@@ -216,6 +340,7 @@ export default function AgentsPage() {
 
           {/* Stats Cards */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Total Agents Card */}
             <Card className="overflow-hidden border-0 shadow-lg bg-white dark:bg-gray-800">
               <CardContent className="p-0">
                 <div className="flex items-center">
@@ -226,13 +351,22 @@ export default function AgentsPage() {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">Total Agents</p>
-                        <div className="flex items-baseline gap-1">
-                          <h3 className="text-2xl font-bold">24</h3>
-                          <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center">
-                          <ArrowUp className="h-3 w-3 mr-0.5" />
-                          12%
-                        </span>
-                        </div>
+                        {isStatsLoading ? (
+                          <div className="animate-pulse h-8 w-16 bg-gray-200 dark:bg-gray-700 rounded mt-1"></div>
+                        ) : statsError ? (
+                          <div className="text-red-500 text-sm">Error loading data</div>
+                        ) : (
+                          <div className="flex items-baseline gap-1">
+                            <h3 className="text-2xl font-bold">{agentStats?.totalAgents || 0}</h3>
+                            <span className={`text-xs ${agentStats?.totalAgentsChange >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'} flex items-center`}>
+                              {agentStats?.totalAgentsChange >= 0 ? 
+                                <ArrowUp className="h-3 w-3 mr-0.5" /> : 
+                                <ArrowDown className="h-3 w-3 mr-0.5" />
+                              }
+                              {Math.abs(agentStats?.totalAgentsChange || 0)}%
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -241,6 +375,7 @@ export default function AgentsPage() {
               </CardContent>
             </Card>
 
+            {/* Average Rating Card */}
             <Card className="overflow-hidden border-0 shadow-lg bg-white dark:bg-gray-800">
               <CardContent className="p-0">
                 <div className="flex items-center">
@@ -251,13 +386,22 @@ export default function AgentsPage() {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">Average Rating</p>
-                        <div className="flex items-baseline gap-1">
-                          <h3 className="text-2xl font-bold">4.7</h3>
-                          <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center">
-                          <ArrowUp className="h-3 w-3 mr-0.5" />
-                          0.2
-                        </span>
-                        </div>
+                        {isStatsLoading ? (
+                          <div className="animate-pulse h-8 w-16 bg-gray-200 dark:bg-gray-700 rounded mt-1"></div>
+                        ) : statsError ? (
+                          <div className="text-red-500 text-sm">Error loading data</div>
+                        ) : (
+                          <div className="flex items-baseline gap-1">
+                            <h3 className="text-2xl font-bold">{agentStats?.averageRating || '0.0'}</h3>
+                            <span className={`text-xs ${agentStats?.averageRatingChange >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'} flex items-center`}>
+                              {agentStats?.averageRatingChange >= 0 ? 
+                                <ArrowUp className="h-3 w-3 mr-0.5" /> : 
+                                <ArrowDown className="h-3 w-3 mr-0.5" />
+                              }
+                              {Math.abs(agentStats?.averageRatingChange || 0)}%
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -266,6 +410,7 @@ export default function AgentsPage() {
               </CardContent>
             </Card>
 
+            {/* Total Properties Card */}
             <Card className="overflow-hidden border-0 shadow-lg bg-white dark:bg-gray-800">
               <CardContent className="p-0">
                 <div className="flex items-center">
@@ -276,13 +421,22 @@ export default function AgentsPage() {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">Total Properties</p>
-                        <div className="flex items-baseline gap-1">
-                          <h3 className="text-2xl font-bold">248</h3>
-                          <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center">
-                          <ArrowUp className="h-3 w-3 mr-0.5" />
-                          8%
-                        </span>
-                        </div>
+                        {isStatsLoading ? (
+                          <div className="animate-pulse h-8 w-16 bg-gray-200 dark:bg-gray-700 rounded mt-1"></div>
+                        ) : statsError ? (
+                          <div className="text-red-500 text-sm">Error loading data</div>
+                        ) : (
+                          <div className="flex items-baseline gap-1">
+                            <h3 className="text-2xl font-bold">{agentStats?.totalProperties || 0}</h3>
+                            <span className={`text-xs ${agentStats?.totalPropertiesChange >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'} flex items-center`}>
+                              {agentStats?.totalPropertiesChange >= 0 ? 
+                                <ArrowUp className="h-3 w-3 mr-0.5" /> : 
+                                <ArrowDown className="h-3 w-3 mr-0.5" />
+                              }
+                              {Math.abs(agentStats?.totalPropertiesChange || 0)}%
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -291,6 +445,7 @@ export default function AgentsPage() {
               </CardContent>
             </Card>
 
+            {/* Total Sales Card */}
             <Card className="overflow-hidden border-0 shadow-lg bg-white dark:bg-gray-800">
               <CardContent className="p-0">
                 <div className="flex items-center">
@@ -301,13 +456,22 @@ export default function AgentsPage() {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">Total Sales</p>
-                        <div className="flex items-baseline gap-1">
-                          <h3 className="text-2xl font-bold">ZMW 12.4M</h3>
-                          <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center">
-                          <ArrowUp className="h-3 w-3 mr-0.5" />
-                          15%
-                        </span>
-                        </div>
+                        {isStatsLoading ? (
+                          <div className="animate-pulse h-8 w-16 bg-gray-200 dark:bg-gray-700 rounded mt-1"></div>
+                        ) : statsError ? (
+                          <div className="text-red-500 text-sm">Error loading data</div>
+                        ) : (
+                          <div className="flex items-baseline gap-1">
+                            <h3 className="text-2xl font-bold">{agentStats?.totalSales || 'ZMW 0.0M'}</h3>
+                            <span className={`text-xs ${agentStats?.totalSalesChange >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'} flex items-center`}>
+                              {agentStats?.totalSalesChange >= 0 ? 
+                                <ArrowUp className="h-3 w-3 mr-0.5" /> : 
+                                <ArrowDown className="h-3 w-3 mr-0.5" />
+                              }
+                              {Math.abs(agentStats?.totalSalesChange || 0)}%
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -317,96 +481,8 @@ export default function AgentsPage() {
             </Card>
           </div>
 
-          {/* Search and Filters */}
-          <Card className="border-0 shadow-lg bg-white dark:bg-gray-800">
-            <CardContent className="p-4 md:p-6 space-y-4">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                      placeholder="Search agents by name, email, or location..."
-                      className="pl-9 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 rounded-lg"
-                  />
-                </div>
 
-                <div className="flex flex-wrap gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="border-gray-200 dark:border-gray-700">
-                        <Filter className="mr-2 h-4 w-4" />
-                        Filters
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                      <DropdownMenuLabel>Agent Filters</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <Award className="mr-2 h-4 w-4" />
-                          <span>Top Performers</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Building className="mr-2 h-4 w-4" />
-                          <span>Commercial Specialists</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Home className="mr-2 h-4 w-4" />
-                          <span>Residential Specialists</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <MapPin className="mr-2 h-4 w-4" />
-                          <span>Lusaka</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <MapPin className="mr-2 h-4 w-4" />
-                          <span>Ndola</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <MapPin className="mr-2 h-4 w-4" />
-                          <span>Kitwe</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="border-gray-200 dark:border-gray-700">
-                        <ChevronDown className="mr-2 h-4 w-4" />
-                        Sort By
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <Star className="mr-2 h-4 w-4" />
-                        <span>Highest Rating</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <TrendingUp className="mr-2 h-4 w-4" />
-                        <span>Most Sales</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Home className="mr-2 h-4 w-4" />
-                        <span>Most Properties</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Clock className="mr-2 h-4 w-4" />
-                        <span>Recently Active</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-
-                  <Button variant="outline" size="sm" className="border-gray-200 dark:border-gray-700">
-                    <Download className="mr-2 h-4 w-4" />
-                    Export
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* Agent Performance Analytics */}
           <Card className="border-0 shadow-lg bg-white dark:bg-gray-800">
@@ -420,32 +496,32 @@ export default function AgentsPage() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" className="border-gray-200 dark:border-gray-700">
                       <Calendar className="mr-2 h-4 w-4" />
-                      This Month
+                      {timePeriod}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>This Week</DropdownMenuItem>
-                    <DropdownMenuItem>This Month</DropdownMenuItem>
-                    <DropdownMenuItem>Last 3 Months</DropdownMenuItem>
-                    <DropdownMenuItem>This Year</DropdownMenuItem>
-                    <DropdownMenuItem>All Time</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTimePeriod("This Week")}>This Week</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTimePeriod("This Month")}>This Month</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTimePeriod("Last 3 Months")}>Last 3 Months</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTimePeriod("This Year")}>This Year</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTimePeriod("All Time")}>All Time</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             </CardHeader>
             <CardContent>
-              <AgentsAnalytics />
+              <AgentsAnalytics timePeriod={timePeriod} />
             </CardContent>
             <CardFooter className="border-t pt-4 flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1">
                   <div className="h-3 w-3 rounded-full bg-emerald-500"></div>
-                  <span className="text-xs text-muted-foreground">+12.5% growth</span>
+                  <span className="text-xs text-muted-foreground">Top performers</span>
                 </div>
                 <div className="h-4 w-px bg-gray-200 dark:bg-gray-700"></div>
                 <div className="flex items-center gap-1">
                   <Clock className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">Updated 2h ago</span>
+                  <span className="text-xs text-muted-foreground">Updated recently</span>
                 </div>
               </div>
               <Button
@@ -657,10 +733,12 @@ export default function AgentsPage() {
                 Showing <span className="font-medium">{filteredAgents.length}</span> of{" "}
                 <span className="font-medium">{agents.length}</span> agents
               </div>
-              <Button variant="outline" size="sm">
-                View All Agents
-                <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
+              {/*<Button*/}
+
+              {/*    variant="outline" size="sm">*/}
+              {/*  View All Agents*/}
+              {/*  <ChevronRight className="ml-2 h-4 w-4" />*/}
+              {/*</Button>*/}
             </CardFooter>
           </Card>
         </div>

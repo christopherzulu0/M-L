@@ -26,9 +26,12 @@ model User {
   emailVerified Boolean        @default(false) @map("email_verified")
   agent         Agent?
   properties    Property[]     @relation("PropertyOwner")
+  purchases     Purchase[]
   tasks         Task[]
   appointments  Appointment[]
   notifications Notification[]
+  documents     Document[]
+  testimonials  Testimonial[]
 
   @@map("users")
 }
@@ -110,8 +113,8 @@ model Property {
   priceType      String    @default("total") @map("price_type") @db.VarChar(20)
   address        String    @db.VarChar(255)
   locationId     Int       @map("location_id")
-  latitude       Decimal?  @db.Decimal(10, 8)
-  longitude      Decimal?  @db.Decimal(11, 8)
+  latitude       String?   @db.VarChar(255)
+  longitude      String?   @db.VarChar(255)
   bedrooms       Int?
   bathrooms      Decimal?  @db.Decimal(4, 1)
   squareFeet     Decimal?  @map("square_feet") @db.Decimal(10, 2)
@@ -138,6 +141,8 @@ model Property {
   inquiries    Inquiry[]
   appointments Appointment[]
   analytics    PropertyAnalytics[]
+  purchases    Purchase[]
+  documents    Document[]
 
   @@map("properties")
 }
@@ -297,6 +302,44 @@ model Notification {
   @@map("notifications")
 }
 
+model Purchase {
+  id              Int       @id @default(autoincrement())
+  propertyId      Int       @map("property_id")
+  buyerId         Int       @map("buyer_id")
+  totalAmount     Decimal   @map("total_amount") @db.Decimal(15, 2)
+  downPayment     Decimal   @map("down_payment") @db.Decimal(15, 2)
+  remainingAmount Decimal   @map("remaining_amount") @db.Decimal(15, 2)
+  status          String    @default("pending") @db.VarChar(50) // pending, completed, cancelled
+  purchaseDate    DateTime  @default(now()) @map("purchase_date") @db.Timestamptz
+  completionDate  DateTime? @map("completion_date") @db.Timestamptz
+  notes           String?
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime  @default(now()) @map("updated_at") @db.Timestamptz
+
+  property Property  @relation(fields: [propertyId], references: [id])
+  buyer    User      @relation(fields: [buyerId], references: [id])
+  payments Payment[]
+
+  @@map("purchases")
+}
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+  purchaseId    Int      @map("purchase_id")
+  amount        Decimal  @db.Decimal(15, 2)
+  paymentMethod String   @map("payment_method") @db.VarChar(50) // credit_card, bank_transfer, cash, etc.
+  paymentDate   DateTime @default(now()) @map("payment_date") @db.Timestamptz
+  status        String   @default("completed") @db.VarChar(50) // pending, completed, failed
+  transactionId String?  @map("transaction_id") @db.VarChar(100)
+  notes         String?
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime @default(now()) @map("updated_at") @db.Timestamptz
+
+  purchase Purchase @relation(fields: [purchaseId], references: [id])
+
+  @@map("payments")
+}
+
 model Setting {
   id           Int      @id @default(autoincrement())
   settingKey   String   @unique @map("setting_key") @db.VarChar(100)
@@ -306,4 +349,42 @@ model Setting {
   updatedAt    DateTime @default(now()) @map("updated_at") @db.Timestamptz
 
   @@map("settings")
+}
+
+model Document {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  description String?
+  fileName    String   @map("file_name") @db.VarChar(255)
+  filePath    String   @map("file_path") @db.VarChar(255)
+  fileSize    Int?     @map("file_size")
+  fileType    String   @map("file_type") @db.VarChar(100)
+  category    String   @default("general") @db.VarChar(50)
+  isPublic    Boolean  @default(false) @map("is_public")
+  propertyId  Int?     @map("property_id")
+  userId      Int      @map("user_id")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz
+
+  property Property? @relation(fields: [propertyId], references: [id])
+  user     User      @relation(fields: [userId], references: [id])
+
+  @@map("documents")
+}
+
+model Testimonial {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(100)
+  role       String   @db.VarChar(100)
+  comment    String
+  rating     Int      @default(5)
+  image      String?  @db.VarChar(255)
+  userId     Int?     @map("user_id")
+  isApproved Boolean  @default(false) @map("is_approved")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @default(now()) @map("updated_at") @db.Timestamptz
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("testimonials")
 }

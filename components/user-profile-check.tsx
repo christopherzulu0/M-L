@@ -39,7 +39,7 @@ export function UserProfileCheck({ children }: { children: React.ReactNode }) {
   const checkUserExists = async () => {
     try {
       // Check if user exists in the database
-      const response = await fetch(`/api/users/check?clerkId=${user.id}`);
+      const response = await fetch(`/api/users/check?clerkId=${user?.id}`);
       const data = await response.json();
 
       if (data.exists) {
@@ -49,10 +49,10 @@ export function UserProfileCheck({ children }: { children: React.ReactNode }) {
         // User doesn't exist, show the form
         // Pre-fill form with data from Clerk
         setFormData({
-          firstName: user.firstName || "",
-          lastName: user.lastName || "",
-          email: user.primaryEmailAddress?.emailAddress || "",
-          phone: user.phoneNumbers?.[0]?.phoneNumber || "",
+          firstName: user?.firstName || "",
+          lastName: user?.lastName || "",
+          email: user?.primaryEmailAddress?.emailAddress || "",
+          phone: user?.phoneNumbers?.[0]?.phoneNumber || "",
         });
         setShowForm(true);
         setIsChecking(false);
@@ -122,8 +122,8 @@ export function UserProfileCheck({ children }: { children: React.ReactNode }) {
     return (
       <>
         {children}
-        <Dialog 
-          open={showForm} 
+        <Dialog
+          open={showForm}
           onOpenChange={(open) => {
             // Prevent closing the dialog by clicking outside
             // It can only be closed programmatically after successful form submission
@@ -190,9 +190,9 @@ export function UserProfileCheck({ children }: { children: React.ReactNode }) {
                 </div>
               </div>
               <DialogFooter>
-                <Button 
-                  type="submit" 
-                  disabled={isSubmitting} 
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
                   className="w-full py-6 text-base font-medium transition-all duration-200 hover:scale-[1.02]"
                 >
                   {isSubmitting ? "Saving..." : "Save Profile"}

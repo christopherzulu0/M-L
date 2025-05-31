@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button"
-import { Building2, Heart, Share2, BedSingle, Bath, Ruler } from "lucide-react"
+import { Building2, Heart, Share2, BedSingle, Bath, Ruler, Video } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { useState } from "react"
+import { useFavorites } from "@/hooks/useFavorites"
+import { shareProperty as sharePropertyUtil } from "@/lib/share-utils"
+import VirtualTourModal from "./VirtualTourModal"
 
 interface PropertyCardProps {
   image: string
@@ -17,11 +21,58 @@ interface PropertyCardProps {
     sqft?: number
   }
   propertyId?: number | string
+  disableLink?: boolean
+  virtualTourUrl?: string
 }
 
-export function PropertyCard({ image, title, address, price, period, type, badges, features, propertyId }: PropertyCardProps) {
+export function PropertyCard({ image, title, address, price, period, type, badges, features, propertyId, disableLink = false, virtualTourUrl }: PropertyCardProps) {
+  // Use the favorites hook
+  const { isFavorite, toggleFavorite: toggleFavoriteState } = useFavorites();
+
+  // State for virtual tour modal
+  const [isVirtualTourOpen, setIsVirtualTourOpen] = useState(false);
+
+  // Check if this property is in favorites
+  const isPropertyFavorite = propertyId ? isFavorite(propertyId) : false;
+
+  // Handle favorite toggle with event prevention
+  const toggleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigation when clicking the button
+    e.stopPropagation();
+
+    if (!propertyId) return;
+
+    toggleFavoriteState(propertyId, title);
+  };
+
+  // Handle property sharing with event prevention
+  const shareProperty = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigation when clicking the button
+    e.stopPropagation();
+
+    sharePropertyUtil(propertyId, title, address, price);
+  };
+
+  // Handle virtual tour button click
+  const openVirtualTour = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigation when clicking the button
+    e.stopPropagation();
+
+    setIsVirtualTourOpen(true);
+  };
+
   return (
     <div className="group relative overflow-hidden rounded-xl border bg-card hover-card hover-lift">
+      {/* Virtual Tour Modal */}
+      {virtualTourUrl && (
+        <VirtualTourModal
+          isOpen={isVirtualTourOpen}
+          onClose={() => setIsVirtualTourOpen(false)}
+          tourUrl={virtualTourUrl}
+          propertyTitle={title}
+        />
+      )}
+
       <div className="relative aspect-[4/3]">
         <Image
           src={image || "https://digiestateorg.wordpress.com/wp-content/uploads/2023/11/ask-us-1024x583-1.jpg"}
@@ -43,17 +94,32 @@ export function PropertyCard({ image, title, address, price, period, type, badge
           <Button
             size="icon"
             variant="secondary"
-            className="h-9 w-9 rounded-full bg-white/90 shadow-lg backdrop-blur-sm transition-transform hover:scale-110 hover:bg-white"
+            className={`h-9 w-9 rounded-full ${isPropertyFavorite ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-white/90 hover:bg-white'} shadow-lg backdrop-blur-sm transition-transform hover:scale-110`}
+            onClick={toggleFavorite}
+            title={isPropertyFavorite ? "Remove from favorites" : "Add to favorites"}
           >
-            <Heart className="h-4 w-4" />
+            <Heart className={`h-4 w-4 ${isPropertyFavorite ? 'fill-white' : ''}`} />
           </Button>
           <Button
             size="icon"
             variant="secondary"
             className="h-9 w-9 rounded-full bg-white/90 shadow-lg backdrop-blur-sm transition-transform hover:scale-110 hover:bg-white"
+            onClick={shareProperty}
+            title="Share property"
           >
             <Share2 className="h-4 w-4" />
           </Button>
+          {virtualTourUrl && (
+            <Button
+              size="icon"
+              variant="secondary"
+              className="h-9 w-9 rounded-full bg-blue-500 text-white shadow-lg backdrop-blur-sm transition-transform hover:scale-110 hover:bg-blue-600"
+              onClick={openVirtualTour}
+              title="View virtual tour"
+            >
+              <Video className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
       <div className="p-5">
@@ -95,11 +161,17 @@ export function PropertyCard({ image, title, address, price, period, type, badge
             {period && <span className="text-sm text-muted-foreground">/{period}</span>}
           </div>
           {propertyId ? (
-            <Link href={`/listing-single/${propertyId}`}>
+            disableLink ? (
               <Button variant="outline" size="sm" className="shadow-sm transition-all hover:bg-blue-50 hover:text-blue-600">
                 View Details
               </Button>
-            </Link>
+            ) : (
+              <Link href={`/listing-single/${propertyId}`}>
+                <Button variant="outline" size="sm" className="shadow-sm transition-all hover:bg-blue-50 hover:text-blue-600">
+                  View Details
+                </Button>
+              </Link>
+            )
           ) : (
             <Button variant="outline" size="sm" className="shadow-sm transition-all hover:bg-blue-50 hover:text-blue-600">
               View Details

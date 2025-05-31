@@ -12,6 +12,7 @@ export async function GET(
         properties: {
           include: {
             propertyType: true,
+            media: true,
             agent: {
               include: {
                 user: {
@@ -68,12 +69,31 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    await prisma.location.delete({
-      where: { id: params.id }
+    const id = parseInt(params.id)
+
+    // Check if location exists
+    const location = await prisma.location.findUnique({
+      where: { id }
     })
 
-    return new NextResponse(null, { status: 204 })
+    if (!location) {
+      return NextResponse.json(
+        { error: "Location not found" },
+        { status: 404 }
+      )
+    }
+
+    // Delete the location
+    await prisma.location.delete({
+      where: { id }
+    })
+
+    return NextResponse.json({ message: "Location deleted successfully" })
   } catch (error) {
-    return NextResponse.json({ error: 'Error deleting location' }, { status: 500 })
+    console.error("Error deleting location:", error)
+    return NextResponse.json(
+      { error: "Failed to delete location" },
+      { status: 500 }
+    )
   }
 }

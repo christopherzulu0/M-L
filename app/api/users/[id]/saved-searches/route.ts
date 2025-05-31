@@ -6,8 +6,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id: userId } = await params
     const savedSearches = await prisma.savedSearch.findMany({
-      where: { userId: params.id },
+      where: { userId },
       orderBy: { createdAt: 'desc' }
     })
 
@@ -25,6 +26,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id: userId } = await params
     const body = await request.json()
     const {
       name,
@@ -34,7 +36,7 @@ export async function POST(
 
     const savedSearch = await prisma.savedSearch.create({
       data: {
-        user: { connect: { id: params.id } },
+        user: { connect: { id: userId } },
         name,
         searchParams,
         notificationsEnabled

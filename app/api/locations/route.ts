@@ -4,6 +4,9 @@ import {auth} from "@clerk/nextjs/server";
 
 export async function GET(request: Request) {
   try {
+    // Add logging to help debug
+    console.log('Fetching locations from database...');
+
     const locations = await prisma.location.findMany({
       include: {
         properties: {
@@ -15,10 +18,24 @@ export async function GET(request: Request) {
           }
         }
       }
-    })
-    return NextResponse.json(locations)
+    });
+
+    console.log(`Successfully fetched ${locations.length} locations`);
+
+    // Set cache headers
+    return NextResponse.json(locations, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
   } catch (error) {
-    return NextResponse.json({ error: 'Error fetching locations' }, { status: 500 })
+    console.error('Error fetching locations:', error);
+    return NextResponse.json({
+      error: 'Error fetching locations',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
 
@@ -31,17 +48,17 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { 
-      name, 
-      city, 
-      stateProvince, 
-      country, 
-      postalCode, 
-      region, 
-      description, 
-      featured, 
-      order, 
-      image 
+    const {
+      name,
+      city,
+      stateProvince,
+      country,
+      postalCode,
+      region,
+      description,
+      featured,
+      order,
+      image
     } = body
 
     const location = await prisma.location.create({
@@ -63,7 +80,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error creating location:', error)
     return NextResponse.json(
-      { error: 'Error creating location' }, 
+      { error: 'Error creating location' },
       { status: 500 }
     )
   }

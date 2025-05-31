@@ -24,6 +24,7 @@ import { PatternBackground } from "@/components/ui/pattern-background"
 import { PropertyComparison } from "@/components/property-comparison"
 import { MortgageCalculator } from "@/components/mortgage-calculator"
 import { AgentCard } from "@/components/agent-card"
+import { TestimonialsDisplay } from "@/components/testimonials-display"
 import FeaturedLocations from "@/components/FeaturedLocations"
 import Properties from "@/components/Properties"
 import Blog from "@/components/Blog"
@@ -98,7 +99,7 @@ export default function Home() {
   const visibleAgents = agents.slice(currentSlide * slidesPerView, currentSlide * slidesPerView + slidesPerView)
 
   return (
-    <main className="bg-gray-50">
+    <main className="bg-gray-50 ">
       <HeroSection />
       <FeaturedLocations />
       <Properties />
@@ -179,32 +180,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeader title="What Our Clients Say" subtitle="Trusted by thousands of happy customers" />
 
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
-            {[1, 2, 3].map((index) => (
-              <div key={index} className="rounded-2xl bg-white p-8 card-shadow subtle-border">
-                <div className="mb-6 flex items-center gap-4">
-                  <div className="h-14 w-14 overflow-hidden rounded-full bg-gray-200">
-                    <Image
-                      src="/placeholder.svg"
-                      alt="Client"
-                      width={56}
-                      height={56}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-semibold">Client Name</h4>
-                    <p className="text-sm text-muted-foreground">Property Buyer</p>
-                  </div>
-                </div>
-                <p className="mb-6 text-muted-foreground">
-                  "Amazing experience working with this team. They helped me find my dream home within my budget. Highly
-                  recommended!"
-                </p>
-                <StarRating rating={5} label="Excellent" className="text-yellow-500" />
-              </div>
-            ))}
-          </div>
+          <TestimonialsDisplay />
         </div>
       </section>
 

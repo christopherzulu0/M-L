@@ -24,7 +24,7 @@ async function main() {
   const listingTypes = [
     { name: 'For Sale', description: 'Property available for purchase' },
     { name: 'For Rent', description: 'Property available for rent' },
-    { name: 'Short Term', description: 'Property available for short-term rental' }
+    { name: 'Sold', description: 'Property available for short-term rental' }
   ]
 
   for (const type of listingTypes) {
@@ -36,47 +36,47 @@ async function main() {
   }
 
   // Create locations
-  const locations = [
-    { name: 'Lusaka', city: 'Lusaka', stateProvince: 'Lusaka Province', country: 'Zambia' },
-    { name: 'Kitwe', city: 'Kitwe', stateProvince: 'Copperbelt Province', country: 'Zambia' },
-    { name: 'Ndola', city: 'Ndola', stateProvince: 'Copperbelt Province', country: 'Zambia' },
-    { name: 'Livingstone', city: 'Livingstone', stateProvince: 'Southern Province', country: 'Zambia' }
-  ]
+  // const locations = [
+  //   { name: 'Lusaka', city: 'Lusaka', stateProvince: 'Lusaka Province', country: 'Zambia' },
+  //   { name: 'Kitwe', city: 'Kitwe', stateProvince: 'Copperbelt Province', country: 'Zambia' },
+  //   { name: 'Ndola', city: 'Ndola', stateProvince: 'Copperbelt Province', country: 'Zambia' },
+  //   { name: 'Livingstone', city: 'Livingstone', stateProvince: 'Southern Province', country: 'Zambia' }
+  // ]
 
-  for (const location of locations) {
-    // Try to find existing location
-    const existingLocation = await prisma.location.findFirst({
-      where: {
-        city: location.city,
-        stateProvince: location.stateProvince,
-        country: location.country
-      }
-    })
+  // for (const location of locations) {
+  //   // Try to find existing location
+  //   const existingLocation = await prisma.location.findFirst({
+  //     where: {
+  //       city: location.city,
+  //       stateProvince: location.stateProvince,
+  //       country: location.country
+  //     }
+  //   })
 
-    if (!existingLocation) {
-      await prisma.location.create({
-        data: location
-      })
-    }
-  }
+  //   if (!existingLocation) {
+  //     await prisma.location.create({
+  //       data: location
+  //     })
+  //   }
+  // }
 
   // Create some features
-  const features = [
-    { name: 'Air Conditioning', category: 'comfort' },
-    { name: 'Garden', category: 'outdoor' },
-    { name: 'Fireplace', category: 'indoor' },
-    { name: 'Swimming Pool', category: 'outdoor' },
-    { name: 'Security System', category: 'security' },
-    { name: 'High Speed Internet', category: 'utilities' }
-  ]
-
-  for (const feature of features) {
-    await prisma.feature.upsert({
-      where: { name: feature.name },
-      update: {},
-      create: feature
-    })
-  }
+  // const features = [
+  //   { name: 'Air Conditioning', category: 'comfort' },
+  //   { name: 'Garden', category: 'outdoor' },
+  //   { name: 'Fireplace', category: 'indoor' },
+  //   { name: 'Swimming Pool', category: 'outdoor' },
+  //   { name: 'Security System', category: 'security' },
+  //   { name: 'High Speed Internet', category: 'utilities' }
+  // ]
+  //
+  // for (const feature of features) {
+  //   await prisma.feature.upsert({
+  //     where: { name: feature.name },
+  //     update: {},
+  //     create: feature
+  //   })
+  // }
 
   console.log('Seed data created successfully')
 }

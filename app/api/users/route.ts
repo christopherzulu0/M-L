@@ -1,8 +1,11 @@
-import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
+import { NextResponse } from "next/server"
+import { PrismaClient } from "@/lib/generated/prisma"
 import {auth} from "@clerk/nextjs/server";
 
-export async function GET(request: Request) {
+const prisma = new PrismaClient()
+
+// GET /api/users - Get all users
+export async function GET() {
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -10,48 +13,72 @@ export async function GET(request: Request) {
         email: true,
         firstName: true,
         lastName: true,
-        phone: true,
         role: true,
-        profileImage: true,
-        createdAt: true,
         status: true,
-        emailVerified: true,
-      }
-    })
-    return NextResponse.json(users)
-  } catch (error) {
-    return NextResponse.json({ error: 'Error fetching users' }, { status: 500 })
-  }
-}
-
-export async function POST(request: Request) {
-  try {
-    const session = await auth();
-
-    if(!session || !session.userId === null){
-      return NextResponse.json({error: 'Not authorized'},{status: 401})
-    }
-
-    const body = await request.json()
-    const { email, firstName, lastName, phone, role } = body
-
-    const user = await prisma.user.create({
-      data: {
-        clerkid: session?.userId,
-        email,
-        firstName,
-        lastName,
-        phone,
-        role,
-        
-
+        profileImage: true,
+        lastLogin: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     })
 
-    return NextResponse.json(user, { status: 201 })
+    return NextResponse.json(users)
   } catch (error) {
+    console.error('Error fetching users:', error)
     return NextResponse.json(
-      { error: 'Error creating user' }, 
+      { error: 'Failed to fetch users' },
+      { status: 500 }
+    )
+  }
+}
+
+// POST /api/users - Create a new user
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+   const session = await auth()
+    // Validate required fields
+    const { email, firstName, lastName, role, password } = body
+
+    if (!email || !firstName || !lastName) {
+      return NextResponse.json(
+        { error: 'Email, first name, and last name are required' },
+        { status: 400 }
+      )
+    }
+
+    // Check if user with email already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    })
+
+    if (existingUser) {
+      return NextResponse.json(
+        { error: 'User with this email already exists' },
+        { status: 400 }
+      )
+    }
+
+    // Create new user
+    const newUser = await prisma.user.create({
+      data: {
+        email,
+        firstName,
+        lastName,
+        role: role || 'user', // Default to 'user' if not specified
+        status: 'active',
+        clerkid:session?.userId
+        // Other fields can be added here
+      },
+    })
+
+    return NextResponse.json(newUser, { status: 201 })
+  } catch (error) {
+    console.error('Error creating user:', error)
+    return NextResponse.json(
+      { error: 'Failed to create user' },
       { status: 500 }
     )
   }

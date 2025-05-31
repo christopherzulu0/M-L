@@ -1,10 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect, useRef } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import dynamic from "next/dynamic"
+import "leaflet/dist/leaflet.css"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,11 +34,107 @@ import {
   ArrowLeft,
   Plus,
   Trash2,
+  Search,
+  Navigation,
 } from "lucide-react"
 import Image from "next/image"
 import { generateClientDropzoneAccept } from "uploadthing/client"
 import { useDropzone } from "react-dropzone"
 import { useUploadThing } from "@/lib/uploadthing"
+
+// Dynamically import the Map components to avoid SSR issues
+const MapContainer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.MapContainer),
+  { ssr: false }
+)
+const TileLayer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.TileLayer),
+  { ssr: false }
+)
+const Marker = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Marker),
+  { ssr: false }
+)
+const Popup = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Popup),
+  { ssr: false }
+)
+const useMapEvents = dynamic(
+  () => import('react-leaflet').then((mod) => mod.useMapEvents),
+  { ssr: false }
+)
+
+// Custom icon for the map marker
+const createMapIcon = () => {
+  if (typeof window === 'undefined') return null;
+
+  // Import Leaflet only on client side
+  const L = require('leaflet');
+
+  return L.icon({
+    iconUrl: '/images/marker-icon.png',
+    iconRetinaUrl: '/images/marker-icon-2x.png',
+    shadowUrl: '/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+};
+
+// Location Marker Component
+const LocationMarker = ({ position, setPosition }) => {
+  const markerRef = useRef(null);
+  const [icon, setIcon] = useState(null);
+
+  // Initialize icon on client side only
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const mapIcon = createMapIcon();
+      setIcon(mapIcon);
+    }
+  }, []);
+
+  const map = useMapEvents({
+    click(e) {
+      const { lat, lng } = e.latlng;
+      setPosition([lat, lng]);
+      map.flyTo(e.latlng, map.getZoom());
+    },
+  });
+
+  const eventHandlers = {
+    dragend() {
+      const marker = markerRef.current;
+      if (marker) {
+        const { lat, lng } = marker.getLatLng();
+        setPosition([lat, lng]);
+      }
+    },
+  };
+
+  // Only render marker when position and icon are both available
+  return (position && icon) ? (
+    <Marker
+      position={position}
+      icon={icon}
+      draggable={true}
+      eventHandlers={eventHandlers}
+      ref={markerRef}
+    >
+      <Popup>
+        <div className="p-2 text-center">
+          <p className="font-medium">Selected Location</p>
+          <p className="text-xs text-gray-500 mt-1">Drag marker to adjust position</p>
+          <p className="text-xs mt-2">
+            Lat: {position[0].toFixed(6)}<br />
+            Lng: {position[1].toFixed(6)}
+          </p>
+        </div>
+      </Popup>
+    </Marker>
+  ) : null;
+};
 
 // Property types interface
 interface PropertyType {
@@ -90,11 +188,11 @@ const availableAmenities = [
 const formSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters" }),
   description: z.string().min(20, { message: "Description must be at least 20 characters" }),
-  propertyTypeId: z.number({ 
+  propertyTypeId: z.number({
     required_error: "Property type is required",
-    invalid_type_error: "Property type must be a number" 
+    invalid_type_error: "Property type must be a number"
   }),
-  listingTypeId: z.number({ 
+  listingTypeId: z.number({
     required_error: "Listing type is required",
     invalid_type_error: "Listing type must be a number"
   }),
@@ -130,6 +228,9 @@ const formSchema = z.object({
 
 export default function AddListingPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const propertyId = searchParams.get('id')
+  const isEditMode = !!propertyId
   const [activeTab, setActiveTab] = useState("basic")
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
@@ -140,6 +241,45 @@ export default function AddListingPage() {
   const [locations, setLocations] = useState<Location[]>([])
   const [agents, setAgents] = useState<Agent[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [mapPosition, setMapPosition] = useState<[number, number] | null>(null)
+  const [searchAddress, setSearchAddress] = useState("")
+  const [isSearching, setIsSearching] = useState(false)
+  const [propertyData, setPropertyData] = useState(null)
+
+  // Initialize form
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      propertyTypeId: 0,
+      listingTypeId: 0,
+      price: "",
+      priceType: "total",
+      address: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "Zambia",
+      locationId: 0,
+      latitude: "",
+      longitude: "",
+      bedrooms: "",
+      bathrooms: "",
+      squareFeet: "",
+      yearBuilt: "",
+      lotSize: "",
+      parkingSpaces: "",
+      features: [],
+      amenities: [],
+      status: "draft",
+      featured: false,
+      DView: "",
+      images: [],
+      floorPlan: "",
+      documents: [],
+    },
+  })
 
   // Fetch property types, listing types, and locations
   useEffect(() => {
@@ -157,11 +297,13 @@ export default function AddListingPage() {
         const listingTypesData = await listingTypesRes.json()
         const locationsData = await locationsRes.json()
         const agentsData = await agentsRes.json()
+        console.log('Agents API response:', agentsData)
+        console.log('Agents array:', agentsData.agents || [])
 
         setPropertyTypes(propertyTypesData)
         setListingTypes(listingTypesData)
         setLocations(locationsData)
-        setAgents(agentsData || [])
+        setAgents(agentsData.agents || [])
       } catch (error) {
         console.error('Error fetching data:', error)
         toast({
@@ -176,6 +318,76 @@ export default function AddListingPage() {
 
     fetchData()
   }, [])
+
+  // Fetch property data if in edit mode
+  useEffect(() => {
+    if (isEditMode && propertyId) {
+      const fetchPropertyData = async () => {
+        try {
+          setIsLoading(true)
+          const response = await fetch(`/api/properties/${propertyId}`)
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch property data")
+          }
+
+          const data = await response.json()
+          setPropertyData(data)
+
+          // Set map position if latitude and longitude are available
+          if (data.latitude && data.longitude) {
+            setMapPosition([parseFloat(data.latitude), parseFloat(data.longitude)])
+          }
+
+          // Populate form with property data
+          if (form) {
+            form.reset({
+              title: data.title || "",
+              description: data.description || "",
+              propertyTypeId: data.propertyTypeId || 0,
+              listingTypeId: data.listingTypeId || 0,
+              price: data.price ? data.price.toString() : "",
+              priceType: data.listingType?.name === "For Rent" ? "monthly" : "total",
+              address: data.address || "",
+              city: data.city || "",
+              state: data.state || "",
+              zipCode: data.zipCode || "",
+              country: data.country || "Zambia",
+              locationId: data.locationId || 0,
+              latitude: data.latitude ? data.latitude.toString() : "",
+              longitude: data.longitude ? data.longitude.toString() : "",
+              bedrooms: data.bedrooms ? data.bedrooms.toString() : "",
+              bathrooms: data.bathrooms ? data.bathrooms.toString() : "",
+              squareFeet: data.squareFeet ? data.squareFeet.toString() : "",
+              yearBuilt: data.yearBuilt ? data.yearBuilt.toString() : "",
+              lotSize: data.lotSize ? data.lotSize.toString() : "",
+              parkingSpaces: data.parkingSpaces ? data.parkingSpaces.toString() : "",
+              features: data.features?.map(f => f.feature.name) || [],
+              amenities: data.amenities?.map(a => a.amenity.name) || [],
+              status: data.status || "draft",
+              featured: data.featured || false,
+              agentId: data.agentId ? data.agentId.toString() : "",
+              DView: data.DView || "",
+              images: data.media?.filter(m => m.mediaType === "image").map(m => m.filePath) || [],
+              floorPlan: data.media?.find(m => m.mediaType === "floorPlan")?.filePath || "",
+              documents: data.media?.filter(m => m.mediaType === "document").map(m => m.filePath) || [],
+            })
+          }
+        } catch (error) {
+          console.error('Error fetching property data:', error)
+          toast({
+            title: "Error",
+            description: "Failed to load property data for editing",
+            variant: "destructive",
+          })
+        } finally {
+          setIsLoading(false)
+        }
+      }
+
+      fetchPropertyData()
+    }
+  }, [isEditMode, propertyId, form])
 
   const { startUpload } = useUploadThing("imageUploader", {
     onClientUploadComplete: (res) => {
@@ -278,44 +490,21 @@ export default function AddListingPage() {
     },
   })
 
-  // Initialize form
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      propertyTypeId: 0,
-      listingTypeId: 0,
-      price: "",
-      priceType: "total",
-      address: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      country: "Zambia",
-      locationId: 0,
-      bedrooms: "",
-      bathrooms: "",
-      squareFeet: "",
-      yearBuilt: "",
-      lotSize: "",
-      parkingSpaces: "",
-      features: [],
-      amenities: [],
-      status: "draft",
-      featured: false,
-      DView: "",
-      images: [],
-      floorPlan: "",
-      documents: [],
-    },
-  })
-
   // Form submission handler
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      console.log('Form submission started');
       console.log('Form values:', values);
       console.log('Selected features:', values.features);
+      console.log('Edit mode:', isEditMode);
+
+      // Check for required fields
+      if (!values.title) console.log('Title is missing');
+      if (!values.description) console.log('Description is missing');
+      if (!values.propertyTypeId) console.log('Property type is missing');
+      if (!values.listingTypeId) console.log('Listing type is missing');
+      if (!values.address) console.log('Address is missing');
+      if (!values.locationId) console.log('Location is missing');
 
       let featureConnections = [];
 
@@ -357,7 +546,8 @@ export default function AddListingPage() {
         }
       }
 
-      const requestData = {
+      // Prepare the base request data
+      const baseRequestData = {
         title: values.title,
         description: values.description,
         price: values.price,
@@ -369,43 +559,93 @@ export default function AddListingPage() {
         listingTypeId: Number(values.listingTypeId),
         locationId: Number(values.locationId),
         agentId: values.agentId ? Number(values.agentId) : null,
-        latitude: values.latitude ? Number(values.latitude) : null,
-        longitude: values.longitude ? Number(values.longitude) : null,
+        latitude: values.latitude || null,
+        longitude: values.longitude || null,
         bedrooms: values.bedrooms ? Number(values.bedrooms) : null,
         bathrooms: values.bathrooms ? Number(values.bathrooms) : null,
         squareFeet: values.squareFeet ? Number(values.squareFeet) : null,
         lotSize: values.lotSize ? Number(values.lotSize) : null,
         yearBuilt: values.yearBuilt ? Number(values.yearBuilt) : null,
         parkingSpaces: values.parkingSpaces ? Number(values.parkingSpaces) : null,
-        features: featureConnections.length > 0 ? {
-          create: featureConnections
-        } : undefined,
-        media: {
-          create: [
-            // Add images
-            ...values.images.map((url) => ({
-              mediaType: "image",
-              filePath: url,
-              fileName: url.split('/').pop() || 'unnamed',
-              isPrimary: false,
-              sortOrder: 0
-            })),
-            // Add documents
-            ...values.documents.map((url) => ({
-              mediaType: "document",
-              filePath: url,
-              fileName: url.split('/').pop() || 'document',
-              isPrimary: false,
-              sortOrder: 0
-            }))
-          ]
-        }
       };
+
+      // Add media and features differently based on whether we're adding or editing
+      let requestData;
+
+      if (isEditMode) {
+        // For editing, we need to handle updating existing media and features
+        requestData = {
+          ...baseRequestData,
+          // For editing, we might need a different approach for features and media
+          // This is a simplified version - you may need to adjust based on your API
+          features: featureConnections.length > 0 ? {
+            // This assumes your API can handle replacing all features
+            // You might need a more complex approach like deleteMany + createMany
+            create: featureConnections
+          } : undefined,
+          // Similarly for media, this is simplified
+          media: {
+            // This assumes your API can handle replacing media
+            create: [
+              // Add images
+              ...values.images.map((url) => ({
+                mediaType: "image",
+                filePath: url,
+                fileName: url.split('/').pop() || 'unnamed',
+                isPrimary: false,
+                sortOrder: 0
+              })),
+              // Add documents
+              ...values.documents.map((url) => ({
+                mediaType: "document",
+                filePath: url,
+                fileName: url.split('/').pop() || 'document',
+                isPrimary: false,
+                sortOrder: 0
+              }))
+            ]
+          }
+        };
+      } else {
+        // For adding a new property
+        requestData = {
+          ...baseRequestData,
+          features: featureConnections.length > 0 ? {
+            create: featureConnections
+          } : undefined,
+          media: {
+            create: [
+              // Add images
+              ...values.images.map((url) => ({
+                mediaType: "image",
+                filePath: url,
+                fileName: url.split('/').pop() || 'unnamed',
+                isPrimary: false,
+                sortOrder: 0
+              })),
+              // Add documents
+              ...values.documents.map((url) => ({
+                mediaType: "document",
+                filePath: url,
+                fileName: url.split('/').pop() || 'document',
+                isPrimary: false,
+                sortOrder: 0
+              }))
+            ]
+          }
+        };
+      }
 
       console.log('Final request data:', JSON.stringify(requestData, null, 2));
 
-      const response = await fetch("/api/properties", {
-        method: "POST",
+      // Different API endpoint and method based on whether we're adding or editing
+      const url = isEditMode ? `/api/properties/${propertyId}` : "/api/properties";
+      const method = isEditMode ? "PUT" : "POST";
+
+      console.log(`Making ${method} request to ${url}`);
+
+      const response = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -424,6 +664,14 @@ export default function AddListingPage() {
       router.push("/dashboard/properties");
     } catch (error) {
       console.error('Submission error:', error);
+      // Log more detailed error information
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+      } else {
+        console.error('Unknown error type:', typeof error);
+      }
+
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to create property listing",
@@ -449,6 +697,68 @@ export default function AddListingPage() {
     }
   }, [isDocumentUploading])
 
+  // Update form values when map position changes
+  useEffect(() => {
+    if (mapPosition) {
+      const [lat, lng] = mapPosition;
+      form.setValue("latitude", lat.toFixed(6));
+      form.setValue("longitude", lng.toFixed(6));
+    }
+  }, [mapPosition, form]);
+
+  // Update map position when form values change
+  useEffect(() => {
+    const lat = form.watch("latitude");
+    const lng = form.watch("longitude");
+
+    if (lat && lng && !isNaN(Number(lat)) && !isNaN(Number(lng))) {
+      setMapPosition([Number(lat), Number(lng)]);
+    }
+  }, [form.watch("latitude"), form.watch("longitude"), form]);
+
+  // Function to search for a location by address
+  const searchLocation = async () => {
+    if (!searchAddress.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter an address to search",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      // Using OpenStreetMap Nominatim API for geocoding
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}`);
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        const { lat, lon } = data[0];
+        setMapPosition([Number(lat), Number(lon)]);
+        toast({
+          title: "Location found",
+          description: `Found location: ${data[0].display_name}`,
+        });
+      } else {
+        toast({
+          title: "Location not found",
+          description: "Could not find the specified address. Please try a different search term.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error searching for location:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while searching for the location",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   // Remove image
   const removeImage = (index: number) => {
     const newImages = [...form.watch("images")]
@@ -467,8 +777,8 @@ export default function AddListingPage() {
     <div className="container mx-auto p-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Add New Property Listing</h1>
-          <p className="text-muted-foreground">Create a new property listing to showcase on your website</p>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">{isEditMode ? "Edit Property Listing" : "Add New Property Listing"}</h1>
+          <p className="text-muted-foreground">{isEditMode ? "Update your property listing information" : "Create a new property listing to showcase on your website"}</p>
         </div>
         <Button variant="outline" onClick={() => router.back()}>
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Properties
@@ -476,7 +786,11 @@ export default function AddListingPage() {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form
+          onSubmit={(e) => {
+            console.log('Form submit event triggered');
+            form.handleSubmit(onSubmit)(e);
+          }}>
           <div className="grid gap-6 md:grid-cols-7">
             {/* Main content */}
             <div className="md:col-span-5">
@@ -860,17 +1174,97 @@ export default function AddListingPage() {
                       <div className="rounded-lg border bg-slate-50 p-4">
                         <div className="mb-4 flex items-center gap-2">
                           <Info className="h-5 w-5 text-blue-600" />
-                          <p className="font-medium">Map Preview</p>
+                          <p className="font-medium">Map Location</p>
                         </div>
-                        <div className="relative h-[300px] w-full bg-gray-200 rounded-md">
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <p className="text-gray-500">Map will be displayed here</p>
+
+                        {/* Search input */}
+                        <div className="mb-4 flex gap-2">
+                          <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+                            <Input
+                              className="pl-10"
+                              placeholder="Search for an address..."
+                              value={searchAddress}
+                              onChange={(e) => setSearchAddress(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  searchLocation();
+                                }
+                              }}
+                            />
                           </div>
+                          <Button
+                            type="button"
+                            onClick={searchLocation}
+                            disabled={isSearching}
+                          >
+                            {isSearching ? (
+                              <>Searching...</>
+                            ) : (
+                              <>Search</>
+                            )}
+                          </Button>
                         </div>
-                        <p className="mt-2 text-xs text-gray-500">
-                          Enter latitude and longitude coordinates for precise location, or use the address for
-                          approximate positioning.
-                        </p>
+
+                        {/* Map */}
+                        <div className="relative h-[300px] w-full rounded-md overflow-hidden border">
+                          {typeof window !== 'undefined' ? (
+                            <MapContainer
+                              center={mapPosition || [-15.3875, 28.3228]} // Default to Lusaka, Zambia
+                              zoom={13}
+                              style={{ height: '100%', width: '100%' }}
+                              className="z-0"
+                            >
+                              <TileLayer
+                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                              />
+                              <LocationMarker
+                                position={mapPosition}
+                                setPosition={setMapPosition}
+                              />
+                            </MapContainer>
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <p className="text-gray-500">Map loading...</p>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="mt-4 flex items-center justify-between">
+                          <p className="text-xs text-gray-500">
+                            Click on the map to set the location or search for an address above.
+                          </p>
+                          {mapPosition && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                if (navigator.geolocation) {
+                                  navigator.geolocation.getCurrentPosition(
+                                    (position) => {
+                                      const { latitude, longitude } = position.coords;
+                                      setMapPosition([latitude, longitude]);
+                                    },
+                                    (error) => {
+                                      console.error("Error getting current location:", error);
+                                      toast({
+                                        title: "Location Error",
+                                        description: "Could not get your current location. Please try again or select manually.",
+                                        variant: "destructive",
+                                      });
+                                    }
+                                  );
+                                }
+                              }}
+                            >
+                              <Navigation className="mr-2 h-4 w-4" />
+                              Use My Location
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </CardContent>
                     <CardFooter className="flex justify-between">
@@ -1087,14 +1481,14 @@ export default function AddListingPage() {
                             </div>
 
                             <div className="flex justify-end space-x-2">
-                              <Button 
-                                type="button" 
-                                variant="outline" 
+                              <Button
+                                type="button"
+                                variant="outline"
                                 onClick={() => document.getElementById('selectDocumentDialog')?.close()}
                               >
                                 Cancel
                               </Button>
-                              <Button 
+                              <Button
                                 type="button"
                                 onClick={() => {
                                   // Add selected documents to form
@@ -1234,7 +1628,15 @@ export default function AddListingPage() {
                       <Button variant="outline" onClick={() => setActiveTab("media")}>
                         Previous
                       </Button>
-                      <Button type="submit">Save Listing</Button>
+                      <Button
+                        type="submit"
+                        onClick={(e) => {
+                          console.log('Save button clicked');
+                          // Don't prevent default to allow form submission
+                        }}
+                      >
+                        {isEditMode ? "Update Listing" : "Save Listing"}
+                      </Button>
                     </CardFooter>
                   </Card>
                 </TabsContent>

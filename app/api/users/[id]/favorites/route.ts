@@ -6,8 +6,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id: userId } = await params
     const favorites = await prisma.favorite.findMany({
-      where: { userId: params.id },
+      where: { userId },
       include: {
         property: {
           include: {
@@ -37,13 +38,14 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id: userId } = await params
     const body = await request.json()
     const { propertyId } = body
 
     // Check if already favorited
     const existingFavorite = await prisma.favorite.findFirst({
       where: {
-        userId: params.id,
+        userId,
         propertyId
       }
     })
@@ -57,7 +59,7 @@ export async function POST(
 
     const favorite = await prisma.favorite.create({
       data: {
-        user: { connect: { id: params.id } },
+        user: { connect: { id: userId } },
         property: { connect: { id: propertyId } }
       },
       include: {
@@ -84,6 +86,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id: userId } = await params
     const { searchParams } = new URL(request.url)
     const propertyId = searchParams.get('propertyId')
 
@@ -96,7 +99,7 @@ export async function DELETE(
 
     await prisma.favorite.deleteMany({
       where: {
-        userId: params.id,
+        userId,
         propertyId
       }
     })
