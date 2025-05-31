@@ -1,5 +1,8 @@
 import { toast } from "@/components/ui/use-toast";
 
+// Check if code is running in browser environment
+const isBrowser = typeof window !== 'undefined';
+
 /**
  * Share content using the Web Share API with fallback to clipboard
  * @param options - Sharing options
@@ -11,10 +14,13 @@ export async function shareContent(options: {
   url: string;
   fallbackText?: string;
 }): Promise<void> {
+  // Return early if not in browser environment
+  if (!isBrowser) return;
+
   const { title, text, url, fallbackText = "Link copied to clipboard!" } = options;
 
   try {
-    if (navigator.share) {
+    if (typeof navigator !== 'undefined' && navigator.share) {
       await navigator.share({
         title,
         text,
@@ -42,13 +48,18 @@ export async function shareContent(options: {
  * @param successMessage - Message to show on success
  */
 async function copyToClipboard(text: string, successMessage: string): Promise<void> {
+  // Return early if not in browser environment
+  if (!isBrowser) return;
+
   try {
-    await navigator.clipboard.writeText(text);
-    toast({
-      title: "Link copied",
-      description: successMessage,
-      duration: 3000,
-    });
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: "Link copied",
+        description: successMessage,
+        duration: 3000,
+      });
+    }
   } catch (error) {
     console.error('Failed to copy:', error);
     toast({
@@ -73,6 +84,10 @@ export function shareProperty(
   address: string,
   price: string
 ): Promise<void> {
+  // Return early if not in browser environment
+  if (!isBrowser) return Promise.resolve();
+
+  // Only access window.location in browser environment
   const shareUrl = propertyId
     ? `${window.location.origin}/listing-single/${propertyId}`
     : window.location.href;

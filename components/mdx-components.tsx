@@ -1,5 +1,6 @@
 import { Button } from "./ui/button"
 import { Alert } from "./ui/alert"
+import React from "react"
 
 export const components = {
   h1: (props) => <h1 className="text-4xl font-bold mb-4" {...props} />,
