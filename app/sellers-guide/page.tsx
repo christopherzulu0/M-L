@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowRight, CheckCircle, Home, DollarSign, Users, Calendar, Lightbulb, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { ScrollButton } from "./scroll-button"
 
 export default function SellersGuidePage() {
   return (
@@ -52,10 +53,9 @@ export default function SellersGuidePage() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="ghost" className="p-0 h-auto text-primary" onClick={() => document.getElementById('preparing')?.scrollIntoView({ behavior: 'smooth' })}>
+              <ScrollButton targetId="preparing">
                 Read More
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              </ScrollButton>
             </CardFooter>
           </Card>
 
@@ -72,10 +72,9 @@ export default function SellersGuidePage() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="ghost" className="p-0 h-auto text-primary" onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}>
+              <ScrollButton targetId="pricing">
                 Read More
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              </ScrollButton>
             </CardFooter>
           </Card>
 
@@ -92,10 +91,9 @@ export default function SellersGuidePage() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="ghost" className="p-0 h-auto text-primary" onClick={() => document.getElementById('agents')?.scrollIntoView({ behavior: 'smooth' })}>
+              <ScrollButton targetId="agents">
                 Read More
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              </ScrollButton>
             </CardFooter>
           </Card>
         </div>
