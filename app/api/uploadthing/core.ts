@@ -88,6 +88,20 @@ export const ourFileRouter = {
         return { url: file.url };
       }),
 
+  //Blog Image Uploader
+  blogImageUploader: f({
+    image: {
+      maxFileSize: "4MB",
+      maxFileCount: 1,
+    },
+  })
+    .middleware(async () => {
+      return { userId: "user" };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      return { url: file.url };
+    }),
+
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

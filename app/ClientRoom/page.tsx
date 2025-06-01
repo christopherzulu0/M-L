@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import UserGuard from './user-guard'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -56,6 +57,14 @@ interface Payment {
 }
 
 export default function ClientRoom() {
+  return (
+    <UserGuard>
+      <ClientRoomContent />
+    </UserGuard>
+  );
+}
+
+function ClientRoomContent() {
   const [properties, setProperties] = useState<Property[]>([])
   const [purchases, setPurchases] = useState<Purchase[]>([])
   const [loading, setLoading] = useState(true)

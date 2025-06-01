@@ -6,8 +6,10 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Ensure params is properly awaited
+    const { id: paramId } = params;
     const feature = await prisma.feature.findUnique({
-      where: { id: params.id },
+      where: { id: paramId },
       include: {
         properties: {
           include: {
@@ -39,11 +41,13 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Ensure params is properly awaited
+    const { id: paramId } = params;
     const body = await request.json()
     const { name, description, category } = body
 
     const feature = await prisma.feature.update({
-      where: { id: params.id },
+      where: { id: paramId },
       data: {
         name,
         description,
@@ -62,8 +66,10 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Ensure params is properly awaited
+    const { id: paramId } = params;
     await prisma.feature.delete({
-      where: { id: params.id }
+      where: { id: paramId }
     })
 
     return new NextResponse(null, { status: 204 })

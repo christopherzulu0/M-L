@@ -37,25 +37,29 @@ model User {
 }
 
 model Agent {
-  id             Int              @id @default(autoincrement())
-  userId         Int              @unique @map("user_id")
-  bio            String?
-  specialization String?          @db.VarChar(100)
-  licenseNumber  String?          @map("license_number") @db.VarChar(100)
-  commissionRate Decimal?         @map("commission_rate") @db.Decimal(5, 2)
-  joinDate       DateTime         @default(now()) @map("join_date") @db.Date
-  status         String           @default("active") @db.VarChar(20)
-  rating         Decimal?         @db.Decimal(3, 1)
-  totalSales     Int              @default(0) @map("total_sales")
-  totalListings  Int              @default(0) @map("total_listings")
-  totalRevenue   Decimal          @default(0) @map("total_revenue") @db.Decimal(15, 2)
-  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt      DateTime         @default(now()) @map("updated_at") @db.Timestamptz
-  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  properties     Property[]
-  inquiries      Inquiry[]
-  appointments   Appointment[]
-  analytics      AgentAnalytics[]
+  id               Int              @id @default(autoincrement())
+  userId           Int              @unique @map("user_id")
+  bio              String?
+  specialization   String?          @db.VarChar(100)
+  licenseNumber    String?          @map("license_number") @db.VarChar(100)
+  commissionRate   Decimal?         @map("commission_rate") @db.Decimal(5, 2)
+  joinDate         DateTime         @default(now()) @map("join_date") @db.Date
+  status           String           @default("active") @db.VarChar(20)
+  rating           Decimal?         @db.Decimal(3, 1)
+  totalSales       Int              @default(0) @map("total_sales")
+  totalListings    Int              @default(0) @map("total_listings")
+  totalRevenue     Decimal          @default(0) @map("total_revenue") @db.Decimal(15, 2)
+  serviceAreas     Json?            @default("[]") @map("service_areas")
+  languages        Json?            @default("[]") @map("languages")
+  socialMediaLinks Json?            @default("{}") @map("social_media_links")
+  address          String?          @db.VarChar(255)
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime         @default(now()) @map("updated_at") @db.Timestamptz
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  properties       Property[]
+  inquiries        Inquiry[]
+  appointments     Appointment[]
+  analytics        AgentAnalytics[]
 
   @@map("agents")
 }

@@ -1,35 +1,108 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from '@/lib/generated/prisma';
 
-export async function POST(request: Request) {
+const prisma = new PrismaClient();
+
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    let user;
 
-    // Create a user first
-    const user = await prisma.user.create({
-      data: {
-        email: body.email || `agent${Date.now()}@example.com`,
-        firstName: body.firstName || 'John',
-        lastName: body.lastName || 'Doe',
-        phone: body.phone || '+260123456789',
-        role: 'agent',
-        profileImage: body.profileImage || 'https://i.pravatar.cc/150?img=1',
-        // Create the associated agent
-        agent: {
-          create: {
-            bio: body.bio || 'Experienced real estate agent',
-            specialization: body.specialization || 'Residential',
-            licenseNumber: body.licenseNumber || `LIC-${Date.now()}`,
-            commissionRate: 5.0,
-            rating: 4.5,
-            status: 'active'
-          }
+    // Check if we're using an existing user
+    if (body.existingUser && body.userId) {
+      // Get the existing user
+      const existingUser = await prisma.user.findUnique({
+        where: {
+          id: parseInt(body.userId)
         }
-      },
-      include: {
-        agent: true
+      });
+
+      if (!existingUser) {
+        return NextResponse.json(
+          { error: 'User not found' },
+          { status: 404 }
+        );
       }
-    });
+
+      // Update the user's role to agent if needed and update phone and profileImage if provided
+      const updateData: any = {
+        role: 'agent'
+      };
+
+      // Add phone to update data if provided
+      if (body.phone) {
+        updateData.phone = body.phone;
+      }
+
+      // Add profileImage to update data if provided
+      if (body.profileImage) {
+        updateData.profileImage = body.profileImage;
+      }
+
+      await prisma.user.update({
+        where: {
+          id: parseInt(body.userId)
+        },
+        data: updateData
+      });
+
+      // Create an agent record for the existing user
+      const agent = await prisma.agent.create({
+        data: {
+          userId: parseInt(body.userId),
+          bio: body.bio || 'Experienced real estate agent',
+          specialization: body.specialization || 'Residential',
+          licenseNumber: body.licenseNumber || `LIC-${Date.now()}`,
+          commissionRate: body.commissionRate || 5.0,
+          rating: body.rating || 4.5,
+          status: body.status || 'active',
+          serviceAreas: body.serviceAreas || [],
+          languages: body.languages || [],
+          socialMediaLinks: body.socialMediaLinks || {},
+          address: body.address || null
+        }
+      });
+
+      // Get the user with the newly created agent
+      user = await prisma.user.findUnique({
+        where: {
+          id: parseInt(body.userId)
+        },
+        include: {
+          agent: true
+        }
+      });
+    } else {
+      // Create a new user with an agent profile
+      user = await prisma.user.create({
+        data: {
+          email: body.email || `agent${Date.now()}@example.com`,
+          firstName: body.firstName || 'John',
+          lastName: body.lastName || 'Doe',
+          phone: body.phone || '+260123456789',
+          role: 'agent',
+          profileImage: body.profileImage || 'https://i.pravatar.cc/150?img=1',
+          // Create the associated agent
+          agent: {
+            create: {
+              bio: body.bio || 'Experienced real estate agent',
+              specialization: body.specialization || 'Residential',
+              licenseNumber: body.licenseNumber || `LIC-${Date.now()}`,
+              commissionRate: body.commissionRate || 5.0,
+              rating: body.rating || 4.5,
+              status: body.status || 'active',
+              serviceAreas: body.serviceAreas || [],
+              languages: body.languages || [],
+              socialMediaLinks: body.socialMediaLinks || {},
+              address: body.address || null
+            }
+          }
+        },
+        include: {
+          agent: true
+        }
+      });
+    }
 
     return NextResponse.json({
       message: 'Agent created successfully',
@@ -44,7 +117,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const agents = await prisma.agent.findMany({
       where: {
@@ -61,7 +134,7 @@ export async function GET() {
 
     // Get property counts for all agents
     const propertyCounts = await Promise.all(
-      agents.map(agent => 
+      agents.map(agent =>
         prisma.property.count({
           where: {
             agentId: agent.id,

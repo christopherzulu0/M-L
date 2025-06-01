@@ -26,7 +26,7 @@ export async function GET() {
 
     // Get property counts for all agents
     const propertyCounts = await Promise.all(
-      agents.map(agent => 
+      agents.map(agent =>
         prisma.property.count({
           where: {
             agentId: agent.id,
@@ -37,7 +37,7 @@ export async function GET() {
 
     // Get count of SOLD properties for all agents
     const soldPropertyCounts = await Promise.all(
-      agents.map(agent => 
+      agents.map(agent =>
         prisma.property.count({
           where: {
             agentId: agent.id,
@@ -68,6 +68,8 @@ export async function GET() {
           phone: agent.user.phone,
           profileImage: agent.user.profileImage,
         },
+        name: `${agent.user.firstName} ${agent.user.lastName}`,
+        image: agent.user.profileImage || "/placeholder.svg", // Add image property for AgentCard
         propertyCount: propertyCounts[index],
         soldPropertyCount: soldPropertyCounts[index],
         rating: agent.rating,
@@ -80,6 +82,13 @@ export async function GET() {
         verified: true,
         featured: Math.random() > 0.7, // Random for now, could be a field in the database
         bio: agent.bio,
+        agency: "Real Estate Agency", // Default agency name for AgentCard
+        listings: propertyCounts[index], // For AgentCard
+        ratingLabel: performance, // For AgentCard
+        serviceAreas: agent.serviceAreas || [],
+        languages: agent.languages || [],
+        socialMediaLinks: agent.socialMediaLinks || {},
+        address: agent.address || null
       };
     });
 

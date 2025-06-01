@@ -32,6 +32,7 @@ model User {
   notifications Notification[]
   documents     Document[]
   testimonials  Testimonial[]
+  blogPosts     BlogPost[]
 
   @@map("users")
 }
@@ -49,6 +50,10 @@ model Agent {
   totalSales     Int              @default(0) @map("total_sales")
   totalListings  Int              @default(0) @map("total_listings")
   totalRevenue   Decimal          @default(0) @map("total_revenue") @db.Decimal(15, 2)
+  serviceAreas   Json?            @map("service_areas") @default("[]")
+  languages      Json?            @map("languages") @default("[]")
+  socialMediaLinks Json?          @map("social_media_links") @default("{}")
+  address        String?          @db.VarChar(255)
   createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz
   updatedAt      DateTime         @default(now()) @map("updated_at") @db.Timestamptz
   user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -387,4 +392,24 @@ model Testimonial {
   user        User?    @relation(fields: [userId], references: [id])
 
   @@map("testimonials")
+}
+
+model BlogPost {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  slug        String   @unique @db.VarChar(255)
+  excerpt     String?
+  content     String
+  image       String?  @db.VarChar(255)
+  category    String   @db.VarChar(50)
+  authorId    Int?     @map("author_id")
+  publishedAt DateTime? @map("published_at") @db.Timestamptz
+  status      String   @default("draft") @db.VarChar(20) // draft, published
+  views       Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz
+
+  author      User?    @relation(fields: [authorId], references: [id])
+
+  @@map("blog_posts")
 }

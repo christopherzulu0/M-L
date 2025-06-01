@@ -36,6 +36,7 @@ export default function MobileNav({ unreadNotifications }: MobileNavProps) {
   const [agentsOpen, setAgentsOpen] = useState(false)
   const [locationOpen, setLocationOpen] = useState(false)
   const [usersOpen, setUsersOpen] = useState(false)
+  const [blogOpen, setBlogOpen] = useState(false)
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -170,6 +171,35 @@ export default function MobileNav({ unreadNotifications }: MobileNavProps) {
                 <Link href="/dashboard/users" passHref onClick={() => setOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start text-sm">
                     Manage Users
+                  </Button>
+                </Link>
+              </CollapsibleContent>
+            </Collapsible>
+
+            <Collapsible
+              className="w-full"
+              open={blogOpen}
+              onOpenChange={setBlogOpen}
+            >
+              <CollapsibleTrigger asChild className="w-full">
+                <Button variant="ghost" className="w-full justify-start">
+                  <FileText className="mr-2 h-4 w-4" /> Blog
+                  {blogOpen ? (
+                    <ChevronDown className="ml-auto h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="ml-auto h-4 w-4" />
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pl-6 mt-1 space-y-1">
+                <Link href="/dashboard/blog/add" passHref onClick={() => setOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start text-sm">
+                    Add Post
+                  </Button>
+                </Link>
+                <Link href="/dashboard/blog" passHref onClick={() => setOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start text-sm">
+                    Manage Posts
                   </Button>
                 </Link>
               </CollapsibleContent>

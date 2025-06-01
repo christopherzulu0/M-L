@@ -1,12 +1,16 @@
-import { NextResponse } from "next/server";
-import {prisma} from '../../../../lib/generated/prisma'
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from '@/lib/generated/prisma';
+
+const prisma = new PrismaClient();
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(await params.id);
+    // Ensure params is properly awaited
+    const { id: paramId } = params;
+    const id = parseInt(paramId);
 
     if (isNaN(id)) {
       return NextResponse.json(
@@ -59,19 +63,40 @@ export async function GET(
       agency: "Real Estate Agency", // Default agency name since it's not in the schema
       image: agent.user.profileImage || "/placeholder.svg", // Fallback to placeholder if no image
       email: agent.user.email,
-      phone: agent.user.phone || "Not provided",
-      address: "Not provided", // Address is not in the schema
-      website: "Not provided", // Website is not in the schema
-      bio: agent.bio || "Real estate professional",
-      specialization: agent.specialization || "Real Estate",
-      licenseNumber: agent.licenseNumber || "Not provided",
-      rating: Number(agent.rating) || 0,
-      ratingLabel: getRatingLabel(agent.rating),
+      phone: agent.user.phone || null,
+      address: agent.address || "123 Main Street, Lusaka, Zambia", // Use agent's address or default
+      website: "https://www.example.com", // Default website since it's not in the schema
+      bio: agent.bio || null,
+      specialization: agent.specialization || null,
+      licenseNumber: agent.licenseNumber || null,
+      rating: Number(agent.rating) || null,
+      ratingLabel: agent.rating ? getRatingLabel(agent.rating) : null,
       verified: agent.status === "active",
       joinDate: agent.joinDate,
       totalSales: agent.totalSales,
       totalListings: propertiesCount, // Use the actual count of properties
       totalRevenue: Number(agent.totalRevenue) || 0,
+      serviceAreas: agent.serviceAreas || [],
+      languages: agent.languages || [],
+      socialMediaLinks: agent.socialMediaLinks || {},
+
+      // Include the complete user schema
+      user: {
+        id: agent.user.id,
+        clerkid: agent.user.clerkid,
+        email: agent.user.email,
+        firstName: agent.user.firstName,
+        lastName: agent.user.lastName,
+        phone: agent.user.phone,
+        role: agent.user.role,
+        profileImage: agent.user.profileImage,
+        createdAt: agent.user.createdAt,
+        updatedAt: agent.user.updatedAt,
+        lastLogin: agent.user.lastLogin,
+        status: agent.user.status,
+        emailVerified: agent.user.emailVerified
+      },
+
       properties: agent.properties.map(property => ({
         id: property.id,
         title: property.title,

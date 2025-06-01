@@ -7,9 +7,9 @@
  * Company information
  */
 export const companyInfo = {
-  name: "ML Real Estate",
+  name: "ML Properties LTD",
   phone: "+1 (555) 123-4567",
-  email: "info@mlrealestate.com",
+  email: "support@ml-properties-ltd.com",
   address: "123 Main Street, New York, NY 10001",
   socialMedia: {
     facebook: "https://facebook.com/mlrealestate",

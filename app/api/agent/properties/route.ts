@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from '@/lib/generated/prisma';
 import { auth } from "@clerk/nextjs/server";
 
-export async function GET(request: Request) {
+const prisma = new PrismaClient();
+
+export async function GET(request: NextRequest) {
   try {
     const session = await auth();
 
@@ -19,109 +21,78 @@ export async function GET(request: Request) {
     const page = parseInt(url.searchParams.get("page") || "1");
     const status = url.searchParams.get("status") || undefined;
 
-    // Calculate skip for pagination
-    const skip = (page - 1) * limit;
-
-    // Find the user with the clerk ID
+    // Fetch the user data from the database using the session userId
     const user = await prisma.user.findFirst({
       where: {
-        clerkid: session.userId,
+        clerkid: session.userId
       },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
-    }
-
-    // Find the agent associated with this user
-    const agent = await prisma.agent.findUnique({
-      where: {
-        userId: user.id,
-      },
-    });
-
-    if (!agent) {
-      return NextResponse.json(
-        { error: "Agent not found for this user" },
-        { status: 404 }
-      );
-    }
-
-    // Build the where clause for the query
-    const whereClause: any = {
-      agentId: agent.id,
-    };
-
-    // Add status filter if provided
-    if (status) {
-      whereClause.status = status;
-    }
-
-    // Get properties for this agent with pagination
-    const properties = await prisma.property.findMany({
-      where: whereClause,
       include: {
-        propertyType: true,
-        listingType: true,
-        location: true,
-        media: {
-          where: {
-            mediaType: "image",
-          },
-          take: 1,
-        },
-      },
-      skip,
-      take: limit,
-      orderBy: {
-        createdAt: "desc",
-      },
+        agent: {
+          include: {
+            properties: {
+              include: {
+                location: true,
+                propertyType: true,
+                inquiries: true,
+                views: true
+              }
+            }
+          }
+        }
+      }
     });
 
-    // Get total count for pagination
-    const totalCount = await prisma.property.count({
-      where: whereClause,
-    });
+    if (!user || !user.agent) {
+      return NextResponse.json(
+        { error: "Agent not found" },
+        { status: 404 }
+      );
+    }
 
-    // Calculate total pages
+    // Format the properties data
+    const properties = user.agent.properties ? user.agent.properties.map(property => {
+      // Calculate days listed
+      const daysListed = property.createdAt ? getDaysListed(property.createdAt) : 0;
+
+      // Count views and inquiries
+      const viewCount = property.views ? property.views.length : 0;
+      const inquiryCount = property.inquiries ? property.inquiries.length : 0;
+
+      return {
+        id: property.id,
+        title: property.title,
+        address: property.address,
+        price: formatPrice(property.price, property.priceType || 'sale'),
+        type: property.propertyType ? property.propertyType.name : 'Unknown',
+        status: property.status || 'active',
+        image: property.featuredImage || "/placeholder.svg",
+        beds: property.bedrooms || 0,
+        baths: property.bathrooms || 0,
+        sqft: property.squareFeet || 0,
+        views: viewCount,
+        inquiries: inquiryCount,
+        daysListed,
+        location: property.location ? property.location.name : 'Unknown'
+      };
+    }) : [];
+
+    // Apply status filter if provided
+    let filteredProperties = properties;
+    if (status) {
+      filteredProperties = properties.filter(prop => prop.status === status);
+    }
+
+    // Apply pagination
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedProperties = filteredProperties.slice(startIndex, endIndex);
+
+    // Calculate pagination values
+    const totalCount = filteredProperties.length;
     const totalPages = Math.ceil(totalCount / limit);
 
-    // Transform the data to match the expected format for the listings tab
-    const formattedProperties = properties.map((property) => ({
-      id: property.id,
-      title: property.title,
-      address: property.address,
-      price: formatPrice(Number(property.price), property.priceType),
-      type: property.propertyType.name,
-      status: property.status,
-      image: property.media[0]?.filePath || "/placeholder.svg",
-      beds: property.bedrooms || 0,
-      baths: Number(property.bathrooms) || 0,
-      sqft: Number(property.squareFeet) || 0,
-      views: property.views || 0,
-      inquiries: 0, // This would need to be calculated from inquiries table
-      daysListed: getDaysListed(property.createdAt),
-      location: property.location.name,
-    }));
-
-    // Return empty array if no data is found
-    if (formattedProperties.length === 0 && page === 1) {
-      return NextResponse.json({
-        properties: [],
-        pagination: {
-          totalCount: 0,
-          totalPages: 0,
-          currentPage: 1,
-          limit,
-        },
-      });
-    }
-
     return NextResponse.json({
-      properties: formattedProperties,
+      properties: paginatedProperties,
       pagination: {
         totalCount,
         totalPages,

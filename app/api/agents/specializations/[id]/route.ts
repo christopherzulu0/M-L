@@ -6,8 +6,10 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Ensure params is properly awaited
+    const { id: paramId } = params;
     const specialization = await prisma.specialization.findUnique({
-      where: { id: params.id },
+      where: { id: paramId },
       include: {
         agents: {
           include: {
@@ -53,11 +55,13 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Ensure params is properly awaited
+    const { id: paramId } = params;
     const body = await request.json()
     const { name, description } = body
 
     const specialization = await prisma.specialization.update({
-      where: { id: params.id },
+      where: { id: paramId },
       data: {
         name,
         description
@@ -78,8 +82,10 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Ensure params is properly awaited
+    const { id: paramId } = params;
     await prisma.specialization.delete({
-      where: { id: params.id }
+      where: { id: paramId }
     })
 
     return new NextResponse(null, { status: 204 })

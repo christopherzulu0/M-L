@@ -52,8 +52,8 @@ const agentFormSchema = z.object({
   lastName: z.string().min(2, { message: "Last name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
   phone: z.string().min(10, { message: "Please enter a valid phone number" }),
+  address: z.string().optional(),
 
-  
   // Agent information
   bio: z.string().min(10, { message: "Bio must be at least 10 characters" }),
   specialization: z.string().min(2, { message: "Please select or enter a specialization" }),
@@ -61,7 +61,17 @@ const agentFormSchema = z.object({
   commissionRate: z.coerce.number().min(0).max(100, { message: "Commission rate must be between 0 and 100" }),
   joinDate: z.date({ required_error: "Please select a join date" }),
   status: z.enum(["active", "inactive", "on leave"], { required_error: "Please select a status" }),
-  
+
+  // New fields
+  serviceAreas: z.array(z.string()).default([]),
+  languages: z.array(z.string()).default([]),
+  socialMediaLinks: z.object({
+    facebook: z.string().optional(),
+    twitter: z.string().optional(),
+    instagram: z.string().optional(),
+    linkedin: z.string().optional(),
+  }).optional().default({}),
+
   // Optional fields
   rating: z.coerce.number().min(0).max(5, { message: "Rating must be between 0 and 5" }).optional(),
   existingUser: z.boolean().default(false),
@@ -84,7 +94,7 @@ interface User {
 export default function AddAgentPage() {
   const router = useRouter()
   const { startUpload } = useUploadThing("agentProfileUploader")
-  const [activeTab, setActiveTab] = useState("basic")
+  const [activeTab, setActiveTab] = useState("account")
   const [uploadProgress, setUploadProgress] = useState(0)
   const [profileImage, setProfileImage] = useState<string | null>(null)
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null)
@@ -124,12 +134,21 @@ export default function AddAgentPage() {
     lastName: "",
     email: "",
     phone: "",
+    address: "",
     bio: "",
     specialization: "",
     licenseNumber: "",
     commissionRate: 2.5,
     joinDate: new Date(),
     status: "active",
+    serviceAreas: [],
+    languages: [],
+    socialMediaLinks: {
+      facebook: "",
+      twitter: "",
+      instagram: "",
+      linkedin: ""
+    },
     rating: 0,
     existingUser: false,
     createAccount: true,
@@ -163,7 +182,7 @@ export default function AddAgentPage() {
     setIsSubmitting(true)
     setFormError(null)
     setFormSuccess(null)
-    
+
     try {
       let finalProfileImage = profileImage
 
@@ -189,6 +208,7 @@ export default function AddAgentPage() {
         // For existing user
         existingUser: true,
         userId: data.userId,
+        phone: data.phone,
         profileImage: finalProfileImage,
         bio: data.bio,
         specialization: data.specialization,
@@ -196,7 +216,11 @@ export default function AddAgentPage() {
         commissionRate: data.commissionRate,
         joinDate: data.joinDate,
         status: data.status,
-        rating: data.rating
+        rating: data.rating,
+        address: data.address,
+        serviceAreas: data.serviceAreas,
+        languages: data.languages,
+        socialMediaLinks: data.socialMediaLinks
       } : {
         // For new user
         createAccount: true,
@@ -211,10 +235,14 @@ export default function AddAgentPage() {
         commissionRate: data.commissionRate,
         joinDate: data.joinDate,
         status: data.status,
-        rating: data.rating
+        rating: data.rating,
+        address: data.address,
+        serviceAreas: data.serviceAreas,
+        languages: data.languages,
+        socialMediaLinks: data.socialMediaLinks
       }
 
-      const response = await fetch('/api/agents', {
+      const response = await fetch('/api/agent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -228,7 +256,7 @@ export default function AddAgentPage() {
       }
 
       setFormSuccess('Agent has been successfully added!')
-      
+
       // Redirect after a short delay
       setTimeout(() => {
         router.push('/dashboard')
@@ -247,7 +275,7 @@ export default function AddAgentPage() {
     if (!file) return
 
     setProfileImageFile(file)
-    
+
     // Preview the image
     const reader = new FileReader()
     reader.onload = (e) => {
@@ -304,72 +332,84 @@ export default function AddAgentPage() {
                 </CardHeader>
                 <CardContent>
                   <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                      <TabsTrigger value="professional">Professional</TabsTrigger>
+                    <TabsList className={`grid w-full ${watchExistingUser ? 'grid-cols-2' : 'grid-cols-3'}`}>
                       <TabsTrigger value="account">Account</TabsTrigger>
+                      <TabsTrigger value="professional">Professional</TabsTrigger>
+                      {!watchExistingUser && <TabsTrigger value="basic">Basic Info</TabsTrigger>}
                     </TabsList>
-                    
+
                     {/* Basic Information Tab */}
-                    <TabsContent value="basic" className="space-y-4 pt-4">
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <FormField
-                          control={form.control}
-                          name="firstName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>First Name *</FormLabel>
-                              <FormControl>
-                                <Input placeholder="John" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="lastName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Last Name *</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Doe" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <FormField
-                          control={form.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Email Address *</FormLabel>
-                              <FormControl>
-                                <Input placeholder="john.doe@example.com" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="phone"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Phone Number *</FormLabel>
-                              <FormControl>
-                                <Input placeholder="+260 97 1234567" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      
+                    {!watchExistingUser && (
+                      <TabsContent value="basic" className="space-y-4 pt-4">
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <FormField
+                            control={form.control}
+                            name="firstName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>First Name *</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="John" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="lastName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Last Name *</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Doe" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Email Address *</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="john.doe@example.com" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="phone"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Phone Number *</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="+260 97 1234567" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+
+                        <div className="flex justify-end">
+                          <Button type="button" onClick={() => handleTabChange("professional")}>
+                            Continue to Professional Info
+                          </Button>
+                        </div>
+                      </TabsContent>
+                    )}
+
+                    {/* Professional Information Tab */}
+                    <TabsContent value="professional" className="space-y-4 pt-4">
                       <FormField
                         control={form.control}
                         name="bio"
@@ -377,10 +417,10 @@ export default function AddAgentPage() {
                           <FormItem>
                             <FormLabel>Bio *</FormLabel>
                             <FormControl>
-                              <Textarea 
-                                placeholder="Enter a professional bio for the agent" 
-                                className="min-h-32" 
-                                {...field} 
+                              <Textarea
+                                placeholder="Enter a professional bio for the agent"
+                                className="min-h-32"
+                                {...field}
                               />
                             </FormControl>
                             <FormDescription>
@@ -390,16 +430,7 @@ export default function AddAgentPage() {
                           </FormItem>
                         )}
                       />
-                      
-                      <div className="flex justify-end">
-                        <Button type="button" onClick={() => handleTabChange("professional")}>
-                          Continue to Professional Info
-                        </Button>
-                      </div>
-                    </TabsContent>
-                    
-                    {/* Professional Information Tab */}
-                    <TabsContent value="professional" className="space-y-4 pt-4">
+
                       <FormField
                         control={form.control}
                         name="specialization"
@@ -428,7 +459,7 @@ export default function AddAgentPage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <div className="grid gap-4 md:grid-cols-2">
                         <FormField
                           control={form.control}
@@ -460,7 +491,7 @@ export default function AddAgentPage() {
                           )}
                         />
                       </div>
-                      
+
                       <div className="grid gap-4 md:grid-cols-2">
                         <FormField
                           control={form.control}
@@ -523,7 +554,138 @@ export default function AddAgentPage() {
                           )}
                         />
                       </div>
-                      
+
+                      <FormField
+                        control={form.control}
+                        name="address"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Address</FormLabel>
+                            <FormControl>
+                              <Input placeholder="123 Main St, Lusaka, Zambia" {...field} />
+                            </FormControl>
+                            <FormDescription>
+                              The agent's physical address
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-medium">Service Areas</h3>
+                        <FormField
+                          control={form.control}
+                          name="serviceAreas"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Service Areas</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Enter service areas separated by semicolons (e.g., Lusaka; Ndola; Kitwe)"
+                                  value={field.value?.join("; ") || ""}
+                                  onChange={(e) => {
+                                    const areas = e.target.value.split(";").map(area => area.trim()).filter(Boolean);
+                                    field.onChange(areas);
+                                  }}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Areas where the agent provides services
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-medium">Languages</h3>
+                        <FormField
+                          control={form.control}
+                          name="languages"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Languages</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Enter languages separated by semicolons (e.g., English; Bemba; Nyanja)"
+                                  value={field.value?.join("; ") || ""}
+                                  onChange={(e) => {
+                                    const langs = e.target.value.split(";").map(lang => lang.trim()).filter(Boolean);
+                                    field.onChange(langs);
+                                  }}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Languages spoken by the agent
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-medium">Social Media Links</h3>
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <FormField
+                            control={form.control}
+                            name="socialMediaLinks.facebook"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Facebook</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="https://facebook.com/username" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="socialMediaLinks.twitter"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Twitter</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="https://twitter.com/username" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <FormField
+                            control={form.control}
+                            name="socialMediaLinks.instagram"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Instagram</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="https://instagram.com/username" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="socialMediaLinks.linkedin"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>LinkedIn</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="https://linkedin.com/in/username" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+
                       <FormField
                         control={form.control}
                         name="rating"
@@ -531,12 +693,12 @@ export default function AddAgentPage() {
                           <FormItem>
                             <FormLabel>Initial Rating (0-5)</FormLabel>
                             <FormControl>
-                              <Input 
-                                type="number" 
-                                step="0.1" 
-                                min="0" 
-                                max="5" 
-                                {...field} 
+                              <Input
+                                type="number"
+                                step="0.1"
+                                min="0"
+                                max="5"
+                                {...field}
                                 value={field.value || ""}
                                 onChange={(e) => field.onChange(e.target.value === "" ? undefined : parseFloat(e.target.value))}
                               />
@@ -548,7 +710,7 @@ export default function AddAgentPage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <div className="flex justify-between">
                         <Button type="button" variant="outline" onClick={() => handleTabChange("basic")}>
                           Back to Basic Info
@@ -558,7 +720,7 @@ export default function AddAgentPage() {
                         </Button>
                       </div>
                     </TabsContent>
-                    
+
                     {/* Account Setup Tab */}
                     <TabsContent value="account" className="space-y-4 pt-4">
                       <FormField
@@ -581,58 +743,77 @@ export default function AddAgentPage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       {watchExistingUser && (
-                        <FormField
-                          control={form.control}
-                          name="userId"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Select User</FormLabel>
-                              <Select 
-                                onValueChange={(value) => {
-                                  field.onChange(value)
-                                  handleUserSelection(value)
-                                }} 
-                                defaultValue={field.value}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select an existing user" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {isLoadingUsers ? (
-                                    <SelectItem value="loading" disabled>
-                                      Loading users...
-                                    </SelectItem>
-                                  ) : existingUsers.length > 0 ? (
-                                    existingUsers.map((user) => (
-                                      <SelectItem key={user.id} value={String(user.id)}>
-                                        {user.firstName} {user.lastName} ({user.email})
+                        <>
+                          <FormField
+                            control={form.control}
+                            name="userId"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Select User</FormLabel>
+                                <Select
+                                  onValueChange={(value) => {
+                                    field.onChange(value)
+                                    handleUserSelection(value)
+                                  }}
+                                  defaultValue={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select an existing user" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {isLoadingUsers ? (
+                                      <SelectItem value="loading" disabled>
+                                        Loading users...
                                       </SelectItem>
-                                    ))
-                                  ) : (
-                                    <SelectItem value="no-users" disabled>
-                                      No users available
-                                    </SelectItem>
-                                  )}
-                                </SelectContent>
-                              </Select>
-                              <FormDescription>
-                                Select an existing user to convert to an agent
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                                    ) : existingUsers.length > 0 ? (
+                                      existingUsers.map((user) => (
+                                        <SelectItem key={user.id} value={String(user.id)}>
+                                          {user.firstName} {user.lastName} ({user.email})
+                                        </SelectItem>
+                                      ))
+                                    ) : (
+                                      <SelectItem value="no-users" disabled>
+                                        No users available
+                                      </SelectItem>
+                                    )}
+                                  </SelectContent>
+                                </Select>
+                                <FormDescription>
+                                  Select an existing user to convert to an agent
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="phone"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Phone Number *</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="+260 97 1234567" {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                  Update the phone number if needed
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </>
                       )}
-                      
+
                       <div className="flex justify-between">
                         <Button type="button" variant="outline" onClick={() => handleTabChange("professional")}>
                           Back to Professional Info
                         </Button>
-                       
+
                       </div>
                     </TabsContent>
                   </Tabs>
@@ -691,7 +872,7 @@ export default function AddAgentPage() {
             </form>
           </Form>
         </div>
-        
+
         {/* Preview Panel */}
         <div className="md:col-span-1">
           <div className="sticky top-6 space-y-6">
@@ -725,23 +906,23 @@ export default function AddAgentPage() {
                     </label>
                   </div> */}
                 </div>
-                
+
                 {uploadProgress > 0 && uploadProgress < 100 && (
                   <div className="mb-4 w-full">
                     <Progress value={uploadProgress} className="h-2" />
                     <p className="mt-1 text-xs text-muted-foreground">Uploading: {uploadProgress}%</p>
                   </div>
                 )}
-                
+
                 <h3 className="text-xl font-semibold">
                   {form.watch("firstName") || "First"} {form.watch("lastName") || "Last"}
                 </h3>
-                
+
                 <p className="text-sm text-muted-foreground">
                   {form.watch("specialization") || "Specialization"}
                 </p>
-                
-                <Badge 
+
+                <Badge
                   className={`mt-2 ${
                     form.watch("status") === "active" 
                       ? "bg-green-100 text-green-800" 
@@ -750,13 +931,13 @@ export default function AddAgentPage() {
                         : "bg-amber-100 text-amber-800"
                   }`}
                 >
-                  {form.watch("status") === "active" 
-                    ? "Active" 
-                    : form.watch("status") === "inactive" 
-                      ? "Inactive" 
+                  {form.watch("status") === "active"
+                    ? "Active"
+                    : form.watch("status") === "inactive"
+                      ? "Inactive"
                       : "On Leave"}
                 </Badge>
-                
+
                 <div className="mt-4 w-full space-y-3 text-left">
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-muted-foreground" />
@@ -787,9 +968,9 @@ export default function AddAgentPage() {
                     </span>
                   </div>
                 </div>
-                
+
                 <Separator className="my-4" />
-                
+
                 <div className="w-full">
                   <h4 className="mb-2 text-sm font-medium">Bio</h4>
                   <p className="text-sm text-muted-foreground line-clamp-4">
@@ -798,7 +979,7 @@ export default function AddAgentPage() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Help & Tips</CardTitle>

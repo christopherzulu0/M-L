@@ -14,9 +14,32 @@ interface AgentCardProps {
   ratingLabel: string
   verified: boolean
   bio: string
+  address?: string
+  serviceAreas?: string[]
+  languages?: string[]
+  socialMediaLinks?: {
+    facebook?: string
+    twitter?: string
+    instagram?: string
+    linkedin?: string
+  }
 }
 
-export function AgentCard({ id, name, agency, image, listings, rating, ratingLabel, verified, bio }: AgentCardProps) {
+export function AgentCard({
+  id,
+  name,
+  agency,
+  image,
+  listings,
+  rating,
+  ratingLabel,
+  verified,
+  bio,
+  address,
+  serviceAreas,
+  languages,
+  socialMediaLinks
+}: AgentCardProps) {
   return (
     <div className="group relative overflow-hidden rounded-2xl bg-white card-shadow subtle-border">
       {/* Badges Container - Positioned absolutely relative to card */}
@@ -53,20 +76,88 @@ export function AgentCard({ id, name, agency, image, listings, rating, ratingLab
           <StarRating rating={rating} label={ratingLabel} />
         </div>
 
-        <p className="text-sm text-muted-foreground text-center mb-6 line-clamp-3">{bio}</p>
+        <p className="text-sm text-muted-foreground text-center mb-4 line-clamp-3">{bio}</p>
+
+        {/* Agent Details */}
+        {address && (
+          <div className="w-full text-sm text-muted-foreground mb-2">
+            <p className="text-center">{address}</p>
+          </div>
+        )}
+
+        {/* Service Areas */}
+        {serviceAreas && serviceAreas.length > 0 && (
+          <div className="w-full text-sm mb-2">
+            <p className="text-center text-xs font-medium text-gray-500 mb-1">Service Areas</p>
+            <div className="flex flex-wrap justify-center gap-1">
+              {serviceAreas.map((area, index) => (
+                <span key={index} className="inline-block px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">
+                  {area}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Languages */}
+        {languages && languages.length > 0 && (
+          <div className="w-full text-sm mb-4">
+            <p className="text-center text-xs font-medium text-gray-500 mb-1">Languages</p>
+            <p className="text-center text-sm">{languages.join(", ")}</p>
+          </div>
+        )}
 
         {/* Social Links */}
         <div className="flex justify-center gap-2 mb-6">
-          {[Facebook, Twitter, Instagram].map((Icon, index) => (
-            <Button
-              key={index}
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 rounded-full bg-gray-50 shadow-sm transition-transform hover:scale-110 hover:bg-blue-50 hover:text-blue-600"
-            >
-              <Icon className="h-4 w-4" />
-            </Button>
-          ))}
+          {socialMediaLinks ? (
+            <>
+              {socialMediaLinks.facebook && (
+                <a href={socialMediaLinks.facebook} target="_blank" rel="noopener noreferrer">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 rounded-full bg-gray-50 shadow-sm transition-transform hover:scale-110 hover:bg-blue-50 hover:text-blue-600"
+                  >
+                    <Facebook className="h-4 w-4" />
+                  </Button>
+                </a>
+              )}
+              {socialMediaLinks.twitter && (
+                <a href={socialMediaLinks.twitter} target="_blank" rel="noopener noreferrer">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 rounded-full bg-gray-50 shadow-sm transition-transform hover:scale-110 hover:bg-blue-50 hover:text-blue-600"
+                  >
+                    <Twitter className="h-4 w-4" />
+                  </Button>
+                </a>
+              )}
+              {socialMediaLinks.instagram && (
+                <a href={socialMediaLinks.instagram} target="_blank" rel="noopener noreferrer">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 rounded-full bg-gray-50 shadow-sm transition-transform hover:scale-110 hover:bg-blue-50 hover:text-blue-600"
+                  >
+                    <Instagram className="h-4 w-4" />
+                  </Button>
+                </a>
+              )}
+            </>
+          ) : (
+            // Fallback to default social icons if no links provided
+            [Facebook, Twitter, Instagram].map((Icon, index) => (
+              <Button
+                key={index}
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8 rounded-full bg-gray-50 shadow-sm transition-transform hover:scale-110 hover:bg-blue-50 hover:text-blue-600"
+              >
+                <Icon className="h-4 w-4" />
+              </Button>
+            ))
+          )}
         </div>
 
         {/* Action Buttons */}

@@ -43,6 +43,7 @@ import Link from "next/link"
 import { useState, useEffect, useCallback } from "react"
 import { useTheme } from "next-themes"
 import MobileNav from "./components/MobileNav"
+import AdminGuard from "./admin-guard"
 
 export default function DashboardLayout({
   children,
@@ -54,6 +55,7 @@ export default function DashboardLayout({
   const [agentsOpen, setAgentsOpen] = useState(false)
   const [locationOpen, setLocationOpen] = useState(false)
   const [usersOpen, setUsersOpen] = useState(false)
+  const [blogOpen, setBlogOpen] = useState(false)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
   const { theme, setTheme } = useTheme()
 
@@ -327,6 +329,35 @@ export default function DashboardLayout({
                     <Link href="/dashboard/users" passHref>
                       <Button variant="ghost" className="w-full justify-start text-sm">
                         Manage Users
+                      </Button>
+                    </Link>
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <Collapsible
+                  className="w-full"
+                  open={blogOpen}
+                  onOpenChange={setBlogOpen}
+                >
+                  <CollapsibleTrigger asChild className="w-full">
+                    <Button variant="ghost" className="w-full justify-start">
+                      <FileText className="mr-2 h-4 w-4" /> Blog
+                      {blogOpen ? (
+                        <ChevronDown className="ml-auto h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="ml-auto h-4 w-4" />
+                      )}
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pl-6 mt-1 space-y-1">
+                    <Link href="/dashboard/blog/add" passHref>
+                      <Button variant="ghost" className="w-full justify-start text-sm">
+                        Add Post
+                      </Button>
+                    </Link>
+                    <Link href="/dashboard/blog" passHref>
+                      <Button variant="ghost" className="w-full justify-start text-sm">
+                        Manage Posts
                       </Button>
                     </Link>
                   </CollapsibleContent>

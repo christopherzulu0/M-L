@@ -9,7 +9,7 @@ import { StarRating } from "@/components/star-rating"
 import { PropertyCard } from "@/components/property-card"
 import { SectionHeader } from "@/components/ui/section-header"
 import { PatternBackground } from "@/components/ui/pattern-background"
-import { Bed, Bath, Square, MapPin, Phone, Mail, Share2, Heart, Printer } from "lucide-react"
+import { Bed, Bath, Square, MapPin, Phone, Mail, Share2, Heart, Printer, Loader2 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import dynamic from "next/dynamic"
@@ -20,6 +20,66 @@ const MapWithNoSSR = dynamic(() => import("@/components/map"), { ssr: false })
 export default function ListingSingle({ params }: { params: { id: string } }) {
   const unwrappedParams = React.use(params)
   const [activeImage, setActiveImage] = useState("/placeholder.svg")
+
+  // Contact form state
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+  const [message, setMessage] = useState("I'm interested in this property. Please contact me.")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [formError, setFormError] = useState("")
+  const [formSuccess, setFormSuccess] = useState("")
+
+  // Handle contact form submission
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setFormError("")
+    setFormSuccess("")
+
+    try {
+      // Validate form
+      if (!name || !email || !message) {
+        throw new Error("Please fill in all required fields")
+      }
+
+      // Prepare form data
+      const formData = {
+        name,
+        email,
+        subject: `Property Inquiry: Modern Apartment in Downtown`,
+        message: `${message}\n\nProperty: Modern Apartment in Downtown (ID: ${unwrappedParams.id})`,
+        agentId: undefined // No agent ID in this demo
+      }
+
+      // Send the form data to the API
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to send message')
+      }
+
+      // Reset form on success
+      setFormSuccess("Your message has been sent! The agent will contact you soon.")
+      setName("")
+      setEmail("")
+      setPhone("")
+      setMessage("I'm interested in this property. Please contact me.")
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Failed to send message')
+      console.error('Error sending contact form:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   const images = [
     "/placeholder.svg",
@@ -88,10 +148,34 @@ export default function ListingSingle({ params }: { params: { id: string } }) {
                     </div>
                     <Button className="w-full mb-4 text-lg py-6">Schedule a Tour</Button>
                     <div className="flex justify-between">
-                      <Button variant="outline" className="flex-1 mr-2">
+                      <Button
+                        variant="outline"
+                        className="flex-1 mr-2"
+                        onClick={() => {
+                          // In a real app, this would use the agent's phone number
+                          const phoneNumber = "+1234567890";
+                          if (phoneNumber) {
+                            window.location.href = `tel:${phoneNumber}`;
+                          } else {
+                            alert("Agent phone number is not available");
+                          }
+                        }}
+                      >
                         <Phone className="w-4 h-4 mr-2" /> Call
                       </Button>
-                      <Button variant="outline" className="flex-1 ml-2">
+                      <Button
+                        variant="outline"
+                        className="flex-1 ml-2"
+                        onClick={() => {
+                          // In a real app, this would use the agent's email
+                          const agentEmail = "agent@example.com";
+                          if (agentEmail) {
+                            window.location.href = `mailto:${agentEmail}?subject=Inquiry about Modern Apartment&body=I'm interested in this property (ID: ${unwrappedParams.id})`;
+                          } else {
+                            alert("Agent email is not available");
+                          }
+                        }}
+                      >
                         <Mail className="w-4 h-4 mr-2" /> Email
                       </Button>
                     </div>
@@ -150,12 +234,57 @@ export default function ListingSingle({ params }: { params: { id: string } }) {
                       <p className="text-sm text-muted-foreground">Real Estate Agent</p>
                     </div>
                   </div>
-                  <form className="space-y-4">
-                    <Input placeholder="Your Name" />
-                    <Input type="email" placeholder="Your Email" />
-                    <Input type="tel" placeholder="Your Phone" />
-                    <Textarea placeholder="Your Message" rows={4} />
-                    <Button className="w-full">Send Message</Button>
+                  {formSuccess && (
+                    <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-md text-sm">
+                      {formSuccess}
+                    </div>
+                  )}
+                  {formError && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
+                      {formError}
+                    </div>
+                  )}
+                  <form className="space-y-4" onSubmit={handleContactSubmit}>
+                    <Input
+                      placeholder="Your Name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                    />
+                    <Input
+                      type="email"
+                      placeholder="Your Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                    <Input
+                      type="tel"
+                      placeholder="Your Phone"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                    <Textarea
+                      placeholder="Your Message"
+                      rows={4}
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      required
+                    />
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        "Send Message"
+                      )}
+                    </Button>
                   </form>
                 </div>
               </div>

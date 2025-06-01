@@ -54,12 +54,12 @@ export default function Home() {
     const fetchAgents = async () => {
       try {
         setIsLoading(true)
-        const response = await fetch('/api/agent')
+        const response = await fetch('/api/agents')
         if (!response.ok) {
           throw new Error('Failed to fetch agents')
         }
         const data = await response.json()
-        setAgents(data)
+        setAgents(data.agents || [])
       } catch (error) {
         console.error('Error fetching agents:', error)
       } finally {

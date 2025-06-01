@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from '@/lib/generated/prisma';
 import { auth } from "@clerk/nextjs/server";
 
-export async function GET() {
+const prisma = new PrismaClient();
+
+export async function GET(request: NextRequest) {
   try {
     const session = await auth();
 
@@ -13,67 +15,56 @@ export async function GET() {
       );
     }
 
-    // Find the user with the clerk ID
+    // Fetch the user data from the database using the session userId
     const user = await prisma.user.findFirst({
       where: {
-        clerkid: session.userId,
+        clerkid: session.userId
       },
+      include: {
+        agent: {
+          include: {
+            properties: {
+              include: {
+                propertyType: true
+              }
+            }
+          }
+        }
+      }
     });
 
-    if (!user) {
+    if (!user || !user.agent) {
       return NextResponse.json(
-        { error: "User not found" },
+        { error: "Agent not found" },
         { status: 404 }
       );
     }
 
-    // Find the agent associated with this user
-    const agent = await prisma.agent.findUnique({
-      where: {
-        userId: user.id,
-      },
-    });
+    // Count properties by property type
+    const propertyTypeCounts = new Map();
 
-    if (!agent) {
-      return NextResponse.json(
-        { error: "Agent not found for this user" },
-        { status: 404 }
-      );
+    if (user.agent.properties && user.agent.properties.length > 0) {
+      user.agent.properties.forEach(property => {
+        if (property.propertyType) {
+          const typeName = property.propertyType.name;
+          propertyTypeCounts.set(typeName, (propertyTypeCounts.get(typeName) || 0) + 1);
+        }
+      });
     }
 
-    // Get all property types
-    const propertyTypes = await prisma.propertyType.findMany();
+    // Format the property type data
+    const propertyTypeData = Array.from(propertyTypeCounts.entries()).map(([name, value]) => ({
+      name,
+      value,
+      color: getColorForPropertyType(name)
+    }));
 
-    // Get the count of properties for each property type for this agent
-    const propertyTypeCounts = await Promise.all(
-      propertyTypes.map(async (type) => {
-        const count = await prisma.property.count({
-          where: {
-            agentId: agent.id,
-            propertyTypeId: type.id,
-          },
-        });
-
-        return {
-          name: type.name,
-          value: count,
-          // Assign a color based on the property type name for consistency
-          color: getColorForPropertyType(type.name),
-        };
-      })
-    );
-
-    // Filter out property types with zero properties
-    const filteredPropertyTypes = propertyTypeCounts.filter(
-      (type) => type.value > 0
-    );
-
-    // Return empty array if no data is found
-    if (filteredPropertyTypes.length === 0) {
+    // If no properties found, return empty array
+    if (propertyTypeData.length === 0) {
       return NextResponse.json([]);
     }
 
-    return NextResponse.json(filteredPropertyTypes);
+    return NextResponse.json(propertyTypeData);
   } catch (error) {
     console.error("Error fetching property types:", error);
     return NextResponse.json(

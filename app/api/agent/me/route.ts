@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from '@/lib/generated/prisma';
 import { auth } from "@clerk/nextjs/server";
 
-export async function GET() {
+const prisma = new PrismaClient();
+
+export async function GET(request: NextRequest) {
   try {
     const session = await auth();
 
@@ -13,113 +15,101 @@ export async function GET() {
       );
     }
 
-    // Find the user with the clerk ID
+    // Fetch the user data from the database using the session userId
     const user = await prisma.user.findFirst({
       where: {
-        clerkid: session.userId,
-      },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
-    }
-
-    // Find the agent associated with this user
-    const agent = await prisma.agent.findUnique({
-      where: {
-        userId: user.id,
+        clerkid: session.userId
       },
       include: {
-        user: true,
-        properties: {
+        agent: {
           include: {
-            location: true,
-            propertyType: true,
-            listingType: true,
-            media: {
-              where: {
-                mediaType: "image",
-              },
-              take: 1,
-            },
-          },
-          take: 3, // Limit to 3 properties for the preview
-        },
-      },
+            properties: true
+          }
+        }
+      }
     });
 
-    if (!agent) {
+    if (!user || !user.agent) {
       return NextResponse.json(
-        { error: "Agent not found for this user" },
+        { error: "Agent not found" },
         { status: 404 }
       );
     }
 
-    // Get the total count of properties for this agent
-    const propertiesCount = await prisma.property.count({
-      where: {
-        agentId: agent.id,
-      },
-    });
+    // Calculate performance metrics
+    const totalSales = user.agent.totalSales || 0;
+    const totalCommission = totalSales * (user.agent.commissionRate || 0.05); // Default 5% commission
+    const activeListings = user.agent.properties ? user.agent.properties.filter(p => p.status === 'active').length : 0;
+    const soldProperties = user.agent.properties ? user.agent.properties.filter(p => p.status === 'sold').length : 0;
+    const pendingDeals = user.agent.properties ? user.agent.properties.filter(p => p.status === 'pending').length : 0;
+    const totalListings = user.agent.properties ? user.agent.properties.length : 0;
+    const conversionRate = totalListings > 0 ? Math.round((soldProperties / totalListings) * 100) : 0;
 
-    // Transform the data to match the expected format for the agent detail page
-    const formattedAgent = {
-      id: agent.id,
-      name: `${agent.user.firstName} ${agent.user.lastName}`,
-      agency: "Real Estate Agency", // Default agency name since it's not in the schema
-      image: agent.user.profileImage || "/placeholder.svg", // Fallback to placeholder if no image
-      email: agent.user.email,
-      phone: agent.user.phone || "Not provided",
-      address: "Not provided", // Address is not in the schema
-      website: "Not provided", // Website is not in the schema
-      bio: agent.bio || "Real estate professional",
-      specialization: agent.specialization || "Real Estate",
-      licenseNumber: agent.licenseNumber || "Not provided",
-      rating: Number(agent.rating) || 0,
-      ratingLabel: getRatingLabel(agent.rating),
-      verified: agent.status === "active",
-      joinDate: agent.joinDate,
-      totalSales: agent.totalSales,
-      totalListings: propertiesCount, // Use the actual count of properties
-      totalRevenue: Number(agent.totalRevenue) || 0,
-      properties: agent.properties.map(property => ({
-        id: property.id,
-        title: property.title,
-        price: Number(property.price),
-        address: property.address,
-        location: property.location.name,
-        bedrooms: property.bedrooms || 0,
-        bathrooms: Number(property.bathrooms) || 0,
-        squareFeet: Number(property.squareFeet) || 0,
-        propertyType: property.propertyType.name,
-        listingType: property.listingType.name,
-        image: property.media[0]?.filePath || "/placeholder.svg",
-        createdAt: property.createdAt,
-      })),
-      // Add performance data
-      performance: {
-        totalSales: formatCurrency(agent.totalSales || 0),
-        totalCommission: formatCurrency(agent.totalRevenue || 0),
-        activeListings: propertiesCount,
-        soldProperties: agent.soldProperties || 0,
-        pendingDeals: agent.pendingDeals || 0,
-        conversionRate: agent.conversionRate || 0,
+    // Format the agent data
+    const agentData = {
+      id: user.agent.id,
+      name: `${user.firstName} ${user.lastName}`,
+      agency: "Independent",
+      image: user.profileImage || "/placeholder.svg",
+      email: user.email,
+      phone: user.phone || "",
+      address: "123 Main Street, Lusaka, Zambia", // Default address since it's not in the schema
+      website: "https://www.example.com", // Default website since it's not in the schema
+      bio: user.agent.bio || "",
+      specialization: user.agent.specialization || "",
+      licenseNumber: user.agent.licenseNumber || "",
+      rating: user.agent.rating || null,
+      reviews: 0, // Default value since reviewCount is not in the schema
+      verified: user.agent.status === "active",
+      joinDate: user.agent.joinDate || user.createdAt,
+      badges: [], // Default value since badges is not in the schema
+      clientsCount: 0,
+
+      // Include the complete user schema
+      user: {
+        id: user.id,
+        clerkid: user.clerkid,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        role: user.role,
+        profileImage: user.profileImage,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        lastLogin: user.lastLogin,
+        status: user.status,
+        emailVerified: user.emailVerified
       },
-      // Add goals data (placeholder values, could be stored in the database)
+
+      // Performance metrics
+      performance: {
+        totalSales: formatCurrency(totalSales),
+        totalCommission: formatCurrency(totalCommission),
+        activeListings,
+        soldProperties,
+        pendingDeals,
+        conversionRate,
+        salesTrend: null, // Default value since salesTrend is not in the schema
+        commissionTrend: null, // Default value since commissionTrend is not in the schema
+        listingsTrend: null, // Default value since listingsTrend is not in the schema
+        soldTrend: null, // Default value since soldTrend is not in the schema
+        pendingTrend: null, // Default value since pendingTrend is not in the schema
+        conversionTrend: null, // Default value since conversionTrend is not in the schema
+      },
+
+      // Goals
       goals: {
-        salesTarget: formatCurrency(agent.salesTarget || 0),
-        salesProgress: calculateProgress(agent.totalSales || 0, agent.salesTarget || 0),
-        listingsTarget: agent.listingsTarget || 0,
-        listingsProgress: calculateProgress(propertiesCount, agent.listingsTarget || 0),
-        clientsTarget: agent.clientsTarget || 0,
-        clientsProgress: calculateProgress(agent.clientsCount || 0, agent.clientsTarget || 0),
+        salesTarget: formatCurrency(totalSales * 1.2), // Default target is 20% more than current sales
+        salesProgress: calculateProgress(totalSales, totalSales * 1.2),
+        listingsTarget: activeListings + 5, // Default target is 5 more than current active listings
+        listingsProgress: calculateProgress(activeListings, activeListings + 5),
+        clientsTarget: 10, // Default target
+        clientsProgress: calculateProgress(0, 10),
       },
     };
 
-    return NextResponse.json(formattedAgent);
+    return NextResponse.json(agentData);
   } catch (error) {
     console.error("Error fetching agent:", error);
     return NextResponse.json(

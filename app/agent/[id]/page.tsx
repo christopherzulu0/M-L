@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useParams } from "next/navigation"
@@ -38,6 +39,7 @@ import {
   Bed,
   Bath,
   Square,
+  Loader2,
 } from "lucide-react"
 
 export default function AgentSingle() {
@@ -45,8 +47,68 @@ export default function AgentSingle() {
   const params = useParams();
   const id = params.id as string;
 
+  // Form state
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [formSuccess, setFormSuccess] = useState("");
+
   // Fetch agent data using React Query
   const { data: agent, isLoading, isError, error } = useAgent(id);
+
+  // Handle contact form submission
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setFormError("");
+    setFormSuccess("");
+
+    try {
+      // Validate form
+      if (!name || !email || !message) {
+        throw new Error("Please fill in all required fields");
+      }
+
+      // Prepare form data
+      const formData = {
+        name,
+        email,
+        subject: subject || `Inquiry about agent: ${agent?.name}`,
+        message,
+        agentId: id,
+      };
+
+      // Send the form data to the API
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to send message');
+      }
+
+      // Reset form on success
+      setFormSuccess("Your message has been sent! The agent will contact you soon.");
+      setName("");
+      setEmail("");
+      setSubject("");
+      setMessage("");
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Failed to send message');
+      console.error('Error sending contact form:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Handle loading state
   if (isLoading) {
@@ -137,20 +199,24 @@ export default function AgentSingle() {
                         <Award className="h-3 w-3 mr-1" />
                         Top Seller
                       </Badge>
-                      <Badge
+                      {agent.verified ? (
+                        <Badge
                           variant="outline"
                           className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/30"
-                      >
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        Verified
-                      </Badge>
-                      <Badge
+                        >
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Verified
+                        </Badge>
+                      ) : null}
+                      {agent.joinDate ? (
+                        <Badge
                           variant="outline"
                           className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/30"
-                      >
-                        <Clock className="h-3 w-3 mr-1" />
-                        5+ Years
-                      </Badge>
+                        >
+                          <Clock className="h-3 w-3 mr-1" />
+                          Joined {new Date(agent.joinDate).toLocaleDateString()}
+                        </Badge>
+                      ) : null}
                     </div>
 
                     <div className="pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
@@ -176,8 +242,8 @@ export default function AgentSingle() {
                         <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
                           <Globe className="h-4 w-4" />
                         </div>
-                        <a href="#" className="text-indigo-600 dark:text-indigo-400 hover:underline">
-                          themeforest.net
+                        <a href={agent.website ? agent.website : "#"} className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                          {agent.website || "Website not available"}
                         </a>
                       </div>
                     </div>
@@ -217,7 +283,7 @@ export default function AgentSingle() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
                       <CardContent className="p-4 text-center">
-                        <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{agent.rating.toFixed(1)}</div>
+                        <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{agent.rating ? agent.rating.toFixed(1) : 'N/A'}</div>
                         <div className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                           <Eye className="h-3 w-3" />
                           Rating
@@ -244,7 +310,7 @@ export default function AgentSingle() {
                     </Card>
                     <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
                       <CardContent className="p-4 text-center">
-                        <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">K{agent.totalRevenue.toLocaleString()}</div>
+                        <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">K{agent.totalRevenue ? agent.totalRevenue.toLocaleString() : '0'}</div>
                         <div className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                           <CheckCircle className="h-3 w-3" />
                           Total Revenue
@@ -299,35 +365,69 @@ export default function AgentSingle() {
                               </div>
                           </div>
 
-                          <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
-                            <h3 className="text-lg font-semibold mb-3">Service Areas</h3>
-                            <div className="flex gap-2 flex-wrap">
-                              {["London", "New York", "Rome", "Dubai", "Paris", "Tokyo", "Sydney"].map((area) => (
-                                  <Badge
-                                      key={area}
-                                      variant="outline"
-                                      className="px-3 py-1 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700"
-                                  >
-                                    {area}
-                                  </Badge>
-                              ))}
+                          {agent.serviceAreas ? (
+                            <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+                              <h3 className="text-lg font-semibold mb-3">Service Areas</h3>
+                              <div className="flex gap-2 flex-wrap">
+                                {agent.serviceAreas.map((area) => (
+                                    <Badge
+                                        key={area}
+                                        variant="outline"
+                                        className="px-3 py-1 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700"
+                                    >
+                                      {area}
+                                    </Badge>
+                                ))}
+                              </div>
                             </div>
-                          </div>
+                          ) : (
+                            <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+                              <h3 className="text-lg font-semibold mb-3">Service Areas</h3>
+                              <div className="flex gap-2 flex-wrap">
+                                {["London", "New York", "Rome", "Dubai", "Paris", "Tokyo", "Sydney"].map((area) => (
+                                    <Badge
+                                        key={area}
+                                        variant="outline"
+                                        className="px-3 py-1 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700"
+                                    >
+                                      {area}
+                                    </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
 
-                          <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
-                            <h3 className="text-lg font-semibold mb-3">Languages</h3>
-                            <div className="flex gap-2 flex-wrap">
-                              {["English", "Spanish", "French", "Italian"].map((language) => (
-                                  <Badge
-                                      key={language}
-                                      variant="outline"
-                                      className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/30"
-                                  >
-                                    {language}
-                                  </Badge>
-                              ))}
+                          {agent.languages ? (
+                            <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+                              <h3 className="text-lg font-semibold mb-3">Languages</h3>
+                              <div className="flex gap-2 flex-wrap">
+                                {agent.languages.map((language) => (
+                                    <Badge
+                                        key={language}
+                                        variant="outline"
+                                        className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/30"
+                                    >
+                                      {language}
+                                    </Badge>
+                                ))}
+                              </div>
                             </div>
-                          </div>
+                          ) : (
+                            <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+                              <h3 className="text-lg font-semibold mb-3">Languages</h3>
+                              <div className="flex gap-2 flex-wrap">
+                                {["English", "Spanish", "French", "Italian"].map((language) => (
+                                    <Badge
+                                        key={language}
+                                        variant="outline"
+                                        className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/30"
+                                    >
+                                      {language}
+                                    </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </CardContent>
                       </Card>
 
@@ -337,7 +437,7 @@ export default function AgentSingle() {
                             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                               <div className="space-y-2">
                                 <h3 className="text-xl font-bold">Need help finding your dream home?</h3>
-                                <p className="text-indigo-100">Schedule a consultation with Andy today.</p>
+                                <p className="text-indigo-100">Schedule a consultation with {agent.name} today.</p>
                               </div>
                               <div className="flex gap-2">
                                 <Button className="bg-white text-indigo-700 hover:bg-indigo-100">
@@ -359,11 +459,11 @@ export default function AgentSingle() {
                               <CardContent className="p-0">
                                 <div className="flex flex-col sm:flex-row">
                                   <div className="relative sm:w-[240px] h-[200px] sm:h-auto">
-                                    <Image 
-                                      src={property.image || "https://digiestateorg.wordpress.com/wp-content/uploads/2023/11/ask-us-1024x583-1.jpg"} 
-                                      alt={property.title} 
-                                      fill 
-                                      className="object-cover" 
+                                    <Image
+                                      src={property.image || "https://digiestateorg.wordpress.com/wp-content/uploads/2023/11/ask-us-1024x583-1.jpg"}
+                                      alt={property.title}
+                                      fill
+                                      className="object-cover"
                                     />
                                     <div className="absolute top-2 left-2 flex gap-2">
                                       <Badge className="bg-blue-600">{property.listingType}</Badge>
@@ -389,7 +489,7 @@ export default function AgentSingle() {
                                         </div>
                                       </div>
                                       <div>
-                                        <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">K{property.price.toLocaleString()}</p>
+                                        <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">K{property.price ? property.price.toLocaleString() : '0'}</p>
                                       </div>
                                     </div>
 
@@ -445,7 +545,7 @@ export default function AgentSingle() {
                           <div className="flex justify-between items-center mb-6">
                             <div>
                               <h3 className="text-lg font-semibold">Client Reviews</h3>
-                              <p className="text-sm text-muted-foreground">See what others are saying about Andy</p>
+                              <p className="text-sm text-muted-foreground">See what others are saying about {agent.name}</p>
                             </div>
                             <Button className="bg-indigo-600 hover:bg-indigo-700">
                               <MessageSquare className="mr-2 h-4 w-4" />
@@ -482,7 +582,7 @@ export default function AgentSingle() {
                                   </div>
                                   <p className="text-muted-foreground">
                                     "Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat
-                                    massa quis enim. Working with Andy was a pleasure from start to finish."
+                                    massa quis enim. Working with {agent.name} was a pleasure from start to finish."
                                   </p>
                                 </div>
                             ))}
@@ -501,9 +601,9 @@ export default function AgentSingle() {
             <CardContent className="p-0">
               <div className="grid md:grid-cols-2">
                 <div className="p-8 bg-gradient-to-br from-indigo-600 to-purple-600 text-white">
-                  <h2 className="text-2xl font-bold mb-4">Get In Touch With Andy</h2>
+                  <h2 className="text-2xl font-bold mb-4">Get In Touch With {agent.name}</h2>
                   <p className="mb-6 text-indigo-100">
-                    Have questions about buying or selling a property? Send Andy a message and he'll get back to you as
+                    Have questions about buying or selling a property? Send {agent.name} a message and {agent.name.includes(' ') ? agent.name.split(' ')[0] : agent.name}'ll get back to you as
                     soon as possible.
                   </p>
 
@@ -514,7 +614,7 @@ export default function AgentSingle() {
                       </div>
                       <div>
                         <p className="text-sm text-indigo-200">Phone Number</p>
-                        <p className="font-medium">+7(123)987654</p>
+                        <p className="font-medium">{agent.phone || "Phone not available"}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -523,7 +623,7 @@ export default function AgentSingle() {
                       </div>
                       <div>
                         <p className="text-sm text-indigo-200">Email Address</p>
-                        <p className="font-medium">MaversRealEstate@domain.com</p>
+                        <p className="font-medium">{agent.email || "Email not available"}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -532,7 +632,7 @@ export default function AgentSingle() {
                       </div>
                       <div>
                         <p className="text-sm text-indigo-200">Office Address</p>
-                        <p className="font-medium">70 Bright St New York, USA</p>
+                        <p className="font-medium">{agent.address || "Address not available"}</p>
                       </div>
                     </div>
                   </div>
@@ -552,15 +652,28 @@ export default function AgentSingle() {
                 <div className="p-8">
                   <h3 className="text-xl font-bold mb-2">Send a Message</h3>
                   <p className="text-muted-foreground mb-6">
-                    Fill out the form below and Andy will get back to you shortly.
+                    Fill out the form below and {agent.name} will get back to you shortly.
                   </p>
 
-                  <form className="space-y-4">
+                  {formSuccess && (
+                    <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-md text-sm">
+                      {formSuccess}
+                    </div>
+                  )}
+                  {formError && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
+                      {formError}
+                    </div>
+                  )}
+                  <form className="space-y-4" onSubmit={handleContactSubmit}>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Input
                             placeholder="Your name*"
                             className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
                         />
                       </div>
                       <div>
@@ -568,6 +681,9 @@ export default function AgentSingle() {
                             placeholder="Your email*"
                             type="email"
                             className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
                         />
                       </div>
                     </div>
@@ -575,17 +691,35 @@ export default function AgentSingle() {
                       <Input
                           placeholder="Subject"
                           className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700"
+                          value={subject}
+                          onChange={(e) => setSubject(e.target.value)}
                       />
                     </div>
                     <div>
                       <Textarea
                           placeholder="Your message"
                           className="min-h-[120px] bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700"
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                          required
                       />
                     </div>
-                    <Button className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600">
-                      <Send className="mr-2 h-4 w-4" />
-                      Send Message
+                    <Button
+                      type="submit"
+                      className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="mr-2 h-4 w-4" />
+                          Send Message
+                        </>
+                      )}
                     </Button>
                   </form>
                 </div>

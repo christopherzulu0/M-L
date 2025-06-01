@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from '@/lib/generated/prisma';
 import { auth } from "@clerk/nextjs/server";
 
-export async function GET() {
+const prisma = new PrismaClient();
+
+export async function GET(request: NextRequest) {
   try {
     const session = await auth();
 
@@ -13,90 +15,90 @@ export async function GET() {
       );
     }
 
-    // Find the user with the clerk ID
+    // Fetch the user data from the database using the session userId
     const user = await prisma.user.findFirst({
       where: {
-        clerkid: session.userId,
+        clerkid: session.userId
       },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
-    }
-
-    // Find the agent associated with this user
-    const agent = await prisma.agent.findUnique({
-      where: {
-        userId: user.id,
-      },
-    });
-
-    if (!agent) {
-      return NextResponse.json(
-        { error: "Agent not found for this user" },
-        { status: 404 }
-      );
-    }
-
-    // Get the current date
-    const currentDate = new Date();
-
-    // Get the date 8 months ago
-    const eightMonthsAgo = new Date();
-    eightMonthsAgo.setMonth(eightMonthsAgo.getMonth() - 8);
-
-    // Format the date to YYYY-MM-DD
-    const formattedEightMonthsAgo = eightMonthsAgo.toISOString().split('T')[0];
-
-    // Get agent analytics data for the last 8 months
-    const agentAnalytics = await prisma.agentAnalytics.findMany({
-      where: {
-        agentId: agent.id,
-        date: {
-          gte: new Date(formattedEightMonthsAgo),
-        },
-      },
-      orderBy: {
-        date: 'asc',
-      },
-    });
-
-    // Group analytics by month
-    const monthlyPerformance = [];
-    const monthMap = {};
-
-    agentAnalytics.forEach(analytic => {
-      const date = new Date(analytic.date);
-      const monthYear = `${date.getFullYear()}-${date.getMonth() + 1}`;
-
-      if (!monthMap[monthYear]) {
-        monthMap[monthYear] = {
-          name: new Date(date.getFullYear(), date.getMonth(), 1).toLocaleString('default', { month: 'short' }),
-          sales: 0,
-          commission: 0,
-          listings: 0,
-        };
+      include: {
+        agent: {
+          include: {
+            properties: true
+          }
+        }
       }
-
-      monthMap[monthYear].sales += Number(analytic.revenue);
-      monthMap[monthYear].commission += Number(analytic.revenue) * 0.05; // Assuming 5% commission
-      monthMap[monthYear].listings += analytic.listingsAdded;
     });
 
-    // Convert the map to an array
-    for (const key in monthMap) {
-      monthlyPerformance.push(monthMap[key]);
+    if (!user || !user.agent) {
+      return NextResponse.json(
+        { error: "Agent not found" },
+        { status: 404 }
+      );
     }
 
-    // Return empty array if no data is found
-    if (monthlyPerformance.length === 0) {
-      return NextResponse.json([]);
+    // Get the current date and calculate the start of the year
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const currentMonthIndex = now.getMonth();
+
+    // Group sales by month and calculate monthly performance
+    const monthlySales = new Map();
+    const monthlyListings = new Map();
+
+    // Initialize all months with zero values
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    months.forEach(month => {
+      monthlySales.set(month, 0);
+      monthlyListings.set(month, 0);
+    });
+
+    // Distribute total sales across months based on properties sold
+    const totalSales = user.agent.totalSales || 0;
+    const soldProperties = user.agent.properties ? user.agent.properties.filter(p => p.status === 'sold') : [];
+
+    // If there are sold properties, distribute sales based on their dates
+    if (soldProperties.length > 0) {
+      const salesPerProperty = totalSales / soldProperties.length;
+
+      soldProperties.forEach(property => {
+        if (property.soldRentedAt && property.soldRentedAt >= startOfYear) {
+          const month = months[new Date(property.soldRentedAt).getMonth()];
+          monthlySales.set(month, monthlySales.get(month) + salesPerProperty);
+        }
+      });
+    } else {
+      // If no sold properties, distribute sales evenly across months
+      const salesPerMonth = totalSales / (currentMonthIndex + 1);
+      for (let i = 0; i <= currentMonthIndex; i++) {
+        monthlySales.set(months[i], salesPerMonth);
+      }
     }
 
-    return NextResponse.json(monthlyPerformance);
+    // Process listings data
+    if (user.agent.properties && user.agent.properties.length > 0) {
+      user.agent.properties.forEach(property => {
+        if (property.createdAt && property.createdAt >= startOfYear) {
+          const month = months[new Date(property.createdAt).getMonth()];
+          monthlyListings.set(month, monthlyListings.get(month) + 1);
+        }
+      });
+    }
+
+    // Calculate commission based on sales (assuming 5% commission rate or use agent's rate)
+    const commissionRate = user.agent.commissionRate || 0.05;
+
+    // Format the performance data
+    const performanceData = months.map(month => ({
+      name: month,
+      sales: monthlySales.get(month),
+      commission: monthlySales.get(month) * commissionRate,
+      listings: monthlyListings.get(month)
+    }));
+
+    // Only include months up to the current month
+    const filteredPerformanceData = performanceData.slice(0, currentMonthIndex + 1);
+
+    return NextResponse.json(filteredPerformanceData);
   } catch (error) {
     console.error("Error fetching agent performance:", error);
     return NextResponse.json(

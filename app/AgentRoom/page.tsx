@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
+import AgentGuard from "./agent-guard"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -64,9 +65,18 @@ import {
     Bath,
     Square,
     Heart,
+    Bell,
 } from "lucide-react"
 
 export default function AgentDashboard() {
+    return (
+        <AgentGuard>
+            <AgentDashboardContent />
+        </AgentGuard>
+    );
+}
+
+function AgentDashboardContent() {
     const [activeTab, setActiveTab] = useState("overview")
     const [timeRange, setTimeRange] = useState("month")
     const [agentData, setAgentData] = useState(null)
@@ -97,20 +107,12 @@ export default function AgentDashboard() {
 
                 const data = await response.json()
 
-                // Add additional fields that might not be in the API response
+                // Use only the data from the API response without fallback values
                 const enhancedData = {
                     ...data,
-                    reviews: data.reviews || 24,
-                    specializations: data.specialization ? 
-                        data.specialization.split(',').map(s => s.trim()) : 
-                        ["Luxury Properties", "Residential Sales", "Investment Properties"],
-                    languages: ["English", "Bemba", "Nyanja"],
-                    socialMedia: {
-                        facebook: "facebook.com/agent",
-                        twitter: "twitter.com/agent",
-                        linkedin: "linkedin.com/in/agent",
-                    },
-                    role: data.specialization || "Real Estate Agent",
+                    specializations: data.specialization ?
+                        data.specialization.split(',').map(s => s.trim()) :
+                        [],
                 }
 
                 setAgentData(enhancedData)
@@ -209,115 +211,10 @@ export default function AgentDashboard() {
 
     // The following are sample data for other tabs that are not yet connected to API endpoints
 
-    // Sample data for clients
-    const recentClients = [
-        {
-            id: 1,
-            name: "John Smith",
-            email: "john.smith@example.com",
-            phone: "+260 97 1234567",
-            avatar: "https://i.pravatar.cc/150?img=11",
-            status: "Active",
-            interest: "Buying",
-            budget: "ZMW 300K - 500K",
-            lastContact: "Today",
-            notes: "Looking for a 2-bedroom apartment in central Lusaka.",
-        },
-        {
-            id: 2,
-            name: "Lisa Wong",
-            email: "lisa.wong@example.com",
-            phone: "+260 97 7654321",
-            avatar: "https://i.pravatar.cc/150?img=5",
-            status: "Active",
-            interest: "Selling",
-            budget: "ZMW 800K+",
-            lastContact: "Yesterday",
-            notes: "Wants to sell her villa by the end of the month.",
-        },
-        {
-            id: 3,
-            name: "Robert Johnson",
-            email: "robert.johnson@example.com",
-            phone: "+260 97 2468135",
-            avatar: "https://i.pravatar.cc/150?img=12",
-            status: "Pending",
-            interest: "Renting",
-            budget: "ZMW 3K - 6K/mo",
-            lastContact: "3 days ago",
-            notes: "Interested in a 3-bedroom house for his family.",
-        },
-    ]
-
-    // Sample data for upcoming tasks
-    const upcomingTasks = [
-        {
-            id: 1,
-            title: "Property Viewing - Modern Apartment",
-            date: "Today, 2:00 PM",
-            client: "John Smith",
-            location: "123 Skyline Ave, Lusaka",
-            priority: "High",
-        },
-        {
-            id: 2,
-            title: "Contract Signing - Luxury Villa",
-            date: "Tomorrow, 10:30 AM",
-            client: "Lisa Wong",
-            location: "456 Park Lane, Lusaka",
-            priority: "High",
-        },
-        {
-            id: 3,
-            title: "Property Photoshoot - Riverside Condo",
-            date: "Aug 15, 9:00 AM",
-            client: "Internal",
-            location: "78 Riverside Drive, Lusaka",
-            priority: "Medium",
-        },
-        {
-            id: 4,
-            title: "Client Meeting - Investment Options",
-            date: "Aug 16, 3:30 PM",
-            client: "Robert Johnson",
-            location: "Office",
-            priority: "Medium",
-        },
-    ]
-
-    // Sample data for recent activity
-    const recentActivity = [
-        {
-            id: 1,
-            action: "Added a new property listing",
-            time: "2 hours ago",
-            details: "Modern Apartment with Pool View",
-        },
-        {
-            id: 2,
-            action: "Responded to an inquiry",
-            time: "5 hours ago",
-            details: "From John Smith about Luxury Villa",
-        },
-        {
-            id: 3,
-            action: "Updated property details",
-            time: "Yesterday",
-            details: "Cozy Townhouse price reduced",
-        },
-        {
-            id: 4,
-            action: "Scheduled a viewing",
-            time: "Yesterday",
-            details: "With Lisa Wong for Modern Apartment",
-        },
-        {
-            id: 5,
-            action: "Closed a deal",
-            time: "3 days ago",
-            details: "Sold Riverside Condo for ZMW 420,000",
-        },
-    ]
+    // Empty arrays for clients, tasks, and activity - no fallback data
+    const recentClients = []
+    const upcomingTasks = []
+    const recentActivity = []
 
     const getPriorityBadgeStyles = (priority: string) => {
         switch (priority) {
@@ -392,7 +289,7 @@ export default function AgentDashboard() {
                                 <div className="relative aspect-square w-24 h-24 md:w-32 md:h-32 rounded-xl overflow-hidden border-4 border-white dark:border-gray-800 shadow-lg mx-auto md:mx-0">
                                     <Image
                                         src={agentData?.image || "/placeholder.svg"}
-                                        alt={agentData?.name || "Agent"}
+                                        alt={agentData?.name || ""}
                                         fill
                                         className="object-cover"
                                     />
@@ -401,40 +298,39 @@ export default function AgentDashboard() {
                                 <div className="mt-4 text-center md:text-left space-y-4">
                                     <div className="flex flex-col">
                                         <h1 className="text-xl md:text-2xl font-bold">{agentData?.name}</h1>
-                                        <p className="text-indigo-600 dark:text-indigo-400 font-medium">{agentData?.role || agentData?.specialization || "Real Estate Agent"}</p>
+                                        <p className="text-indigo-600 dark:text-indigo-400 font-medium">{agentData?.role || agentData?.specialization}</p>
                                         <div className="mt-2 flex items-center justify-center md:justify-start">
-                                            <div className="flex">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <Star
-                                                        key={i}
-                                                        className={`h-4 w-4 ${
-                                                            i < Math.floor(agentData?.rating || 0)
-                                                                ? "fill-amber-400 text-amber-400"
-                                                                : "text-gray-300 dark:text-gray-600"
-                                                        }`}
-                                                    />
-                                                ))}
-                                            </div>
-                                            <span className="ml-2 text-sm text-muted-foreground">({agentData?.reviews || 0} reviews)</span>
+                                            {agentData?.rating ? (
+                                                <div className="flex">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <Star
+                                                            key={i}
+                                                            className={`h-4 w-4 ${
+                                                                i < Math.floor(agentData.rating)
+                                                                    ? "fill-amber-400 text-amber-400"
+                                                                    : "text-gray-300 dark:text-gray-600"
+                                                            }`}
+                                                        />
+                                                    ))}
+                                                    <span className="ml-2 text-sm text-muted-foreground">({agentData.reviews || 0} reviews)</span>
+                                                </div>
+                                            ) : null}
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                                        <Badge
-                                            variant="outline"
-                                            className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800/30"
-                                        >
-                                            <Award className="h-3 w-3 mr-1" />
-                                            Top Seller
-                                        </Badge>
-                                        <Badge
-                                            variant="outline"
-                                            className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/30"
-                                        >
-                                            <CheckCircle className="h-3 w-3 mr-1" />
-                                            Verified
-                                        </Badge>
-                                    </div>
+                                    {agentData?.badges && agentData.badges.length > 0 ? (
+                                        <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+                                            {agentData.badges.map((badge, index) => (
+                                                <Badge
+                                                    key={index}
+                                                    variant="outline"
+                                                    className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800/30"
+                                                >
+                                                    {badge}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    ) : null}
 
                                     <div className="pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
                                         <div className="flex items-center gap-2">
@@ -481,17 +377,19 @@ export default function AgentDashboard() {
                                                 <div>
                                                     <p className="text-sm font-medium text-muted-foreground">Total Sales</p>
                                                     <h3 className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
-                                                        {agentData?.performance?.totalSales || "ZMW 0"}
+                                                        {agentData?.performance?.totalSales}
                                                     </h3>
                                                 </div>
                                                 <div className="rounded-full bg-indigo-100 dark:bg-indigo-900/30 p-2 text-indigo-600 dark:text-indigo-400">
                                                     <DollarSign className="h-5 w-5" />
                                                 </div>
                                             </div>
-                                            <div className="mt-2 flex items-center text-xs text-emerald-600">
-                                                <ArrowUpRight className="h-3 w-3 mr-1" />
-                                                <span>12% from last month</span>
-                                            </div>
+                                            {agentData?.performance?.salesTrend && (
+                                                <div className="mt-2 flex items-center text-xs text-emerald-600">
+                                                    <ArrowUpRight className="h-3 w-3 mr-1" />
+                                                    <span>{agentData.performance.salesTrend}</span>
+                                                </div>
+                                            )}
                                         </CardContent>
                                     </Card>
                                     <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
@@ -500,17 +398,19 @@ export default function AgentDashboard() {
                                                 <div>
                                                     <p className="text-sm font-medium text-muted-foreground">Commission</p>
                                                     <h3 className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
-                                                        {agentData?.performance?.totalCommission || "ZMW 0"}
+                                                        {agentData?.performance?.totalCommission}
                                                     </h3>
                                                 </div>
                                                 <div className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 p-2 text-emerald-600 dark:text-emerald-400">
                                                     <DollarSign className="h-5 w-5" />
                                                 </div>
                                             </div>
-                                            <div className="mt-2 flex items-center text-xs text-emerald-600">
-                                                <ArrowUpRight className="h-3 w-3 mr-1" />
-                                                <span>8% from last month</span>
-                                            </div>
+                                            {agentData?.performance?.commissionTrend && (
+                                                <div className="mt-2 flex items-center text-xs text-emerald-600">
+                                                    <ArrowUpRight className="h-3 w-3 mr-1" />
+                                                    <span>{agentData.performance.commissionTrend}</span>
+                                                </div>
+                                            )}
                                         </CardContent>
                                     </Card>
                                     <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
@@ -519,17 +419,19 @@ export default function AgentDashboard() {
                                                 <div>
                                                     <p className="text-sm font-medium text-muted-foreground">Active Listings</p>
                                                     <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                                                        {agentData?.performance?.activeListings || 0}
+                                                        {agentData?.performance?.activeListings}
                                                     </h3>
                                                 </div>
                                                 <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-2 text-blue-600 dark:text-blue-400">
                                                     <Home className="h-5 w-5" />
                                                 </div>
                                             </div>
-                                            <div className="mt-2 flex items-center text-xs text-emerald-600">
-                                                <ArrowUpRight className="h-3 w-3 mr-1" />
-                                                <span>3 new this month</span>
-                                            </div>
+                                            {agentData?.performance?.listingsTrend && (
+                                                <div className="mt-2 flex items-center text-xs text-emerald-600">
+                                                    <ArrowUpRight className="h-3 w-3 mr-1" />
+                                                    <span>{agentData.performance.listingsTrend}</span>
+                                                </div>
+                                            )}
                                         </CardContent>
                                     </Card>
                                     <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
@@ -538,17 +440,19 @@ export default function AgentDashboard() {
                                                 <div>
                                                     <p className="text-sm font-medium text-muted-foreground">Sold Properties</p>
                                                     <h3 className="text-xl font-bold text-purple-600 dark:text-purple-400">
-                                                        {agentData?.performance?.soldProperties || 0}
+                                                        {agentData?.performance?.soldProperties}
                                                     </h3>
                                                 </div>
                                                 <div className="rounded-full bg-purple-100 dark:bg-purple-900/30 p-2 text-purple-600 dark:text-purple-400">
                                                     <CheckCircle className="h-5 w-5" />
                                                 </div>
                                             </div>
-                                            <div className="mt-2 flex items-center text-xs text-emerald-600">
-                                                <ArrowUpRight className="h-3 w-3 mr-1" />
-                                                <span>2 this month</span>
-                                            </div>
+                                            {agentData?.performance?.soldTrend && (
+                                                <div className="mt-2 flex items-center text-xs text-emerald-600">
+                                                    <ArrowUpRight className="h-3 w-3 mr-1" />
+                                                    <span>{agentData.performance.soldTrend}</span>
+                                                </div>
+                                            )}
                                         </CardContent>
                                     </Card>
                                     <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
@@ -557,17 +461,19 @@ export default function AgentDashboard() {
                                                 <div>
                                                     <p className="text-sm font-medium text-muted-foreground">Pending Deals</p>
                                                     <h3 className="text-xl font-bold text-amber-600 dark:text-amber-400">
-                                                        {agentData?.performance?.pendingDeals || 0}
+                                                        {agentData?.performance?.pendingDeals}
                                                     </h3>
                                                 </div>
                                                 <div className="rounded-full bg-amber-100 dark:bg-amber-900/30 p-2 text-amber-600 dark:text-amber-400">
                                                     <Clock className="h-5 w-5" />
                                                 </div>
                                             </div>
-                                            <div className="mt-2 flex items-center text-xs text-amber-600">
-                                                <Clock className="h-3 w-3 mr-1" />
-                                                <span>1 closing this week</span>
-                                            </div>
+                                            {agentData?.performance?.pendingTrend && (
+                                                <div className="mt-2 flex items-center text-xs text-amber-600">
+                                                    <Clock className="h-3 w-3 mr-1" />
+                                                    <span>{agentData.performance.pendingTrend}</span>
+                                                </div>
+                                            )}
                                         </CardContent>
                                     </Card>
                                     <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
@@ -576,17 +482,19 @@ export default function AgentDashboard() {
                                                 <div>
                                                     <p className="text-sm font-medium text-muted-foreground">Conversion Rate</p>
                                                     <h3 className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
-                                                        {agentData?.performance?.conversionRate || 0}%
+                                                        {agentData?.performance?.conversionRate ? `${agentData.performance.conversionRate}%` : ''}
                                                     </h3>
                                                 </div>
                                                 <div className="rounded-full bg-indigo-100 dark:bg-indigo-900/30 p-2 text-indigo-600 dark:text-indigo-400">
                                                     <TrendingUp className="h-5 w-5" />
                                                 </div>
                                             </div>
-                                            <div className="mt-2 flex items-center text-xs text-emerald-600">
-                                                <ArrowUpRight className="h-3 w-3 mr-1" />
-                                                <span>5% from last month</span>
-                                            </div>
+                                            {agentData?.performance?.conversionTrend && (
+                                                <div className="mt-2 flex items-center text-xs text-emerald-600">
+                                                    <ArrowUpRight className="h-3 w-3 mr-1" />
+                                                    <span>{agentData.performance.conversionTrend}</span>
+                                                </div>
+                                            )}
                                         </CardContent>
                                     </Card>
                                 </div>
@@ -601,17 +509,17 @@ export default function AgentDashboard() {
                                                     <span className="font-medium">Sales Target</span>
                                                 </div>
                                                 <span className="text-sm font-semibold">
-                          {agentData?.performance?.totalSales || "ZMW 0"} / {agentData?.goals?.salesTarget || "ZMW 0"}
+                          {agentData?.performance?.totalSales} / {agentData?.goals?.salesTarget}
                         </span>
                                             </div>
                                             <Progress
-                                                value={agentData?.goals?.salesProgress || 0}
+                                                value={agentData?.goals?.salesProgress}
                                                 className="h-2"
                                                 style={{ backgroundColor: "#f3f4f6" }}
                                             >
                                                 <div
                                                     className="h-full rounded-full bg-gradient-to-r from-indigo-600 to-purple-600"
-                                                    style={{ width: `${agentData?.goals?.salesProgress || 0}%` }}
+                                                    style={{ width: agentData?.goals?.salesProgress ? `${agentData.goals.salesProgress}%` : '0%' }}
                                                 ></div>
                                             </Progress>
                                         </div>
@@ -622,17 +530,17 @@ export default function AgentDashboard() {
                                                     <span className="font-medium">Listings Target</span>
                                                 </div>
                                                 <span className="text-sm font-semibold">
-                          {agentData?.performance?.activeListings || 0} / {agentData?.goals?.listingsTarget || 0}
+                          {agentData?.performance?.activeListings} / {agentData?.goals?.listingsTarget}
                         </span>
                                             </div>
                                             <Progress
-                                                value={agentData?.goals?.listingsProgress || 0}
+                                                value={agentData?.goals?.listingsProgress}
                                                 className="h-2"
                                                 style={{ backgroundColor: "#f3f4f6" }}
                                             >
                                                 <div
                                                     className="h-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-600"
-                                                    style={{ width: `${agentData?.goals?.listingsProgress || 0}%` }}
+                                                    style={{ width: agentData?.goals?.listingsProgress ? `${agentData.goals.listingsProgress}%` : '0%' }}
                                                 ></div>
                                             </Progress>
                                         </div>
@@ -643,17 +551,17 @@ export default function AgentDashboard() {
                                                     <span className="font-medium">Clients Target</span>
                                                 </div>
                                                 <span className="text-sm font-semibold">
-                                                    {agentData?.clientsCount || 0} / {agentData?.goals?.clientsTarget || 0}
+                                                    {agentData?.clientsCount} / {agentData?.goals?.clientsTarget}
                                                 </span>
                                             </div>
                                             <Progress
-                                                value={agentData?.goals?.clientsProgress || 0}
+                                                value={agentData?.goals?.clientsProgress}
                                                 className="h-2"
                                                 style={{ backgroundColor: "#f3f4f6" }}
                                             >
                                                 <div
                                                     className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-teal-600"
-                                                    style={{ width: `${agentData?.goals?.clientsProgress || 0}%` }}
+                                                    style={{ width: agentData?.goals?.clientsProgress ? `${agentData.goals.clientsProgress}%` : '0%' }}
                                                 ></div>
                                             </Progress>
                                         </div>
@@ -902,42 +810,52 @@ export default function AgentDashboard() {
                                     <CardDescription>Your schedule for the next few days</CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="space-y-4">
-                                        {upcomingTasks.slice(0, 3).map((task) => (
-                                            <div
-                                                key={task.id}
-                                                className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 p-3"
-                                            >
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <div
-                                                            className={`h-2 w-2 rounded-full ${
-                                                                task.priority === "High"
-                                                                    ? "bg-red-500"
-                                                                    : task.priority === "Medium"
-                                                                        ? "bg-amber-500"
-                                                                        : "bg-emerald-500"
-                                                            }`}
-                                                        ></div>
-                                                        <p className="font-medium text-sm">{task.title}</p>
+                                    {upcomingTasks.length > 0 ? (
+                                        <div className="space-y-4">
+                                            {upcomingTasks.slice(0, 3).map((task) => (
+                                                <div
+                                                    key={task.id}
+                                                    className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 p-3"
+                                                >
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <div
+                                                                className={`h-2 w-2 rounded-full ${
+                                                                    task.priority === "High"
+                                                                        ? "bg-red-500"
+                                                                        : task.priority === "Medium"
+                                                                            ? "bg-amber-500"
+                                                                            : "bg-emerald-500"
+                                                                }`}
+                                                            ></div>
+                                                            <p className="font-medium text-sm">{task.title}</p>
+                                                        </div>
+                                                        <div className="mt-1 flex items-center gap-4">
+                                                            <p className="text-xs text-muted-foreground flex items-center">
+                                                                <Calendar className="mr-1 h-3 w-3" />
+                                                                {task.date}
+                                                            </p>
+                                                            <p className="text-xs text-muted-foreground flex items-center">
+                                                                <User className="mr-1 h-3 w-3" />
+                                                                {task.client}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                    <div className="mt-1 flex items-center gap-4">
-                                                        <p className="text-xs text-muted-foreground flex items-center">
-                                                            <Calendar className="mr-1 h-3 w-3" />
-                                                            {task.date}
-                                                        </p>
-                                                        <p className="text-xs text-muted-foreground flex items-center">
-                                                            <User className="mr-1 h-3 w-3" />
-                                                            {task.client}
-                                                        </p>
-                                                    </div>
+                                                    <Badge variant="outline" className={getPriorityBadgeStyles(task.priority)}>
+                                                        {task.priority}
+                                                    </Badge>
                                                 </div>
-                                                <Badge variant="outline" className={getPriorityBadgeStyles(task.priority)}>
-                                                    {task.priority}
-                                                </Badge>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center py-8 text-center">
+                                            <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-3 mb-4">
+                                                <Calendar className="h-6 w-6 text-gray-400" />
                                             </div>
-                                        ))}
-                                    </div>
+                                            <h3 className="text-lg font-medium mb-2">No upcoming tasks</h3>
+                                            <p className="text-sm text-muted-foreground">You don't have any scheduled tasks.</p>
+                                        </div>
+                                    )}
                                 </CardContent>
                                 <CardFooter className="border-t pt-4 flex justify-between">
                                     <Button variant="ghost" size="sm" className="text-muted-foreground">
@@ -956,23 +874,33 @@ export default function AgentDashboard() {
                                     <CardDescription>Latest actions on the platform</CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="relative space-y-5">
-                                        <div className="absolute left-3 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700"></div>
-                                        {recentActivity.slice(0, 4).map((activity, index) => (
-                                            <div key={activity.id} className="flex items-start gap-4 relative">
-                                                <div className="absolute left-3 -translate-x-1/2 h-6 w-6 rounded-full flex items-center justify-center z-10 bg-indigo-500">
-                                                    <CheckCircle className="h-3 w-3 text-white" />
+                                    {recentActivity.length > 0 ? (
+                                        <div className="relative space-y-5">
+                                            <div className="absolute left-3 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700"></div>
+                                            {recentActivity.slice(0, 4).map((activity, index) => (
+                                                <div key={activity.id} className="flex items-start gap-4 relative">
+                                                    <div className="absolute left-3 -translate-x-1/2 h-6 w-6 rounded-full flex items-center justify-center z-10 bg-indigo-500">
+                                                        <CheckCircle className="h-3 w-3 text-white" />
+                                                    </div>
+                                                    <div className="ml-8 space-y-1 bg-gray-50 dark:bg-gray-900 rounded-lg p-3 w-full">
+                                                        <p className="text-sm">
+                                                            <span className="font-medium">You</span> {activity.action}
+                                                        </p>
+                                                        <p className="text-xs text-muted-foreground">{activity.time}</p>
+                                                        <p className="text-xs text-indigo-600 dark:text-indigo-400">{activity.details}</p>
+                                                    </div>
                                                 </div>
-                                                <div className="ml-8 space-y-1 bg-gray-50 dark:bg-gray-900 rounded-lg p-3 w-full">
-                                                    <p className="text-sm">
-                                                        <span className="font-medium">You</span> {activity.action}
-                                                    </p>
-                                                    <p className="text-xs text-muted-foreground">{activity.time}</p>
-                                                    <p className="text-xs text-indigo-600 dark:text-indigo-400">{activity.details}</p>
-                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center py-8 text-center">
+                                            <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-3 mb-4">
+                                                <Clock className="h-6 w-6 text-gray-400" />
                                             </div>
-                                        ))}
-                                    </div>
+                                            <h3 className="text-lg font-medium mb-2">No recent activity</h3>
+                                            <p className="text-sm text-muted-foreground">Your recent actions will appear here.</p>
+                                        </div>
+                                    )}
                                 </CardContent>
                                 <CardFooter className="border-t pt-4 flex justify-center">
                                     <Button variant="outline" size="sm" className="w-full">
@@ -982,26 +910,6 @@ export default function AgentDashboard() {
                             </Card>
                         </div>
 
-                        <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white">
-                            <CardContent className="p-6">
-                                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                                    <div className="space-y-2">
-                                        <h3 className="text-xl font-bold">Ready to boost your performance?</h3>
-                                        <p className="text-indigo-100">Get personalized coaching and tips to increase your sales.</p>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <Button variant="ghost" className="border border-white/20 text-white hover:bg-white/10">
-                                            <FileText className="mr-2 h-4 w-4" />
-                                            Learn more
-                                        </Button>
-                                        <Button className="bg-white text-indigo-700 hover:bg-indigo-100">
-                                            <Zap className="mr-2 h-4 w-4" />
-                                            Get Started
-                                        </Button>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
                     </TabsContent>
 
                     {/* Listings Tab Content */}
@@ -1173,9 +1081,9 @@ export default function AgentDashboard() {
                                 </div>
                                 {listingsPagination.totalPages > 1 && (
                                     <div className="flex items-center gap-2">
-                                        <Button 
-                                            variant="outline" 
-                                            size="sm" 
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
                                             disabled={listingsPagination.currentPage === 1 || listingsLoading}
                                             onClick={() => fetchListingsData(listingsPagination.currentPage - 1)}
                                         >
@@ -1185,8 +1093,8 @@ export default function AgentDashboard() {
                                             Page <span className="font-medium">{listingsPagination.currentPage}</span> of{" "}
                                             <span className="font-medium">{listingsPagination.totalPages}</span>
                                         </div>
-                                        <Button 
-                                            variant="outline" 
+                                        <Button
+                                            variant="outline"
                                             size="sm"
                                             disabled={listingsPagination.currentPage === listingsPagination.totalPages || listingsLoading}
                                             onClick={() => fetchListingsData(listingsPagination.currentPage + 1)}
@@ -1198,20 +1106,6 @@ export default function AgentDashboard() {
                             </CardFooter>
                         </Card>
 
-                        <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white">
-                            <CardContent className="p-6">
-                                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                                    <div className="space-y-2">
-                                        <h3 className="text-xl font-bold">Need to add a new property?</h3>
-                                        <p className="text-indigo-100">Create a new listing in just a few minutes.</p>
-                                    </div>
-                                    <Button className="bg-white text-indigo-700 hover:bg-indigo-100">
-                                        <Plus className="mr-2 h-4 w-4" />
-                                        Add New Listing
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
                     </TabsContent>
 
                     {/* Clients Tab Content */}
@@ -1237,92 +1131,111 @@ export default function AgentDashboard() {
                                 </div>
                             </CardHeader>
                             <CardContent className="pt-4">
-                                <div className="space-y-4">
-                                    {recentClients.map((client) => (
-                                        <Card key={client.id} className="border border-gray-200 dark:border-gray-700 shadow-sm">
-                                            <CardContent className="p-4">
-                                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                                                    <div className="flex items-center gap-4">
-                                                        <Avatar className="h-12 w-12 border-2 border-white shadow-sm">
-                                                            <AvatarImage src={client.avatar || "/placeholder.svg"} alt={client.name} />
-                                                            <AvatarFallback>{client.name.charAt(0)}</AvatarFallback>
-                                                        </Avatar>
-                                                        <div>
-                                                            <h3 className="font-semibold">{client.name}</h3>
-                                                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-muted-foreground">
-                                                                <div className="flex items-center">
-                                                                    <Mail className="mr-1 h-3 w-3" />
-                                                                    <span>{client.email}</span>
-                                                                </div>
-                                                                <div className="flex items-center">
-                                                                    <Phone className="mr-1 h-3 w-3" />
-                                                                    <span>{client.phone}</span>
+                                {recentClients.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {recentClients.map((client) => (
+                                            <Card key={client.id} className="border border-gray-200 dark:border-gray-700 shadow-sm">
+                                                <CardContent className="p-4">
+                                                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                                        <div className="flex items-center gap-4">
+                                                            <Avatar className="h-12 w-12 border-2 border-white shadow-sm">
+                                                                <AvatarImage src={client.avatar || "/placeholder.svg"} alt={client.name} />
+                                                                <AvatarFallback>{client.name.charAt(0)}</AvatarFallback>
+                                                            </Avatar>
+                                                            <div>
+                                                                <h3 className="font-semibold">{client.name}</h3>
+                                                                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-muted-foreground">
+                                                                    <div className="flex items-center">
+                                                                        <Mail className="mr-1 h-3 w-3" />
+                                                                        <span>{client.email}</span>
+                                                                    </div>
+                                                                    <div className="flex items-center">
+                                                                        <Phone className="mr-1 h-3 w-3" />
+                                                                        <span>{client.phone}</span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        <div className="flex flex-wrap items-center gap-2">
+                                                            <Badge variant="outline" className={getStatusBadgeStyles(client.status)}>
+                                                                {client.status}
+                                                            </Badge>
+                                                            <Badge
+                                                                variant="outline"
+                                                                className="bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 border-blue-200 dark:border-blue-800/30"
+                                                            >
+                                                                {client.interest}
+                                                            </Badge>
+                                                        </div>
                                                     </div>
-                                                    <div className="flex flex-wrap items-center gap-2">
-                                                        <Badge variant="outline" className={getStatusBadgeStyles(client.status)}>
-                                                            {client.status}
-                                                        </Badge>
-                                                        <Badge
-                                                            variant="outline"
-                                                            className="bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 border-blue-200 dark:border-blue-800/30"
-                                                        >
-                                                            {client.interest}
-                                                        </Badge>
+                                                    <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                        <div className="rounded-lg bg-gray-50 dark:bg-gray-900 p-3">
+                                                            <p className="text-xs text-muted-foreground">Budget</p>
+                                                            <p className="font-medium">{client.budget}</p>
+                                                        </div>
+                                                        <div className="rounded-lg bg-gray-50 dark:bg-gray-900 p-3">
+                                                            <p className="text-xs text-muted-foreground">Last Contact</p>
+                                                            <p className="font-medium">{client.lastContact}</p>
+                                                        </div>
+                                                        <div className="rounded-lg bg-gray-50 dark:bg-gray-900 p-3">
+                                                            <p className="text-xs text-muted-foreground">Notes</p>
+                                                            <p className="text-sm line-clamp-1">{client.notes}</p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                    <div className="rounded-lg bg-gray-50 dark:bg-gray-900 p-3">
-                                                        <p className="text-xs text-muted-foreground">Budget</p>
-                                                        <p className="font-medium">{client.budget}</p>
+                                                    <div className="mt-4 flex justify-end gap-2">
+                                                        <Button variant="outline" size="sm">
+                                                            <MessageSquare className="mr-1.5 h-3.5 w-3.5" /> Message
+                                                        </Button>
+                                                        <Button variant="outline" size="sm">
+                                                            <Edit className="mr-1.5 h-3.5 w-3.5" /> Edit
+                                                        </Button>
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="outline" size="sm" className="px-2">
+                                                                    <MoreHorizontal className="h-4 w-4" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end" className="w-[160px]">
+                                                                <DropdownMenuItem>
+                                                                    <Calendar className="mr-2 h-4 w-4" /> Schedule Meeting
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem>
+                                                                    <FileText className="mr-2 h-4 w-4" /> View History
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuItem className="text-red-600 focus:text-red-600">
+                                                                    <Trash2 className="mr-2 h-4 w-4" /> Remove Client
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
                                                     </div>
-                                                    <div className="rounded-lg bg-gray-50 dark:bg-gray-900 p-3">
-                                                        <p className="text-xs text-muted-foreground">Last Contact</p>
-                                                        <p className="font-medium">{client.lastContact}</p>
-                                                    </div>
-                                                    <div className="rounded-lg bg-gray-50 dark:bg-gray-900 p-3">
-                                                        <p className="text-xs text-muted-foreground">Notes</p>
-                                                        <p className="text-sm line-clamp-1">{client.notes}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="mt-4 flex justify-end gap-2">
-                                                    <Button variant="outline" size="sm">
-                                                        <MessageSquare className="mr-1.5 h-3.5 w-3.5" /> Message
-                                                    </Button>
-                                                    <Button variant="outline" size="sm">
-                                                        <Edit className="mr-1.5 h-3.5 w-3.5" /> Edit
-                                                    </Button>
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button variant="outline" size="sm" className="px-2">
-                                                                <MoreHorizontal className="h-4 w-4" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end" className="w-[160px]">
-                                                            <DropdownMenuItem>
-                                                                <Calendar className="mr-2 h-4 w-4" /> Schedule Meeting
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem>
-                                                                <FileText className="mr-2 h-4 w-4" /> View History
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuSeparator />
-                                                            <DropdownMenuItem className="text-red-600 focus:text-red-600">
-                                                                <Trash2 className="mr-2 h-4 w-4" /> Remove Client
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    ))}
-                                </div>
+                                                </CardContent>
+                                            </Card>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-8 text-center">
+                                        <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-3 mb-4">
+                                            <Users className="h-6 w-6 text-gray-400" />
+                                        </div>
+                                        <h3 className="text-lg font-medium mb-2">No clients found</h3>
+                                        <p className="text-sm text-muted-foreground">You don't have any clients yet.</p>
+                                        <Button className="mt-4 bg-gradient-to-r from-indigo-600 to-indigo-500">
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            Add Your First Client
+                                        </Button>
+                                    </div>
+                                )}
                             </CardContent>
                             <CardFooter className="border-t pt-4 flex justify-between">
                                 <div className="text-sm text-muted-foreground">
-                                    Showing <span className="font-medium">{recentClients.length}</span> of{" "}
-                                    <span className="font-medium">13</span> clients
+                                    {recentClients.length > 0 ? (
+                                        <>
+                                            Showing <span className="font-medium">{recentClients.length}</span> clients
+                                        </>
+                                    ) : (
+                                        <>No clients to display</>
+                                    )}
                                 </div>
                                 <Button variant="outline" size="sm">
                                     View All Clients
@@ -1473,45 +1386,12 @@ export default function AgentDashboard() {
                                 <CardDescription>Recent system notifications</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <div className="space-y-4">
-                                    {[
-                                        {
-                                            id: 1,
-                                            title: "New inquiry received",
-                                            message: "You have a new inquiry for Modern Apartment with Pool View",
-                                            time: "2 hours ago",
-                                            read: false,
-                                        },
-                                        {
-                                            id: 2,
-                                            title: "Listing approved",
-                                            message: "Your listing 'Luxury Villa with Garden' has been approved",
-                                            time: "Yesterday",
-                                            read: true,
-                                        },
-                                        {
-                                            id: 3,
-                                            title: "Commission payment",
-                                            message: "Commission payment of ZMW 22,500 has been processed",
-                                            time: "3 days ago",
-                                            read: true,
-                                        },
-                                    ].map((notification) => (
-                                        <div
-                                            key={notification.id}
-                                            className={`rounded-lg p-4 ${
-                                                notification.read
-                                                    ? "bg-gray-50 dark:bg-gray-900"
-                                                    : "bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500"
-                                            }`}
-                                        >
-                                            <div className="flex justify-between items-start">
-                                                <h4 className="font-medium">{notification.title}</h4>
-                                                <span className="text-xs text-muted-foreground">{notification.time}</span>
-                                            </div>
-                                            <p className="text-sm mt-1">{notification.message}</p>
-                                        </div>
-                                    ))}
+                                <div className="flex flex-col items-center justify-center py-8 text-center">
+                                    <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-3 mb-4">
+                                        <Bell className="h-6 w-6 text-gray-400" />
+                                    </div>
+                                    <h3 className="text-lg font-medium mb-2">No notifications</h3>
+                                    <p className="text-sm text-muted-foreground">You don't have any notifications yet.</p>
                                 </div>
                             </CardContent>
                             <CardFooter className="border-t pt-4 flex justify-between">
