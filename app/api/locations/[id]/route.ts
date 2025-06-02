@@ -6,8 +6,13 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Await params before destructuring
+    const paramsData = await params;
+    const { id: paramId } = paramsData;
+    const id = parseInt(paramId)
+
     const location = await prisma.location.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         properties: {
           include: {
@@ -47,8 +52,13 @@ export async function PUT(
     const body = await request.json()
     const { name, cityName, stateName, countryName, postalCode } = body
 
+    // Await params before destructuring
+    const paramsData = await params;
+    const { id: paramId } = paramsData;
+    const id = parseInt(paramId)
+
     const location = await prisma.location.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name,
         cityName,
@@ -69,7 +79,10 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id)
+    // Await params before destructuring
+    const paramsData = await params;
+    const { id: paramId } = paramsData;
+    const id = parseInt(paramId)
 
     // Check if location exists
     const location = await prisma.location.findUnique({
