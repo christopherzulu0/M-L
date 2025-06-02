@@ -4,6 +4,93 @@ import { auth } from '@clerk/nextjs/server'
 
 const prisma = new PrismaClient()
 
+// POST /api/properties - Create a new property
+export async function POST(request: NextRequest) {
+  try {
+    // Authentication is required for creating properties
+    const { userId } = await auth()
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Parse the request body
+    const body = await request.json()
+
+    // Validate required fields
+    const requiredFields = ['title', 'propertyTypeId', 'listingTypeId', 'price', 'address', 'locationId']
+    for (const field of requiredFields) {
+      if (!body[field]) {
+        return NextResponse.json({ error: `Missing required field: ${field}` }, { status: 400 })
+      }
+    }
+
+    // Create the property
+    const property = await prisma.property.create({
+      data: {
+        title: body.title,
+        description: body.description,
+        propertyTypeId: parseInt(body.propertyTypeId),
+        listingTypeId: parseInt(body.listingTypeId),
+        price: parseFloat(body.price),
+        priceType: body.priceType || 'total',
+        address: body.address,
+        locationId: parseInt(body.locationId),
+        latitude: body.latitude,
+        longitude: body.longitude,
+        bedrooms: body.bedrooms ? parseInt(body.bedrooms) : null,
+        bathrooms: body.bathrooms ? parseFloat(body.bathrooms) : null,
+        squareFeet: body.squareFeet ? parseFloat(body.squareFeet) : null,
+        lotSize: body.lotSize ? parseFloat(body.lotSize) : null,
+        yearBuilt: body.yearBuilt ? parseInt(body.yearBuilt) : null,
+        parkingSpaces: body.parkingSpaces ? parseInt(body.parkingSpaces) : null,
+        status: body.status || 'draft',
+        featured: body.featured || false,
+        agentId: body.agentId ? parseInt(body.agentId) : null,
+        ownerId: body.ownerId ? parseInt(body.ownerId) : null,
+        // Store DView and FloorPlan directly on the property
+        DView: body.DView || null,
+        FloorPlan: body.FloorPlan || null,
+        // Handle media creation if provided
+        media: body.media?.create ? {
+          create: body.media.create
+        } : undefined,
+        // Handle features if provided
+        features: body.features?.create ? {
+          create: body.features.create
+        } : undefined,
+      },
+      include: {
+        listingType: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        propertyType: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        location: {
+          select: {
+            id: true,
+            name: true,
+            city: true,
+            country: true
+          }
+        }
+      }
+    })
+
+    return NextResponse.json({ property }, { status: 201 })
+  } catch (error) {
+    console.error('Error creating property:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
 // GET /api/properties - Get properties with optional filtering
 export async function GET(request: NextRequest) {
   try {

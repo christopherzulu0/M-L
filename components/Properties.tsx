@@ -36,11 +36,15 @@ interface Property {
   squareFeet?: number
   media: {
     filePath: string
-    type: string
+    mediaType: string
+    isPrimary: boolean
   }[]
 }
 
 export default function Properties() {
+  // Base URL for media files
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || ""
+
   const [activeTab, setActiveTab] = useState<"all" | "sale" | "rent">("all")
   const [properties, setProperties] = useState<Property[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -366,9 +370,25 @@ export default function Properties() {
                 // Get the first image from media array or use a default
                 // Make sure we're accessing the correct property's media
                 const propertyMedia = property.media || [];
-                const imageUrl = propertyMedia.length > 0 && propertyMedia[0]?.filePath
-                  ? propertyMedia[0].filePath
-                  : "https://digiestateorg.wordpress.com/wp-content/uploads/2023/11/ask-us-1024x583-1.jpg"
+
+                // Find primary image first, then fall back to first image
+                const primaryImage = propertyMedia.find(m => m.isPrimary);
+                let filePath = primaryImage?.filePath || (propertyMedia.length > 0 ? propertyMedia[0]?.filePath : null);
+
+                // Add baseUrl if needed
+                let imageUrl;
+                if (filePath) {
+                  // Check if filePath is already a full URL
+                  if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+                    imageUrl = filePath;
+                  } else {
+                    // Otherwise, prefix with baseUrl
+                    imageUrl = `${baseUrl}${filePath}`;
+                  }
+                } else {
+                  // Default image if no media is available
+                  imageUrl = "https://digiestateorg.wordpress.com/wp-content/uploads/2023/11/ask-us-1024x583-1.jpg";
+                }
 
                 // Format price with currency
                 const formattedPrice = `ZMW ${property.price.toLocaleString()}`

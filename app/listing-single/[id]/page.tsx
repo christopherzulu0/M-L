@@ -83,6 +83,9 @@ export default function ListingSingle({ params }: { params: { id: string } }) {
   const [isSimilarLoading, setIsSimilarLoading] = useState(true)
   const [showDirections, setShowDirections] = useState(false)
 
+  // Base URL for media files
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || ""
+
   // Contact form state
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -105,7 +108,14 @@ export default function ListingSingle({ params }: { params: { id: string } }) {
 
         // Set up images
         if (data.media && data.media.length > 0) {
-          const mediaUrls = data.media.map((item: any) => item.filePath)
+          const mediaUrls = data.media.map((item: any) => {
+            // Check if filePath is already a full URL
+            if (item.filePath.startsWith('http://') || item.filePath.startsWith('https://')) {
+              return item.filePath;
+            }
+            // Otherwise, prefix with baseUrl
+            return `${baseUrl}${item.filePath}`;
+          })
           setImages(mediaUrls)
           setActiveImage(mediaUrls[0])
         } else {
@@ -427,7 +437,13 @@ export default function ListingSingle({ params }: { params: { id: string } }) {
                                   {property.agent ? (
                                       <div className="flex items-center mb-4">
                                         <Image
-                                            src={property.agent.user.profileImage || "/placeholder.svg"}
+                                            src={
+                                              property.agent.user.profileImage
+                                                ? (property.agent.user.profileImage.startsWith('http')
+                                                    ? property.agent.user.profileImage
+                                                    : `${baseUrl}${property.agent.user.profileImage}`)
+                                                : "/placeholder.svg"
+                                            }
                                             alt={`${property.agent.user.firstName} ${property.agent.user.lastName}`}
                                             width={48}
                                             height={48}
@@ -524,7 +540,19 @@ export default function ListingSingle({ params }: { params: { id: string } }) {
                             <h2 className="text-2xl font-bold mb-4">Floor Plan</h2>
                             <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
                               {property.FloorPlan ? (
-                                  <Image src={property.FloorPlan} alt="Floor Plan" fill className="object-contain" />
+                                  <Image src={property.FloorPlan.startsWith('http') ? property.FloorPlan : `${baseUrl}${property.FloorPlan}`} alt="Floor Plan" fill className="object-contain" />
+                              ) : property.media?.find(m => m.mediaType === "floorplan")?.filePath ? (
+                                  <Image
+                                    src={
+                                      (() => {
+                                        const filePath = property.media.find(m => m.mediaType === "floorplan")?.filePath || "";
+                                        return filePath.startsWith('http') ? filePath : `${baseUrl}${filePath}`;
+                                      })()
+                                    }
+                                    alt="Floor Plan"
+                                    fill
+                                    className="object-contain"
+                                  />
                               ) : (
                                   <Image src="/placeholder.svg?text=Floor+Plan" alt="Floor Plan" fill className="object-contain" />
                               )}
@@ -570,7 +598,20 @@ export default function ListingSingle({ params }: { params: { id: string } }) {
                             <div className="relative aspect-video rounded-lg overflow-hidden">
                               {property.DView ? (
                                   <iframe
-                                      src={property.DView}
+                                      src={property.DView.startsWith('http') ? property.DView : `${baseUrl}${property.DView}`}
+                                      width="100%"
+                                      height="100%"
+                                      frameBorder="0"
+                                      allowFullScreen
+                                  ></iframe>
+                              ) : property.media?.find(m => m.mediaType === "3dview")?.filePath ? (
+                                  <iframe
+                                      src={
+                                        (() => {
+                                          const filePath = property.media.find(m => m.mediaType === "3dview")?.filePath || "";
+                                          return filePath.startsWith('http') ? filePath : `${baseUrl}${filePath}`;
+                                        })()
+                                      }
                                       width="100%"
                                       height="100%"
                                       frameBorder="0"
@@ -608,8 +649,13 @@ export default function ListingSingle({ params }: { params: { id: string } }) {
                           // Render actual similar properties
                           similarProperties.map((property) => {
                             // Get primary image or fallback
-                            const primaryImage = property.media?.find(m => m.isPrimary)?.filePath ||
+                            let primaryImage = property.media?.find(m => m.isPrimary)?.filePath ||
                                 (property.media?.length ? property.media[0].filePath : "/placeholder.svg");
+
+                            // Add baseUrl if needed
+                            if (primaryImage && !primaryImage.startsWith('http') && !primaryImage.startsWith('/placeholder')) {
+                              primaryImage = `${baseUrl}${primaryImage}`;
+                            }
 
                             return (
                                 <div key={property.id} className="hover:shadow-md transition-shadow duration-200 bg-white rounded-lg overflow-hidden">

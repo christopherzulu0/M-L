@@ -602,7 +602,23 @@ export default function AddListingPage() {
                 fileName: url.split('/').pop() || 'document',
                 isPrimary: false,
                 sortOrder: 0
-              }))
+              })),
+              // Add floor plan if available
+              ...(values.floorPlan ? [{
+                mediaType: "floorplan",
+                filePath: values.floorPlan,
+                fileName: values.floorPlan.split('/').pop() || 'floorplan',
+                isPrimary: false,
+                sortOrder: 0
+              }] : []),
+              // Add 3D view if available
+              ...(values.DView ? [{
+                mediaType: "3dview",
+                filePath: values.DView,
+                fileName: 'dview',
+                isPrimary: false,
+                sortOrder: 0
+              }] : [])
             ]
           }
         };
@@ -630,7 +646,23 @@ export default function AddListingPage() {
                 fileName: url.split('/').pop() || 'document',
                 isPrimary: false,
                 sortOrder: 0
-              }))
+              })),
+              // Add floor plan if available
+              ...(values.floorPlan ? [{
+                mediaType: "floorplan",
+                filePath: values.floorPlan,
+                fileName: values.floorPlan.split('/').pop() || 'floorplan',
+                isPrimary: false,
+                sortOrder: 0
+              }] : []),
+              // Add 3D view if available
+              ...(values.DView ? [{
+                mediaType: "3dview",
+                filePath: values.DView,
+                fileName: 'dview',
+                isPrimary: false,
+                sortOrder: 0
+              }] : [])
             ]
           }
         };

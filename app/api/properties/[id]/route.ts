@@ -58,6 +58,7 @@ export async function PUT(
       price,
       status,
       features,
+      media,
       ...updateData
     } = body
 
@@ -71,14 +72,20 @@ export async function PUT(
         description,
         price,
         status,
-        features: {
+        // Handle features update
+        features: features ? {
           deleteMany: {},
           create: features?.map((featureId: number) => ({
             feature: {
               connect: { id: featureId }
             }
           }))
-        }
+        } : undefined,
+        // Handle media update if provided
+        media: media?.create ? {
+          deleteMany: {},
+          create: media.create
+        } : undefined
       },
       include: {
         propertyType: true,
@@ -88,7 +95,8 @@ export async function PUT(
           include: {
             feature: true
           }
-        }
+        },
+        media: true
       }
     })
 
