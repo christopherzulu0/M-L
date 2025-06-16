@@ -79,19 +79,23 @@ function ClientRoomContent() {
     // Fetch available properties
     const fetchProperties = async () => {
       try {
-        const response = await fetch('/api/properties?status=published')
+        const response = await fetch('/api/properties')
         if (!response.ok) {
           throw new Error('Failed to fetch properties')
         }
         const data = await response.json()
+        console.log('API Response:', data)
         if (data.properties && Array.isArray(data.properties)) {
+          console.log('Properties found:', data.properties.length)
           setProperties(data.properties)
+          console.log('Properties set to:', data.properties)
         } else {
           console.error('Expected properties array in response but got:', data)
           setProperties([])
         }
       } catch (error) {
         console.error('Error fetching properties:', error)
+        setProperties([]) // Ensure properties is set to empty array on error
         toast({
           title: "Error",
           description: "Failed to load properties. Please try again later.",
@@ -111,13 +115,15 @@ function ClientRoomContent() {
         setPurchases(data)
       } catch (error) {
         console.error('Error fetching purchases:', error)
-      } finally {
-        setLoading(false)
+        setPurchases([]) // Ensure purchases is set to empty array on error
       }
     }
 
-    fetchProperties()
-    fetchPurchases()
+    // Execute both fetches and update loading state when both are done
+    Promise.all([fetchProperties(), fetchPurchases()])
+      .finally(() => {
+        setLoading(false)
+      })
   }, [toast])
 
   const handlePropertySelect = (property: Property) => {
@@ -157,12 +163,11 @@ function ClientRoomContent() {
         body: JSON.stringify(purchaseData),
       })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Failed to complete purchase')
-      }
+      const responseData = await response.json()
 
-      const result = await response.json()
+      if (!response.ok) {
+        throw new Error(responseData.error || responseData.message || 'Failed to complete purchase')
+      }
 
       toast({
         title: "Purchase Initiated",
@@ -218,7 +223,7 @@ function ClientRoomContent() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Client Room</h1>
 
-      <Tabs defaultValue="purchases" className="w-full">
+      <Tabs defaultValue="buy" className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-8">
           <TabsTrigger value="purchases">My Purchases</TabsTrigger>
           <TabsTrigger value="buy">Buy Property</TabsTrigger>
@@ -344,34 +349,47 @@ function ClientRoomContent() {
           <div className="grid gap-6 md:grid-cols-3">
             <div className="md:col-span-2">
               <h2 className="text-2xl font-semibold mb-4">Available Properties</h2>
-              <div className="grid gap-4 md:grid-cols-2">
-                {properties.map((property) => (
-                  <Card
-                    key={property.id}
-                    className={`cursor-pointer transition-all ${selectedProperty?.id === property.id ? 'ring-2 ring-indigo-500' : 'hover:shadow-md'}`}
-                    onClick={() => handlePropertySelect(property)}
-                  >
-                    <div className="aspect-video relative overflow-hidden rounded-t-lg">
-                      <img
-                        src={property.media && property.media.length > 0 ? property.media.find(m => m.isPrimary)?.filePath || property.media[0].filePath : '/placeholder.svg'}
-                        alt={property.title}
-                        className="object-cover w-full h-full"
-                      />
-                      <div className="absolute top-2 right-2">
-                        <Badge>{property.listingType?.name || 'For Sale'}</Badge>
+              {console.log('Rendering properties, length:', properties.length)}
+              {properties.length === 0 ? (
+                <Card>
+                  <CardContent className="pt-6 text-center">
+                    <p className="text-muted-foreground">No properties available at the moment.</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {console.log('Mapping properties:', properties)}
+                  {properties.map((property) => (
+                    <Card
+                      key={property.id}
+                      className={`cursor-pointer transition-all ${selectedProperty?.id === property.id ? 'ring-2 ring-indigo-500' : 'hover:shadow-md'}`}
+                      onClick={() => handlePropertySelect(property)}
+                    >
+                      <div className="aspect-video relative overflow-hidden rounded-t-lg">
+                        <img
+                          src={property?.media && Array.isArray(property.media) && property.media.length > 0
+                            ? (property.media.find(m => m?.isPrimary)?.filePath || property.media[0]?.filePath || '/placeholder.svg')
+                            : '/placeholder.svg'}
+                          alt={property?.title || 'Property Image'}
+                          className="object-cover w-full h-full"
+                          onError={(e) => { e.currentTarget.src = '/placeholder.svg' }}
+                        />
+                        <div className="absolute top-2 right-2">
+                          <Badge>{property?.listingType?.name || 'For Sale'}</Badge>
+                        </div>
                       </div>
-                    </div>
-                    <CardContent className="pt-4">
-                      <h3 className="font-semibold text-lg">{property.title}</h3>
-                      <p className="text-muted-foreground text-sm">{property.address}</p>
-                      <div className="flex items-center justify-between mt-2">
-                        <p className="font-bold text-indigo-600">{formatCurrency(property.price)}</p>
-                        <p className="text-sm">{property.propertyType?.name || 'Property'}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                      <CardContent className="pt-4">
+                        <h3 className="font-semibold text-lg">{property?.title || 'Untitled Property'}</h3>
+                        <p className="text-muted-foreground text-sm">{property?.address || 'No address provided'}</p>
+                        <div className="flex items-center justify-between mt-2">
+                          <p className="font-bold text-indigo-600">{formatCurrency(property?.price || 0)}</p>
+                          <p className="text-sm">{property?.propertyType?.name || 'Property'}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div>
@@ -453,7 +471,7 @@ function ClientRoomContent() {
                     onClick={handlePurchase}
                   >
                     {purchaseLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Add to cart
+                    Complete Purchase
                   </Button>
                 </CardFooter>
               </Card>
