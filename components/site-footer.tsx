@@ -53,9 +53,9 @@ export function SiteFooter() {
           <div>
             <h3 className="mb-4 text-lg font-semibold">Contact Info</h3>
             <ul className="space-y-2 text-muted-foreground">
-              <li>123 Main Street, New York, NY 10001</li>
-              <li>+1 234 567 890</li>
-              <li>contact@realestate.com</li>
+              <li>Kitwe</li>
+              <li>0976828986</li>
+              <li>support@ml-properties-ltd.com</li>
             </ul>
           </div>
         </div>

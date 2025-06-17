@@ -8,14 +8,14 @@
  */
 export const companyInfo = {
   name: "ML Properties LTD",
-  phone: "+1 (555) 123-4567",
+  phone: "0976828986",
   email: "support@ml-properties-ltd.com",
-  address: "123 Main Street, New York, NY 10001",
+  address: "Kitwe",
   socialMedia: {
-    facebook: "https://facebook.com/mlrealestate",
-    twitter: "https://twitter.com/mlrealestate",
-    instagram: "https://instagram.com/mlrealestate",
-    linkedin: "https://linkedin.com/company/mlrealestate",
+    facebook: "#",
+    twitter: "#",
+    instagram: "#",
+    linkedin: "#",
   },
 };
 
@@ -50,17 +50,17 @@ export const navigation = {
       icon: "Users",
       featured: false,
     },
-    {
-      name: "Market",
-      href: "/market-trends",
-      icon: "TrendingUp",
-      featured: true,
-      submenu: [
-        { name: "Market Reports", href: "/market-trends/reports", icon: "BookOpen" },
-        { name: "Price Analytics", href: "/market-trends/analytics", icon: "TrendingUp" },
-        { name: "Investment Insights", href: "/market-trends/insights", icon: "Star" },
-      ],
-    },
+    // {
+    //   name: "Market",
+    //   href: "/market-trends",
+    //   icon: "TrendingUp",
+    //   featured: true,
+    //   submenu: [
+    //     { name: "Market Reports", href: "/market-trends/reports", icon: "BookOpen" },
+    //     { name: "Price Analytics", href: "/market-trends/analytics", icon: "TrendingUp" },
+    //     { name: "Investment Insights", href: "/market-trends/insights", icon: "Star" },
+    //   ],
+    // },
     {
       name: "Resources",
       href: "/resources",
