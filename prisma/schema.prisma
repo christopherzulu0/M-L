@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-
 }
 
 model User {
@@ -38,29 +37,31 @@ model User {
 }
 
 model Agent {
-  id             Int              @id @default(autoincrement())
-  userId         Int              @unique @map("user_id")
-  bio            String?
-  specialization String?          @db.VarChar(100)
-  licenseNumber  String?          @map("license_number") @db.VarChar(100)
-  commissionRate Decimal?         @map("commission_rate") @db.Decimal(5, 2)
-  joinDate       DateTime         @default(now()) @map("join_date") @db.Date
-  status         String           @default("active") @db.VarChar(20)
-  rating         Decimal?         @db.Decimal(3, 1)
-  totalSales     Int              @default(0) @map("total_sales")
-  totalListings  Int              @default(0) @map("total_listings")
-  totalRevenue   Decimal          @default(0) @map("total_revenue") @db.Decimal(15, 2)
-  serviceAreas   Json?            @map("service_areas") @default("[]")
-  languages      Json?            @map("languages") @default("[]")
-  socialMediaLinks Json?          @map("social_media_links") @default("{}")
-  address        String?          @db.VarChar(255)
-  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt      DateTime         @default(now()) @map("updated_at") @db.Timestamptz
-  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  properties     Property[]
-  inquiries      Inquiry[]
-  appointments   Appointment[]
-  analytics      AgentAnalytics[]
+  id               Int              @id @default(autoincrement())
+  userId           Int              @unique @map("user_id")
+  bio              String?
+  specialization   String?          @db.VarChar(100)
+  licenseNumber    String?          @map("license_number") @db.VarChar(100)
+  commissionRate   Decimal?         @map("commission_rate") @db.Decimal(5, 2)
+  joinDate         DateTime         @default(now()) @map("join_date") @db.Date
+  status           String           @default("active") @db.VarChar(20)
+  rating           Decimal?         @db.Decimal(3, 1)
+  totalSales       Int              @default(0) @map("total_sales")
+  totalListings    Int              @default(0) @map("total_listings")
+  totalRevenue     Decimal          @default(0) @map("total_revenue") @db.Decimal(15, 2)
+  serviceAreas     Json?            @default("[]") @map("service_areas")
+  languages        Json?            @default("[]") @map("languages")
+  socialMediaLinks Json?            @default("{}") @map("social_media_links")
+  address          String?          @db.VarChar(255)
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime         @default(now()) @map("updated_at") @db.Timestamptz
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  properties       Property[]
+  inquiries        Inquiry[]
+  appointments     Appointment[]
+  analytics        AgentAnalytics[]
+  reviews          AgentReview[]
+  contacts         AgentContact[]
 
   @@map("agents")
 }
@@ -378,38 +379,71 @@ model Document {
 }
 
 model Testimonial {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(100)
-  role        String   @db.VarChar(100)
-  comment     String
-  rating      Int      @default(5)
-  image       String?  @db.VarChar(255)
-  userId      Int?     @map("user_id")
-  isApproved  Boolean  @default(false) @map("is_approved")
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(100)
+  role       String   @db.VarChar(100)
+  comment    String
+  rating     Int      @default(5)
+  image      String?  @db.VarChar(255)
+  userId     Int?     @map("user_id")
+  isApproved Boolean  @default(false) @map("is_approved")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @default(now()) @map("updated_at") @db.Timestamptz
 
-  user        User?    @relation(fields: [userId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
 
   @@map("testimonials")
 }
 
 model BlogPost {
-  id          Int      @id @default(autoincrement())
-  title       String   @db.VarChar(255)
-  slug        String   @unique @db.VarChar(255)
+  id          Int       @id @default(autoincrement())
+  title       String    @db.VarChar(255)
+  slug        String    @unique @db.VarChar(255)
   excerpt     String?
   content     String
-  image       String?  @db.VarChar(255)
-  category    String   @db.VarChar(50)
-  authorId    Int?     @map("author_id")
+  image       String?   @db.VarChar(255)
+  category    String    @db.VarChar(50)
+  authorId    Int?      @map("author_id")
   publishedAt DateTime? @map("published_at") @db.Timestamptz
-  status      String   @default("draft") @db.VarChar(20) // draft, published
-  views       Int      @default(0)
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz
+  status      String    @default("draft") @db.VarChar(20) // draft, published
+  views       Int       @default(0)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz
 
-  author      User?    @relation(fields: [authorId], references: [id])
+  author User? @relation(fields: [authorId], references: [id])
 
   @@map("blog_posts")
+}
+
+model AgentReview {
+  id         Int      @id @default(autoincrement())
+  agentId    Int      @map("agent_id")
+  userId     Int?     @map("user_id")
+  name       String   @db.VarChar(100)
+  email      String   @db.VarChar(255)
+  rating     Int // 1-5 stars
+  comment    String
+  isApproved Boolean  @default(false) @map("is_approved")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @default(now()) @map("updated_at") @db.Timestamptz
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("agent_reviews")
+}
+
+model AgentContact {
+  id        Int      @id @default(autoincrement())
+  agentId   Int      @map("agent_id")
+  name      String   @db.VarChar(100)
+  email     String   @db.VarChar(255)
+  subject   String?  @db.VarChar(255)
+  message   String
+  status    String   @default("new") @db.VarChar(20) // new, read, responded
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("agent_contacts")
 }

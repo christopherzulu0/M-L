@@ -9,17 +9,26 @@ const isPublicRoute = createRouteMatcher([
   "/api/dashboard(.*)",
   // Only allow public access to specific agent API routes, not all
   "/api/agent/public(.*)",  // Public agent data
+  "/api/agent/(.*)",  // Allow public access to agent detail API
   "/api/properties(.*)",  // Allow public access to properties API
   "/api/mortgage(.*)",  // Allow public access to mortgage API
   "/api/testimonials(.*)",  // Allow public access to testimonials API
   "/api/locations(.*)",  // Allow public access to locations API
   "/api/agent/property-types(.*)",
   "/api/agent/me(.*)",
-  "/api//agent/property-types(.*)",
-  "/agent(.*)",
+  "/api/agent/(.*)/reviews(.*)",  // Allow public access to agent reviews
+  "/api/agent/(.*)/contact(.*)",  // Allow public access to agent contact form
+  "/agent/(.*)",
+  "/agents(.*)",
   "/properties(.*)",
   "/blog(.*)",
+  "/api/blog(.*)",
+   "/buyers-guide(.*)",
+    "/sellers-guide(.*)",
+     "/saved-searches(.*)",
+      "/calculator(.*)",
   "/contact(.*)",
+  "/api/contact(.*)",
   "/favorities(.*)",
   "/listings(.*)",
   "/listings-single(.*)",

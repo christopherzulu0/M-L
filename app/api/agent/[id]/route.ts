@@ -4,11 +4,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Ensure params is properly awaited
-    const { id: paramId } = params;
+    const { id: paramId } = await params;
     const id = parseInt(paramId);
 
     if (isNaN(id)) {

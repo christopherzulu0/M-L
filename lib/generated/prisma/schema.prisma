@@ -60,6 +60,8 @@ model Agent {
   inquiries        Inquiry[]
   appointments     Appointment[]
   analytics        AgentAnalytics[]
+  reviews          AgentReview[]
+  contacts         AgentContact[]
 
   @@map("agents")
 }
@@ -411,4 +413,37 @@ model BlogPost {
   author User? @relation(fields: [authorId], references: [id])
 
   @@map("blog_posts")
+}
+
+model AgentReview {
+  id         Int      @id @default(autoincrement())
+  agentId    Int      @map("agent_id")
+  userId     Int?     @map("user_id")
+  name       String   @db.VarChar(100)
+  email      String   @db.VarChar(255)
+  rating     Int // 1-5 stars
+  comment    String
+  isApproved Boolean  @default(false) @map("is_approved")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @default(now()) @map("updated_at") @db.Timestamptz
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("agent_reviews")
+}
+
+model AgentContact {
+  id        Int      @id @default(autoincrement())
+  agentId   Int      @map("agent_id")
+  name      String   @db.VarChar(100)
+  email     String   @db.VarChar(255)
+  subject   String?  @db.VarChar(255)
+  message   String
+  status    String   @default("new") @db.VarChar(20) // new, read, responded
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("agent_contacts")
 }

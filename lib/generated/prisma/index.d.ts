@@ -123,6 +123,16 @@ export type Testimonial = $Result.DefaultSelection<Prisma.$TestimonialPayload>
  * 
  */
 export type BlogPost = $Result.DefaultSelection<Prisma.$BlogPostPayload>
+/**
+ * Model AgentReview
+ * 
+ */
+export type AgentReview = $Result.DefaultSelection<Prisma.$AgentReviewPayload>
+/**
+ * Model AgentContact
+ * 
+ */
+export type AgentContact = $Result.DefaultSelection<Prisma.$AgentContactPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -460,6 +470,26 @@ export class PrismaClient<
     * ```
     */
   get blogPost(): Prisma.BlogPostDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.agentReview`: Exposes CRUD operations for the **AgentReview** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AgentReviews
+    * const agentReviews = await prisma.agentReview.findMany()
+    * ```
+    */
+  get agentReview(): Prisma.AgentReviewDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.agentContact`: Exposes CRUD operations for the **AgentContact** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AgentContacts
+    * const agentContacts = await prisma.agentContact.findMany()
+    * ```
+    */
+  get agentContact(): Prisma.AgentContactDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -915,7 +945,9 @@ export namespace Prisma {
     Setting: 'Setting',
     Document: 'Document',
     Testimonial: 'Testimonial',
-    BlogPost: 'BlogPost'
+    BlogPost: 'BlogPost',
+    AgentReview: 'AgentReview',
+    AgentContact: 'AgentContact'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -931,7 +963,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "agent" | "propertyType" | "listingType" | "location" | "property" | "feature" | "propertyFeature" | "propertyMedia" | "inquiry" | "appointment" | "task" | "analytics" | "propertyAnalytics" | "agentAnalytics" | "notification" | "purchase" | "payment" | "setting" | "document" | "testimonial" | "blogPost"
+      modelProps: "user" | "agent" | "propertyType" | "listingType" | "location" | "property" | "feature" | "propertyFeature" | "propertyMedia" | "inquiry" | "appointment" | "task" | "analytics" | "propertyAnalytics" | "agentAnalytics" | "notification" | "purchase" | "payment" | "setting" | "document" | "testimonial" | "blogPost" | "agentReview" | "agentContact"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2563,6 +2595,154 @@ export namespace Prisma {
           }
         }
       }
+      AgentReview: {
+        payload: Prisma.$AgentReviewPayload<ExtArgs>
+        fields: Prisma.AgentReviewFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AgentReviewFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentReviewPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AgentReviewFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentReviewPayload>
+          }
+          findFirst: {
+            args: Prisma.AgentReviewFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentReviewPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AgentReviewFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentReviewPayload>
+          }
+          findMany: {
+            args: Prisma.AgentReviewFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentReviewPayload>[]
+          }
+          create: {
+            args: Prisma.AgentReviewCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentReviewPayload>
+          }
+          createMany: {
+            args: Prisma.AgentReviewCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AgentReviewCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentReviewPayload>[]
+          }
+          delete: {
+            args: Prisma.AgentReviewDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentReviewPayload>
+          }
+          update: {
+            args: Prisma.AgentReviewUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentReviewPayload>
+          }
+          deleteMany: {
+            args: Prisma.AgentReviewDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AgentReviewUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AgentReviewUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentReviewPayload>[]
+          }
+          upsert: {
+            args: Prisma.AgentReviewUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentReviewPayload>
+          }
+          aggregate: {
+            args: Prisma.AgentReviewAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAgentReview>
+          }
+          groupBy: {
+            args: Prisma.AgentReviewGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AgentReviewGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AgentReviewCountArgs<ExtArgs>
+            result: $Utils.Optional<AgentReviewCountAggregateOutputType> | number
+          }
+        }
+      }
+      AgentContact: {
+        payload: Prisma.$AgentContactPayload<ExtArgs>
+        fields: Prisma.AgentContactFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AgentContactFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentContactPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AgentContactFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentContactPayload>
+          }
+          findFirst: {
+            args: Prisma.AgentContactFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentContactPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AgentContactFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentContactPayload>
+          }
+          findMany: {
+            args: Prisma.AgentContactFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentContactPayload>[]
+          }
+          create: {
+            args: Prisma.AgentContactCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentContactPayload>
+          }
+          createMany: {
+            args: Prisma.AgentContactCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AgentContactCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentContactPayload>[]
+          }
+          delete: {
+            args: Prisma.AgentContactDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentContactPayload>
+          }
+          update: {
+            args: Prisma.AgentContactUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentContactPayload>
+          }
+          deleteMany: {
+            args: Prisma.AgentContactDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AgentContactUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AgentContactUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentContactPayload>[]
+          }
+          upsert: {
+            args: Prisma.AgentContactUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentContactPayload>
+          }
+          aggregate: {
+            args: Prisma.AgentContactAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAgentContact>
+          }
+          groupBy: {
+            args: Prisma.AgentContactGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AgentContactGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AgentContactCountArgs<ExtArgs>
+            result: $Utils.Optional<AgentContactCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2693,6 +2873,8 @@ export namespace Prisma {
     document?: DocumentOmit
     testimonial?: TestimonialOmit
     blogPost?: BlogPostOmit
+    agentReview?: AgentReviewOmit
+    agentContact?: AgentContactOmit
   }
 
   /* Types for Logging */
@@ -2871,6 +3053,8 @@ export namespace Prisma {
     inquiries: number
     appointments: number
     analytics: number
+    reviews: number
+    contacts: number
   }
 
   export type AgentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2878,6 +3062,8 @@ export namespace Prisma {
     inquiries?: boolean | AgentCountOutputTypeCountInquiriesArgs
     appointments?: boolean | AgentCountOutputTypeCountAppointmentsArgs
     analytics?: boolean | AgentCountOutputTypeCountAnalyticsArgs
+    reviews?: boolean | AgentCountOutputTypeCountReviewsArgs
+    contacts?: boolean | AgentCountOutputTypeCountContactsArgs
   }
 
   // Custom InputTypes
@@ -2917,6 +3103,20 @@ export namespace Prisma {
    */
   export type AgentCountOutputTypeCountAnalyticsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AgentAnalyticsWhereInput
+  }
+
+  /**
+   * AgentCountOutputType without action
+   */
+  export type AgentCountOutputTypeCountReviewsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AgentReviewWhereInput
+  }
+
+  /**
+   * AgentCountOutputType without action
+   */
+  export type AgentCountOutputTypeCountContactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AgentContactWhereInput
   }
 
 
@@ -4910,6 +5110,8 @@ export namespace Prisma {
     inquiries?: boolean | Agent$inquiriesArgs<ExtArgs>
     appointments?: boolean | Agent$appointmentsArgs<ExtArgs>
     analytics?: boolean | Agent$analyticsArgs<ExtArgs>
+    reviews?: boolean | Agent$reviewsArgs<ExtArgs>
+    contacts?: boolean | Agent$contactsArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
 
@@ -4985,6 +5187,8 @@ export namespace Prisma {
     inquiries?: boolean | Agent$inquiriesArgs<ExtArgs>
     appointments?: boolean | Agent$appointmentsArgs<ExtArgs>
     analytics?: boolean | Agent$analyticsArgs<ExtArgs>
+    reviews?: boolean | Agent$reviewsArgs<ExtArgs>
+    contacts?: boolean | Agent$contactsArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AgentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5002,6 +5206,8 @@ export namespace Prisma {
       inquiries: Prisma.$InquiryPayload<ExtArgs>[]
       appointments: Prisma.$AppointmentPayload<ExtArgs>[]
       analytics: Prisma.$AgentAnalyticsPayload<ExtArgs>[]
+      reviews: Prisma.$AgentReviewPayload<ExtArgs>[]
+      contacts: Prisma.$AgentContactPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -5421,6 +5627,8 @@ export namespace Prisma {
     inquiries<T extends Agent$inquiriesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$inquiriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InquiryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     appointments<T extends Agent$appointmentsArgs<ExtArgs> = {}>(args?: Subset<T, Agent$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     analytics<T extends Agent$analyticsArgs<ExtArgs> = {}>(args?: Subset<T, Agent$analyticsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentAnalyticsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    reviews<T extends Agent$reviewsArgs<ExtArgs> = {}>(args?: Subset<T, Agent$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    contacts<T extends Agent$contactsArgs<ExtArgs> = {}>(args?: Subset<T, Agent$contactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5957,6 +6165,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: AgentAnalyticsScalarFieldEnum | AgentAnalyticsScalarFieldEnum[]
+  }
+
+  /**
+   * Agent.reviews
+   */
+  export type Agent$reviewsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentReview
+     */
+    select?: AgentReviewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentReview
+     */
+    omit?: AgentReviewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentReviewInclude<ExtArgs> | null
+    where?: AgentReviewWhereInput
+    orderBy?: AgentReviewOrderByWithRelationInput | AgentReviewOrderByWithRelationInput[]
+    cursor?: AgentReviewWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AgentReviewScalarFieldEnum | AgentReviewScalarFieldEnum[]
+  }
+
+  /**
+   * Agent.contacts
+   */
+  export type Agent$contactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentContact
+     */
+    select?: AgentContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentContact
+     */
+    omit?: AgentContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentContactInclude<ExtArgs> | null
+    where?: AgentContactWhereInput
+    orderBy?: AgentContactOrderByWithRelationInput | AgentContactOrderByWithRelationInput[]
+    cursor?: AgentContactWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AgentContactScalarFieldEnum | AgentContactScalarFieldEnum[]
   }
 
   /**
@@ -29856,6 +30112,2323 @@ export namespace Prisma {
 
 
   /**
+   * Model AgentReview
+   */
+
+  export type AggregateAgentReview = {
+    _count: AgentReviewCountAggregateOutputType | null
+    _avg: AgentReviewAvgAggregateOutputType | null
+    _sum: AgentReviewSumAggregateOutputType | null
+    _min: AgentReviewMinAggregateOutputType | null
+    _max: AgentReviewMaxAggregateOutputType | null
+  }
+
+  export type AgentReviewAvgAggregateOutputType = {
+    id: number | null
+    agentId: number | null
+    userId: number | null
+    rating: number | null
+  }
+
+  export type AgentReviewSumAggregateOutputType = {
+    id: number | null
+    agentId: number | null
+    userId: number | null
+    rating: number | null
+  }
+
+  export type AgentReviewMinAggregateOutputType = {
+    id: number | null
+    agentId: number | null
+    userId: number | null
+    name: string | null
+    email: string | null
+    rating: number | null
+    comment: string | null
+    isApproved: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AgentReviewMaxAggregateOutputType = {
+    id: number | null
+    agentId: number | null
+    userId: number | null
+    name: string | null
+    email: string | null
+    rating: number | null
+    comment: string | null
+    isApproved: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AgentReviewCountAggregateOutputType = {
+    id: number
+    agentId: number
+    userId: number
+    name: number
+    email: number
+    rating: number
+    comment: number
+    isApproved: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AgentReviewAvgAggregateInputType = {
+    id?: true
+    agentId?: true
+    userId?: true
+    rating?: true
+  }
+
+  export type AgentReviewSumAggregateInputType = {
+    id?: true
+    agentId?: true
+    userId?: true
+    rating?: true
+  }
+
+  export type AgentReviewMinAggregateInputType = {
+    id?: true
+    agentId?: true
+    userId?: true
+    name?: true
+    email?: true
+    rating?: true
+    comment?: true
+    isApproved?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AgentReviewMaxAggregateInputType = {
+    id?: true
+    agentId?: true
+    userId?: true
+    name?: true
+    email?: true
+    rating?: true
+    comment?: true
+    isApproved?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AgentReviewCountAggregateInputType = {
+    id?: true
+    agentId?: true
+    userId?: true
+    name?: true
+    email?: true
+    rating?: true
+    comment?: true
+    isApproved?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AgentReviewAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AgentReview to aggregate.
+     */
+    where?: AgentReviewWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentReviews to fetch.
+     */
+    orderBy?: AgentReviewOrderByWithRelationInput | AgentReviewOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AgentReviewWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentReviews from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentReviews.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AgentReviews
+    **/
+    _count?: true | AgentReviewCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: AgentReviewAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AgentReviewSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AgentReviewMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AgentReviewMaxAggregateInputType
+  }
+
+  export type GetAgentReviewAggregateType<T extends AgentReviewAggregateArgs> = {
+        [P in keyof T & keyof AggregateAgentReview]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAgentReview[P]>
+      : GetScalarType<T[P], AggregateAgentReview[P]>
+  }
+
+
+
+
+  export type AgentReviewGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AgentReviewWhereInput
+    orderBy?: AgentReviewOrderByWithAggregationInput | AgentReviewOrderByWithAggregationInput[]
+    by: AgentReviewScalarFieldEnum[] | AgentReviewScalarFieldEnum
+    having?: AgentReviewScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AgentReviewCountAggregateInputType | true
+    _avg?: AgentReviewAvgAggregateInputType
+    _sum?: AgentReviewSumAggregateInputType
+    _min?: AgentReviewMinAggregateInputType
+    _max?: AgentReviewMaxAggregateInputType
+  }
+
+  export type AgentReviewGroupByOutputType = {
+    id: number
+    agentId: number
+    userId: number | null
+    name: string
+    email: string
+    rating: number
+    comment: string
+    isApproved: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: AgentReviewCountAggregateOutputType | null
+    _avg: AgentReviewAvgAggregateOutputType | null
+    _sum: AgentReviewSumAggregateOutputType | null
+    _min: AgentReviewMinAggregateOutputType | null
+    _max: AgentReviewMaxAggregateOutputType | null
+  }
+
+  type GetAgentReviewGroupByPayload<T extends AgentReviewGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AgentReviewGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AgentReviewGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AgentReviewGroupByOutputType[P]>
+            : GetScalarType<T[P], AgentReviewGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AgentReviewSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentId?: boolean
+    userId?: boolean
+    name?: boolean
+    email?: boolean
+    rating?: boolean
+    comment?: boolean
+    isApproved?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["agentReview"]>
+
+  export type AgentReviewSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentId?: boolean
+    userId?: boolean
+    name?: boolean
+    email?: boolean
+    rating?: boolean
+    comment?: boolean
+    isApproved?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["agentReview"]>
+
+  export type AgentReviewSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentId?: boolean
+    userId?: boolean
+    name?: boolean
+    email?: boolean
+    rating?: boolean
+    comment?: boolean
+    isApproved?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["agentReview"]>
+
+  export type AgentReviewSelectScalar = {
+    id?: boolean
+    agentId?: boolean
+    userId?: boolean
+    name?: boolean
+    email?: boolean
+    rating?: boolean
+    comment?: boolean
+    isApproved?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type AgentReviewOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "agentId" | "userId" | "name" | "email" | "rating" | "comment" | "isApproved" | "createdAt" | "updatedAt", ExtArgs["result"]["agentReview"]>
+  export type AgentReviewInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+  export type AgentReviewIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+  export type AgentReviewIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+
+  export type $AgentReviewPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AgentReview"
+    objects: {
+      agent: Prisma.$AgentPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      agentId: number
+      userId: number | null
+      name: string
+      email: string
+      rating: number
+      comment: string
+      isApproved: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["agentReview"]>
+    composites: {}
+  }
+
+  type AgentReviewGetPayload<S extends boolean | null | undefined | AgentReviewDefaultArgs> = $Result.GetResult<Prisma.$AgentReviewPayload, S>
+
+  type AgentReviewCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AgentReviewFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AgentReviewCountAggregateInputType | true
+    }
+
+  export interface AgentReviewDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AgentReview'], meta: { name: 'AgentReview' } }
+    /**
+     * Find zero or one AgentReview that matches the filter.
+     * @param {AgentReviewFindUniqueArgs} args - Arguments to find a AgentReview
+     * @example
+     * // Get one AgentReview
+     * const agentReview = await prisma.agentReview.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AgentReviewFindUniqueArgs>(args: SelectSubset<T, AgentReviewFindUniqueArgs<ExtArgs>>): Prisma__AgentReviewClient<$Result.GetResult<Prisma.$AgentReviewPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AgentReview that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AgentReviewFindUniqueOrThrowArgs} args - Arguments to find a AgentReview
+     * @example
+     * // Get one AgentReview
+     * const agentReview = await prisma.agentReview.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AgentReviewFindUniqueOrThrowArgs>(args: SelectSubset<T, AgentReviewFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AgentReviewClient<$Result.GetResult<Prisma.$AgentReviewPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AgentReview that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentReviewFindFirstArgs} args - Arguments to find a AgentReview
+     * @example
+     * // Get one AgentReview
+     * const agentReview = await prisma.agentReview.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AgentReviewFindFirstArgs>(args?: SelectSubset<T, AgentReviewFindFirstArgs<ExtArgs>>): Prisma__AgentReviewClient<$Result.GetResult<Prisma.$AgentReviewPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AgentReview that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentReviewFindFirstOrThrowArgs} args - Arguments to find a AgentReview
+     * @example
+     * // Get one AgentReview
+     * const agentReview = await prisma.agentReview.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AgentReviewFindFirstOrThrowArgs>(args?: SelectSubset<T, AgentReviewFindFirstOrThrowArgs<ExtArgs>>): Prisma__AgentReviewClient<$Result.GetResult<Prisma.$AgentReviewPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AgentReviews that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentReviewFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AgentReviews
+     * const agentReviews = await prisma.agentReview.findMany()
+     * 
+     * // Get first 10 AgentReviews
+     * const agentReviews = await prisma.agentReview.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const agentReviewWithIdOnly = await prisma.agentReview.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AgentReviewFindManyArgs>(args?: SelectSubset<T, AgentReviewFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AgentReview.
+     * @param {AgentReviewCreateArgs} args - Arguments to create a AgentReview.
+     * @example
+     * // Create one AgentReview
+     * const AgentReview = await prisma.agentReview.create({
+     *   data: {
+     *     // ... data to create a AgentReview
+     *   }
+     * })
+     * 
+     */
+    create<T extends AgentReviewCreateArgs>(args: SelectSubset<T, AgentReviewCreateArgs<ExtArgs>>): Prisma__AgentReviewClient<$Result.GetResult<Prisma.$AgentReviewPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AgentReviews.
+     * @param {AgentReviewCreateManyArgs} args - Arguments to create many AgentReviews.
+     * @example
+     * // Create many AgentReviews
+     * const agentReview = await prisma.agentReview.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AgentReviewCreateManyArgs>(args?: SelectSubset<T, AgentReviewCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AgentReviews and returns the data saved in the database.
+     * @param {AgentReviewCreateManyAndReturnArgs} args - Arguments to create many AgentReviews.
+     * @example
+     * // Create many AgentReviews
+     * const agentReview = await prisma.agentReview.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AgentReviews and only return the `id`
+     * const agentReviewWithIdOnly = await prisma.agentReview.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AgentReviewCreateManyAndReturnArgs>(args?: SelectSubset<T, AgentReviewCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentReviewPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AgentReview.
+     * @param {AgentReviewDeleteArgs} args - Arguments to delete one AgentReview.
+     * @example
+     * // Delete one AgentReview
+     * const AgentReview = await prisma.agentReview.delete({
+     *   where: {
+     *     // ... filter to delete one AgentReview
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AgentReviewDeleteArgs>(args: SelectSubset<T, AgentReviewDeleteArgs<ExtArgs>>): Prisma__AgentReviewClient<$Result.GetResult<Prisma.$AgentReviewPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AgentReview.
+     * @param {AgentReviewUpdateArgs} args - Arguments to update one AgentReview.
+     * @example
+     * // Update one AgentReview
+     * const agentReview = await prisma.agentReview.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AgentReviewUpdateArgs>(args: SelectSubset<T, AgentReviewUpdateArgs<ExtArgs>>): Prisma__AgentReviewClient<$Result.GetResult<Prisma.$AgentReviewPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AgentReviews.
+     * @param {AgentReviewDeleteManyArgs} args - Arguments to filter AgentReviews to delete.
+     * @example
+     * // Delete a few AgentReviews
+     * const { count } = await prisma.agentReview.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AgentReviewDeleteManyArgs>(args?: SelectSubset<T, AgentReviewDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AgentReviews.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentReviewUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AgentReviews
+     * const agentReview = await prisma.agentReview.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AgentReviewUpdateManyArgs>(args: SelectSubset<T, AgentReviewUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AgentReviews and returns the data updated in the database.
+     * @param {AgentReviewUpdateManyAndReturnArgs} args - Arguments to update many AgentReviews.
+     * @example
+     * // Update many AgentReviews
+     * const agentReview = await prisma.agentReview.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AgentReviews and only return the `id`
+     * const agentReviewWithIdOnly = await prisma.agentReview.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AgentReviewUpdateManyAndReturnArgs>(args: SelectSubset<T, AgentReviewUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentReviewPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AgentReview.
+     * @param {AgentReviewUpsertArgs} args - Arguments to update or create a AgentReview.
+     * @example
+     * // Update or create a AgentReview
+     * const agentReview = await prisma.agentReview.upsert({
+     *   create: {
+     *     // ... data to create a AgentReview
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AgentReview we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AgentReviewUpsertArgs>(args: SelectSubset<T, AgentReviewUpsertArgs<ExtArgs>>): Prisma__AgentReviewClient<$Result.GetResult<Prisma.$AgentReviewPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AgentReviews.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentReviewCountArgs} args - Arguments to filter AgentReviews to count.
+     * @example
+     * // Count the number of AgentReviews
+     * const count = await prisma.agentReview.count({
+     *   where: {
+     *     // ... the filter for the AgentReviews we want to count
+     *   }
+     * })
+    **/
+    count<T extends AgentReviewCountArgs>(
+      args?: Subset<T, AgentReviewCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AgentReviewCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AgentReview.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentReviewAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AgentReviewAggregateArgs>(args: Subset<T, AgentReviewAggregateArgs>): Prisma.PrismaPromise<GetAgentReviewAggregateType<T>>
+
+    /**
+     * Group by AgentReview.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentReviewGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AgentReviewGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AgentReviewGroupByArgs['orderBy'] }
+        : { orderBy?: AgentReviewGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AgentReviewGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAgentReviewGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AgentReview model
+   */
+  readonly fields: AgentReviewFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AgentReview.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AgentReviewClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AgentReview model
+   */
+  interface AgentReviewFieldRefs {
+    readonly id: FieldRef<"AgentReview", 'Int'>
+    readonly agentId: FieldRef<"AgentReview", 'Int'>
+    readonly userId: FieldRef<"AgentReview", 'Int'>
+    readonly name: FieldRef<"AgentReview", 'String'>
+    readonly email: FieldRef<"AgentReview", 'String'>
+    readonly rating: FieldRef<"AgentReview", 'Int'>
+    readonly comment: FieldRef<"AgentReview", 'String'>
+    readonly isApproved: FieldRef<"AgentReview", 'Boolean'>
+    readonly createdAt: FieldRef<"AgentReview", 'DateTime'>
+    readonly updatedAt: FieldRef<"AgentReview", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AgentReview findUnique
+   */
+  export type AgentReviewFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentReview
+     */
+    select?: AgentReviewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentReview
+     */
+    omit?: AgentReviewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentReviewInclude<ExtArgs> | null
+    /**
+     * Filter, which AgentReview to fetch.
+     */
+    where: AgentReviewWhereUniqueInput
+  }
+
+  /**
+   * AgentReview findUniqueOrThrow
+   */
+  export type AgentReviewFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentReview
+     */
+    select?: AgentReviewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentReview
+     */
+    omit?: AgentReviewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentReviewInclude<ExtArgs> | null
+    /**
+     * Filter, which AgentReview to fetch.
+     */
+    where: AgentReviewWhereUniqueInput
+  }
+
+  /**
+   * AgentReview findFirst
+   */
+  export type AgentReviewFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentReview
+     */
+    select?: AgentReviewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentReview
+     */
+    omit?: AgentReviewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentReviewInclude<ExtArgs> | null
+    /**
+     * Filter, which AgentReview to fetch.
+     */
+    where?: AgentReviewWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentReviews to fetch.
+     */
+    orderBy?: AgentReviewOrderByWithRelationInput | AgentReviewOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AgentReviews.
+     */
+    cursor?: AgentReviewWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentReviews from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentReviews.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AgentReviews.
+     */
+    distinct?: AgentReviewScalarFieldEnum | AgentReviewScalarFieldEnum[]
+  }
+
+  /**
+   * AgentReview findFirstOrThrow
+   */
+  export type AgentReviewFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentReview
+     */
+    select?: AgentReviewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentReview
+     */
+    omit?: AgentReviewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentReviewInclude<ExtArgs> | null
+    /**
+     * Filter, which AgentReview to fetch.
+     */
+    where?: AgentReviewWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentReviews to fetch.
+     */
+    orderBy?: AgentReviewOrderByWithRelationInput | AgentReviewOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AgentReviews.
+     */
+    cursor?: AgentReviewWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentReviews from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentReviews.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AgentReviews.
+     */
+    distinct?: AgentReviewScalarFieldEnum | AgentReviewScalarFieldEnum[]
+  }
+
+  /**
+   * AgentReview findMany
+   */
+  export type AgentReviewFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentReview
+     */
+    select?: AgentReviewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentReview
+     */
+    omit?: AgentReviewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentReviewInclude<ExtArgs> | null
+    /**
+     * Filter, which AgentReviews to fetch.
+     */
+    where?: AgentReviewWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentReviews to fetch.
+     */
+    orderBy?: AgentReviewOrderByWithRelationInput | AgentReviewOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AgentReviews.
+     */
+    cursor?: AgentReviewWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentReviews from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentReviews.
+     */
+    skip?: number
+    distinct?: AgentReviewScalarFieldEnum | AgentReviewScalarFieldEnum[]
+  }
+
+  /**
+   * AgentReview create
+   */
+  export type AgentReviewCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentReview
+     */
+    select?: AgentReviewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentReview
+     */
+    omit?: AgentReviewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentReviewInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AgentReview.
+     */
+    data: XOR<AgentReviewCreateInput, AgentReviewUncheckedCreateInput>
+  }
+
+  /**
+   * AgentReview createMany
+   */
+  export type AgentReviewCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AgentReviews.
+     */
+    data: AgentReviewCreateManyInput | AgentReviewCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AgentReview createManyAndReturn
+   */
+  export type AgentReviewCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentReview
+     */
+    select?: AgentReviewSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentReview
+     */
+    omit?: AgentReviewOmit<ExtArgs> | null
+    /**
+     * The data used to create many AgentReviews.
+     */
+    data: AgentReviewCreateManyInput | AgentReviewCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentReviewIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AgentReview update
+   */
+  export type AgentReviewUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentReview
+     */
+    select?: AgentReviewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentReview
+     */
+    omit?: AgentReviewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentReviewInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AgentReview.
+     */
+    data: XOR<AgentReviewUpdateInput, AgentReviewUncheckedUpdateInput>
+    /**
+     * Choose, which AgentReview to update.
+     */
+    where: AgentReviewWhereUniqueInput
+  }
+
+  /**
+   * AgentReview updateMany
+   */
+  export type AgentReviewUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AgentReviews.
+     */
+    data: XOR<AgentReviewUpdateManyMutationInput, AgentReviewUncheckedUpdateManyInput>
+    /**
+     * Filter which AgentReviews to update
+     */
+    where?: AgentReviewWhereInput
+    /**
+     * Limit how many AgentReviews to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AgentReview updateManyAndReturn
+   */
+  export type AgentReviewUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentReview
+     */
+    select?: AgentReviewSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentReview
+     */
+    omit?: AgentReviewOmit<ExtArgs> | null
+    /**
+     * The data used to update AgentReviews.
+     */
+    data: XOR<AgentReviewUpdateManyMutationInput, AgentReviewUncheckedUpdateManyInput>
+    /**
+     * Filter which AgentReviews to update
+     */
+    where?: AgentReviewWhereInput
+    /**
+     * Limit how many AgentReviews to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentReviewIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AgentReview upsert
+   */
+  export type AgentReviewUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentReview
+     */
+    select?: AgentReviewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentReview
+     */
+    omit?: AgentReviewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentReviewInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AgentReview to update in case it exists.
+     */
+    where: AgentReviewWhereUniqueInput
+    /**
+     * In case the AgentReview found by the `where` argument doesn't exist, create a new AgentReview with this data.
+     */
+    create: XOR<AgentReviewCreateInput, AgentReviewUncheckedCreateInput>
+    /**
+     * In case the AgentReview was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AgentReviewUpdateInput, AgentReviewUncheckedUpdateInput>
+  }
+
+  /**
+   * AgentReview delete
+   */
+  export type AgentReviewDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentReview
+     */
+    select?: AgentReviewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentReview
+     */
+    omit?: AgentReviewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentReviewInclude<ExtArgs> | null
+    /**
+     * Filter which AgentReview to delete.
+     */
+    where: AgentReviewWhereUniqueInput
+  }
+
+  /**
+   * AgentReview deleteMany
+   */
+  export type AgentReviewDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AgentReviews to delete
+     */
+    where?: AgentReviewWhereInput
+    /**
+     * Limit how many AgentReviews to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AgentReview without action
+   */
+  export type AgentReviewDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentReview
+     */
+    select?: AgentReviewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentReview
+     */
+    omit?: AgentReviewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentReviewInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model AgentContact
+   */
+
+  export type AggregateAgentContact = {
+    _count: AgentContactCountAggregateOutputType | null
+    _avg: AgentContactAvgAggregateOutputType | null
+    _sum: AgentContactSumAggregateOutputType | null
+    _min: AgentContactMinAggregateOutputType | null
+    _max: AgentContactMaxAggregateOutputType | null
+  }
+
+  export type AgentContactAvgAggregateOutputType = {
+    id: number | null
+    agentId: number | null
+  }
+
+  export type AgentContactSumAggregateOutputType = {
+    id: number | null
+    agentId: number | null
+  }
+
+  export type AgentContactMinAggregateOutputType = {
+    id: number | null
+    agentId: number | null
+    name: string | null
+    email: string | null
+    subject: string | null
+    message: string | null
+    status: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AgentContactMaxAggregateOutputType = {
+    id: number | null
+    agentId: number | null
+    name: string | null
+    email: string | null
+    subject: string | null
+    message: string | null
+    status: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AgentContactCountAggregateOutputType = {
+    id: number
+    agentId: number
+    name: number
+    email: number
+    subject: number
+    message: number
+    status: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AgentContactAvgAggregateInputType = {
+    id?: true
+    agentId?: true
+  }
+
+  export type AgentContactSumAggregateInputType = {
+    id?: true
+    agentId?: true
+  }
+
+  export type AgentContactMinAggregateInputType = {
+    id?: true
+    agentId?: true
+    name?: true
+    email?: true
+    subject?: true
+    message?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AgentContactMaxAggregateInputType = {
+    id?: true
+    agentId?: true
+    name?: true
+    email?: true
+    subject?: true
+    message?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AgentContactCountAggregateInputType = {
+    id?: true
+    agentId?: true
+    name?: true
+    email?: true
+    subject?: true
+    message?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AgentContactAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AgentContact to aggregate.
+     */
+    where?: AgentContactWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentContacts to fetch.
+     */
+    orderBy?: AgentContactOrderByWithRelationInput | AgentContactOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AgentContactWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentContacts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentContacts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AgentContacts
+    **/
+    _count?: true | AgentContactCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: AgentContactAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AgentContactSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AgentContactMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AgentContactMaxAggregateInputType
+  }
+
+  export type GetAgentContactAggregateType<T extends AgentContactAggregateArgs> = {
+        [P in keyof T & keyof AggregateAgentContact]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAgentContact[P]>
+      : GetScalarType<T[P], AggregateAgentContact[P]>
+  }
+
+
+
+
+  export type AgentContactGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AgentContactWhereInput
+    orderBy?: AgentContactOrderByWithAggregationInput | AgentContactOrderByWithAggregationInput[]
+    by: AgentContactScalarFieldEnum[] | AgentContactScalarFieldEnum
+    having?: AgentContactScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AgentContactCountAggregateInputType | true
+    _avg?: AgentContactAvgAggregateInputType
+    _sum?: AgentContactSumAggregateInputType
+    _min?: AgentContactMinAggregateInputType
+    _max?: AgentContactMaxAggregateInputType
+  }
+
+  export type AgentContactGroupByOutputType = {
+    id: number
+    agentId: number
+    name: string
+    email: string
+    subject: string | null
+    message: string
+    status: string
+    createdAt: Date
+    updatedAt: Date
+    _count: AgentContactCountAggregateOutputType | null
+    _avg: AgentContactAvgAggregateOutputType | null
+    _sum: AgentContactSumAggregateOutputType | null
+    _min: AgentContactMinAggregateOutputType | null
+    _max: AgentContactMaxAggregateOutputType | null
+  }
+
+  type GetAgentContactGroupByPayload<T extends AgentContactGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AgentContactGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AgentContactGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AgentContactGroupByOutputType[P]>
+            : GetScalarType<T[P], AgentContactGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AgentContactSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentId?: boolean
+    name?: boolean
+    email?: boolean
+    subject?: boolean
+    message?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["agentContact"]>
+
+  export type AgentContactSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentId?: boolean
+    name?: boolean
+    email?: boolean
+    subject?: boolean
+    message?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["agentContact"]>
+
+  export type AgentContactSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentId?: boolean
+    name?: boolean
+    email?: boolean
+    subject?: boolean
+    message?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["agentContact"]>
+
+  export type AgentContactSelectScalar = {
+    id?: boolean
+    agentId?: boolean
+    name?: boolean
+    email?: boolean
+    subject?: boolean
+    message?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type AgentContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "agentId" | "name" | "email" | "subject" | "message" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["agentContact"]>
+  export type AgentContactInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+  export type AgentContactIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+  export type AgentContactIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+
+  export type $AgentContactPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AgentContact"
+    objects: {
+      agent: Prisma.$AgentPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      agentId: number
+      name: string
+      email: string
+      subject: string | null
+      message: string
+      status: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["agentContact"]>
+    composites: {}
+  }
+
+  type AgentContactGetPayload<S extends boolean | null | undefined | AgentContactDefaultArgs> = $Result.GetResult<Prisma.$AgentContactPayload, S>
+
+  type AgentContactCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AgentContactFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AgentContactCountAggregateInputType | true
+    }
+
+  export interface AgentContactDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AgentContact'], meta: { name: 'AgentContact' } }
+    /**
+     * Find zero or one AgentContact that matches the filter.
+     * @param {AgentContactFindUniqueArgs} args - Arguments to find a AgentContact
+     * @example
+     * // Get one AgentContact
+     * const agentContact = await prisma.agentContact.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AgentContactFindUniqueArgs>(args: SelectSubset<T, AgentContactFindUniqueArgs<ExtArgs>>): Prisma__AgentContactClient<$Result.GetResult<Prisma.$AgentContactPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AgentContact that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AgentContactFindUniqueOrThrowArgs} args - Arguments to find a AgentContact
+     * @example
+     * // Get one AgentContact
+     * const agentContact = await prisma.agentContact.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AgentContactFindUniqueOrThrowArgs>(args: SelectSubset<T, AgentContactFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AgentContactClient<$Result.GetResult<Prisma.$AgentContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AgentContact that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentContactFindFirstArgs} args - Arguments to find a AgentContact
+     * @example
+     * // Get one AgentContact
+     * const agentContact = await prisma.agentContact.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AgentContactFindFirstArgs>(args?: SelectSubset<T, AgentContactFindFirstArgs<ExtArgs>>): Prisma__AgentContactClient<$Result.GetResult<Prisma.$AgentContactPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AgentContact that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentContactFindFirstOrThrowArgs} args - Arguments to find a AgentContact
+     * @example
+     * // Get one AgentContact
+     * const agentContact = await prisma.agentContact.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AgentContactFindFirstOrThrowArgs>(args?: SelectSubset<T, AgentContactFindFirstOrThrowArgs<ExtArgs>>): Prisma__AgentContactClient<$Result.GetResult<Prisma.$AgentContactPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AgentContacts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentContactFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AgentContacts
+     * const agentContacts = await prisma.agentContact.findMany()
+     * 
+     * // Get first 10 AgentContacts
+     * const agentContacts = await prisma.agentContact.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const agentContactWithIdOnly = await prisma.agentContact.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AgentContactFindManyArgs>(args?: SelectSubset<T, AgentContactFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AgentContact.
+     * @param {AgentContactCreateArgs} args - Arguments to create a AgentContact.
+     * @example
+     * // Create one AgentContact
+     * const AgentContact = await prisma.agentContact.create({
+     *   data: {
+     *     // ... data to create a AgentContact
+     *   }
+     * })
+     * 
+     */
+    create<T extends AgentContactCreateArgs>(args: SelectSubset<T, AgentContactCreateArgs<ExtArgs>>): Prisma__AgentContactClient<$Result.GetResult<Prisma.$AgentContactPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AgentContacts.
+     * @param {AgentContactCreateManyArgs} args - Arguments to create many AgentContacts.
+     * @example
+     * // Create many AgentContacts
+     * const agentContact = await prisma.agentContact.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AgentContactCreateManyArgs>(args?: SelectSubset<T, AgentContactCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AgentContacts and returns the data saved in the database.
+     * @param {AgentContactCreateManyAndReturnArgs} args - Arguments to create many AgentContacts.
+     * @example
+     * // Create many AgentContacts
+     * const agentContact = await prisma.agentContact.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AgentContacts and only return the `id`
+     * const agentContactWithIdOnly = await prisma.agentContact.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AgentContactCreateManyAndReturnArgs>(args?: SelectSubset<T, AgentContactCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentContactPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AgentContact.
+     * @param {AgentContactDeleteArgs} args - Arguments to delete one AgentContact.
+     * @example
+     * // Delete one AgentContact
+     * const AgentContact = await prisma.agentContact.delete({
+     *   where: {
+     *     // ... filter to delete one AgentContact
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AgentContactDeleteArgs>(args: SelectSubset<T, AgentContactDeleteArgs<ExtArgs>>): Prisma__AgentContactClient<$Result.GetResult<Prisma.$AgentContactPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AgentContact.
+     * @param {AgentContactUpdateArgs} args - Arguments to update one AgentContact.
+     * @example
+     * // Update one AgentContact
+     * const agentContact = await prisma.agentContact.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AgentContactUpdateArgs>(args: SelectSubset<T, AgentContactUpdateArgs<ExtArgs>>): Prisma__AgentContactClient<$Result.GetResult<Prisma.$AgentContactPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AgentContacts.
+     * @param {AgentContactDeleteManyArgs} args - Arguments to filter AgentContacts to delete.
+     * @example
+     * // Delete a few AgentContacts
+     * const { count } = await prisma.agentContact.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AgentContactDeleteManyArgs>(args?: SelectSubset<T, AgentContactDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AgentContacts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentContactUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AgentContacts
+     * const agentContact = await prisma.agentContact.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AgentContactUpdateManyArgs>(args: SelectSubset<T, AgentContactUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AgentContacts and returns the data updated in the database.
+     * @param {AgentContactUpdateManyAndReturnArgs} args - Arguments to update many AgentContacts.
+     * @example
+     * // Update many AgentContacts
+     * const agentContact = await prisma.agentContact.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AgentContacts and only return the `id`
+     * const agentContactWithIdOnly = await prisma.agentContact.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AgentContactUpdateManyAndReturnArgs>(args: SelectSubset<T, AgentContactUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentContactPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AgentContact.
+     * @param {AgentContactUpsertArgs} args - Arguments to update or create a AgentContact.
+     * @example
+     * // Update or create a AgentContact
+     * const agentContact = await prisma.agentContact.upsert({
+     *   create: {
+     *     // ... data to create a AgentContact
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AgentContact we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AgentContactUpsertArgs>(args: SelectSubset<T, AgentContactUpsertArgs<ExtArgs>>): Prisma__AgentContactClient<$Result.GetResult<Prisma.$AgentContactPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AgentContacts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentContactCountArgs} args - Arguments to filter AgentContacts to count.
+     * @example
+     * // Count the number of AgentContacts
+     * const count = await prisma.agentContact.count({
+     *   where: {
+     *     // ... the filter for the AgentContacts we want to count
+     *   }
+     * })
+    **/
+    count<T extends AgentContactCountArgs>(
+      args?: Subset<T, AgentContactCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AgentContactCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AgentContact.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentContactAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AgentContactAggregateArgs>(args: Subset<T, AgentContactAggregateArgs>): Prisma.PrismaPromise<GetAgentContactAggregateType<T>>
+
+    /**
+     * Group by AgentContact.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentContactGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AgentContactGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AgentContactGroupByArgs['orderBy'] }
+        : { orderBy?: AgentContactGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AgentContactGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAgentContactGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AgentContact model
+   */
+  readonly fields: AgentContactFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AgentContact.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AgentContactClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AgentContact model
+   */
+  interface AgentContactFieldRefs {
+    readonly id: FieldRef<"AgentContact", 'Int'>
+    readonly agentId: FieldRef<"AgentContact", 'Int'>
+    readonly name: FieldRef<"AgentContact", 'String'>
+    readonly email: FieldRef<"AgentContact", 'String'>
+    readonly subject: FieldRef<"AgentContact", 'String'>
+    readonly message: FieldRef<"AgentContact", 'String'>
+    readonly status: FieldRef<"AgentContact", 'String'>
+    readonly createdAt: FieldRef<"AgentContact", 'DateTime'>
+    readonly updatedAt: FieldRef<"AgentContact", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AgentContact findUnique
+   */
+  export type AgentContactFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentContact
+     */
+    select?: AgentContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentContact
+     */
+    omit?: AgentContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentContactInclude<ExtArgs> | null
+    /**
+     * Filter, which AgentContact to fetch.
+     */
+    where: AgentContactWhereUniqueInput
+  }
+
+  /**
+   * AgentContact findUniqueOrThrow
+   */
+  export type AgentContactFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentContact
+     */
+    select?: AgentContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentContact
+     */
+    omit?: AgentContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentContactInclude<ExtArgs> | null
+    /**
+     * Filter, which AgentContact to fetch.
+     */
+    where: AgentContactWhereUniqueInput
+  }
+
+  /**
+   * AgentContact findFirst
+   */
+  export type AgentContactFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentContact
+     */
+    select?: AgentContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentContact
+     */
+    omit?: AgentContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentContactInclude<ExtArgs> | null
+    /**
+     * Filter, which AgentContact to fetch.
+     */
+    where?: AgentContactWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentContacts to fetch.
+     */
+    orderBy?: AgentContactOrderByWithRelationInput | AgentContactOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AgentContacts.
+     */
+    cursor?: AgentContactWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentContacts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentContacts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AgentContacts.
+     */
+    distinct?: AgentContactScalarFieldEnum | AgentContactScalarFieldEnum[]
+  }
+
+  /**
+   * AgentContact findFirstOrThrow
+   */
+  export type AgentContactFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentContact
+     */
+    select?: AgentContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentContact
+     */
+    omit?: AgentContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentContactInclude<ExtArgs> | null
+    /**
+     * Filter, which AgentContact to fetch.
+     */
+    where?: AgentContactWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentContacts to fetch.
+     */
+    orderBy?: AgentContactOrderByWithRelationInput | AgentContactOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AgentContacts.
+     */
+    cursor?: AgentContactWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentContacts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentContacts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AgentContacts.
+     */
+    distinct?: AgentContactScalarFieldEnum | AgentContactScalarFieldEnum[]
+  }
+
+  /**
+   * AgentContact findMany
+   */
+  export type AgentContactFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentContact
+     */
+    select?: AgentContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentContact
+     */
+    omit?: AgentContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentContactInclude<ExtArgs> | null
+    /**
+     * Filter, which AgentContacts to fetch.
+     */
+    where?: AgentContactWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentContacts to fetch.
+     */
+    orderBy?: AgentContactOrderByWithRelationInput | AgentContactOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AgentContacts.
+     */
+    cursor?: AgentContactWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentContacts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentContacts.
+     */
+    skip?: number
+    distinct?: AgentContactScalarFieldEnum | AgentContactScalarFieldEnum[]
+  }
+
+  /**
+   * AgentContact create
+   */
+  export type AgentContactCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentContact
+     */
+    select?: AgentContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentContact
+     */
+    omit?: AgentContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentContactInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AgentContact.
+     */
+    data: XOR<AgentContactCreateInput, AgentContactUncheckedCreateInput>
+  }
+
+  /**
+   * AgentContact createMany
+   */
+  export type AgentContactCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AgentContacts.
+     */
+    data: AgentContactCreateManyInput | AgentContactCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AgentContact createManyAndReturn
+   */
+  export type AgentContactCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentContact
+     */
+    select?: AgentContactSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentContact
+     */
+    omit?: AgentContactOmit<ExtArgs> | null
+    /**
+     * The data used to create many AgentContacts.
+     */
+    data: AgentContactCreateManyInput | AgentContactCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentContactIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AgentContact update
+   */
+  export type AgentContactUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentContact
+     */
+    select?: AgentContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentContact
+     */
+    omit?: AgentContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentContactInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AgentContact.
+     */
+    data: XOR<AgentContactUpdateInput, AgentContactUncheckedUpdateInput>
+    /**
+     * Choose, which AgentContact to update.
+     */
+    where: AgentContactWhereUniqueInput
+  }
+
+  /**
+   * AgentContact updateMany
+   */
+  export type AgentContactUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AgentContacts.
+     */
+    data: XOR<AgentContactUpdateManyMutationInput, AgentContactUncheckedUpdateManyInput>
+    /**
+     * Filter which AgentContacts to update
+     */
+    where?: AgentContactWhereInput
+    /**
+     * Limit how many AgentContacts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AgentContact updateManyAndReturn
+   */
+  export type AgentContactUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentContact
+     */
+    select?: AgentContactSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentContact
+     */
+    omit?: AgentContactOmit<ExtArgs> | null
+    /**
+     * The data used to update AgentContacts.
+     */
+    data: XOR<AgentContactUpdateManyMutationInput, AgentContactUncheckedUpdateManyInput>
+    /**
+     * Filter which AgentContacts to update
+     */
+    where?: AgentContactWhereInput
+    /**
+     * Limit how many AgentContacts to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentContactIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AgentContact upsert
+   */
+  export type AgentContactUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentContact
+     */
+    select?: AgentContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentContact
+     */
+    omit?: AgentContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentContactInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AgentContact to update in case it exists.
+     */
+    where: AgentContactWhereUniqueInput
+    /**
+     * In case the AgentContact found by the `where` argument doesn't exist, create a new AgentContact with this data.
+     */
+    create: XOR<AgentContactCreateInput, AgentContactUncheckedCreateInput>
+    /**
+     * In case the AgentContact was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AgentContactUpdateInput, AgentContactUncheckedUpdateInput>
+  }
+
+  /**
+   * AgentContact delete
+   */
+  export type AgentContactDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentContact
+     */
+    select?: AgentContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentContact
+     */
+    omit?: AgentContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentContactInclude<ExtArgs> | null
+    /**
+     * Filter which AgentContact to delete.
+     */
+    where: AgentContactWhereUniqueInput
+  }
+
+  /**
+   * AgentContact deleteMany
+   */
+  export type AgentContactDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AgentContacts to delete
+     */
+    where?: AgentContactWhereInput
+    /**
+     * Limit how many AgentContacts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AgentContact without action
+   */
+  export type AgentContactDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentContact
+     */
+    select?: AgentContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentContact
+     */
+    omit?: AgentContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentContactInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -30238,6 +32811,37 @@ export namespace Prisma {
   export type BlogPostScalarFieldEnum = (typeof BlogPostScalarFieldEnum)[keyof typeof BlogPostScalarFieldEnum]
 
 
+  export const AgentReviewScalarFieldEnum: {
+    id: 'id',
+    agentId: 'agentId',
+    userId: 'userId',
+    name: 'name',
+    email: 'email',
+    rating: 'rating',
+    comment: 'comment',
+    isApproved: 'isApproved',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AgentReviewScalarFieldEnum = (typeof AgentReviewScalarFieldEnum)[keyof typeof AgentReviewScalarFieldEnum]
+
+
+  export const AgentContactScalarFieldEnum: {
+    id: 'id',
+    agentId: 'agentId',
+    name: 'name',
+    email: 'email',
+    subject: 'subject',
+    message: 'message',
+    status: 'status',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AgentContactScalarFieldEnum = (typeof AgentContactScalarFieldEnum)[keyof typeof AgentContactScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -30526,6 +33130,8 @@ export namespace Prisma {
     inquiries?: InquiryListRelationFilter
     appointments?: AppointmentListRelationFilter
     analytics?: AgentAnalyticsListRelationFilter
+    reviews?: AgentReviewListRelationFilter
+    contacts?: AgentContactListRelationFilter
   }
 
   export type AgentOrderByWithRelationInput = {
@@ -30552,6 +33158,8 @@ export namespace Prisma {
     inquiries?: InquiryOrderByRelationAggregateInput
     appointments?: AppointmentOrderByRelationAggregateInput
     analytics?: AgentAnalyticsOrderByRelationAggregateInput
+    reviews?: AgentReviewOrderByRelationAggregateInput
+    contacts?: AgentContactOrderByRelationAggregateInput
   }
 
   export type AgentWhereUniqueInput = Prisma.AtLeast<{
@@ -30581,6 +33189,8 @@ export namespace Prisma {
     inquiries?: InquiryListRelationFilter
     appointments?: AppointmentListRelationFilter
     analytics?: AgentAnalyticsListRelationFilter
+    reviews?: AgentReviewListRelationFilter
+    contacts?: AgentContactListRelationFilter
   }, "id" | "userId">
 
   export type AgentOrderByWithAggregationInput = {
@@ -32352,6 +34962,165 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"BlogPost"> | Date | string
   }
 
+  export type AgentReviewWhereInput = {
+    AND?: AgentReviewWhereInput | AgentReviewWhereInput[]
+    OR?: AgentReviewWhereInput[]
+    NOT?: AgentReviewWhereInput | AgentReviewWhereInput[]
+    id?: IntFilter<"AgentReview"> | number
+    agentId?: IntFilter<"AgentReview"> | number
+    userId?: IntNullableFilter<"AgentReview"> | number | null
+    name?: StringFilter<"AgentReview"> | string
+    email?: StringFilter<"AgentReview"> | string
+    rating?: IntFilter<"AgentReview"> | number
+    comment?: StringFilter<"AgentReview"> | string
+    isApproved?: BoolFilter<"AgentReview"> | boolean
+    createdAt?: DateTimeFilter<"AgentReview"> | Date | string
+    updatedAt?: DateTimeFilter<"AgentReview"> | Date | string
+    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+  }
+
+  export type AgentReviewOrderByWithRelationInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    rating?: SortOrder
+    comment?: SortOrder
+    isApproved?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    agent?: AgentOrderByWithRelationInput
+  }
+
+  export type AgentReviewWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: AgentReviewWhereInput | AgentReviewWhereInput[]
+    OR?: AgentReviewWhereInput[]
+    NOT?: AgentReviewWhereInput | AgentReviewWhereInput[]
+    agentId?: IntFilter<"AgentReview"> | number
+    userId?: IntNullableFilter<"AgentReview"> | number | null
+    name?: StringFilter<"AgentReview"> | string
+    email?: StringFilter<"AgentReview"> | string
+    rating?: IntFilter<"AgentReview"> | number
+    comment?: StringFilter<"AgentReview"> | string
+    isApproved?: BoolFilter<"AgentReview"> | boolean
+    createdAt?: DateTimeFilter<"AgentReview"> | Date | string
+    updatedAt?: DateTimeFilter<"AgentReview"> | Date | string
+    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+  }, "id">
+
+  export type AgentReviewOrderByWithAggregationInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    rating?: SortOrder
+    comment?: SortOrder
+    isApproved?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AgentReviewCountOrderByAggregateInput
+    _avg?: AgentReviewAvgOrderByAggregateInput
+    _max?: AgentReviewMaxOrderByAggregateInput
+    _min?: AgentReviewMinOrderByAggregateInput
+    _sum?: AgentReviewSumOrderByAggregateInput
+  }
+
+  export type AgentReviewScalarWhereWithAggregatesInput = {
+    AND?: AgentReviewScalarWhereWithAggregatesInput | AgentReviewScalarWhereWithAggregatesInput[]
+    OR?: AgentReviewScalarWhereWithAggregatesInput[]
+    NOT?: AgentReviewScalarWhereWithAggregatesInput | AgentReviewScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"AgentReview"> | number
+    agentId?: IntWithAggregatesFilter<"AgentReview"> | number
+    userId?: IntNullableWithAggregatesFilter<"AgentReview"> | number | null
+    name?: StringWithAggregatesFilter<"AgentReview"> | string
+    email?: StringWithAggregatesFilter<"AgentReview"> | string
+    rating?: IntWithAggregatesFilter<"AgentReview"> | number
+    comment?: StringWithAggregatesFilter<"AgentReview"> | string
+    isApproved?: BoolWithAggregatesFilter<"AgentReview"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"AgentReview"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"AgentReview"> | Date | string
+  }
+
+  export type AgentContactWhereInput = {
+    AND?: AgentContactWhereInput | AgentContactWhereInput[]
+    OR?: AgentContactWhereInput[]
+    NOT?: AgentContactWhereInput | AgentContactWhereInput[]
+    id?: IntFilter<"AgentContact"> | number
+    agentId?: IntFilter<"AgentContact"> | number
+    name?: StringFilter<"AgentContact"> | string
+    email?: StringFilter<"AgentContact"> | string
+    subject?: StringNullableFilter<"AgentContact"> | string | null
+    message?: StringFilter<"AgentContact"> | string
+    status?: StringFilter<"AgentContact"> | string
+    createdAt?: DateTimeFilter<"AgentContact"> | Date | string
+    updatedAt?: DateTimeFilter<"AgentContact"> | Date | string
+    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+  }
+
+  export type AgentContactOrderByWithRelationInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    subject?: SortOrderInput | SortOrder
+    message?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    agent?: AgentOrderByWithRelationInput
+  }
+
+  export type AgentContactWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: AgentContactWhereInput | AgentContactWhereInput[]
+    OR?: AgentContactWhereInput[]
+    NOT?: AgentContactWhereInput | AgentContactWhereInput[]
+    agentId?: IntFilter<"AgentContact"> | number
+    name?: StringFilter<"AgentContact"> | string
+    email?: StringFilter<"AgentContact"> | string
+    subject?: StringNullableFilter<"AgentContact"> | string | null
+    message?: StringFilter<"AgentContact"> | string
+    status?: StringFilter<"AgentContact"> | string
+    createdAt?: DateTimeFilter<"AgentContact"> | Date | string
+    updatedAt?: DateTimeFilter<"AgentContact"> | Date | string
+    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+  }, "id">
+
+  export type AgentContactOrderByWithAggregationInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    subject?: SortOrderInput | SortOrder
+    message?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AgentContactCountOrderByAggregateInput
+    _avg?: AgentContactAvgOrderByAggregateInput
+    _max?: AgentContactMaxOrderByAggregateInput
+    _min?: AgentContactMinOrderByAggregateInput
+    _sum?: AgentContactSumOrderByAggregateInput
+  }
+
+  export type AgentContactScalarWhereWithAggregatesInput = {
+    AND?: AgentContactScalarWhereWithAggregatesInput | AgentContactScalarWhereWithAggregatesInput[]
+    OR?: AgentContactScalarWhereWithAggregatesInput[]
+    NOT?: AgentContactScalarWhereWithAggregatesInput | AgentContactScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"AgentContact"> | number
+    agentId?: IntWithAggregatesFilter<"AgentContact"> | number
+    name?: StringWithAggregatesFilter<"AgentContact"> | string
+    email?: StringWithAggregatesFilter<"AgentContact"> | string
+    subject?: StringNullableWithAggregatesFilter<"AgentContact"> | string | null
+    message?: StringWithAggregatesFilter<"AgentContact"> | string
+    status?: StringWithAggregatesFilter<"AgentContact"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"AgentContact"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"AgentContact"> | Date | string
+  }
+
   export type UserCreateInput = {
     clerkid?: string | null
     email: string
@@ -32519,6 +35288,8 @@ export namespace Prisma {
     inquiries?: InquiryCreateNestedManyWithoutAgentInput
     appointments?: AppointmentCreateNestedManyWithoutAgentInput
     analytics?: AgentAnalyticsCreateNestedManyWithoutAgentInput
+    reviews?: AgentReviewCreateNestedManyWithoutAgentInput
+    contacts?: AgentContactCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateInput = {
@@ -32544,6 +35315,8 @@ export namespace Prisma {
     inquiries?: InquiryUncheckedCreateNestedManyWithoutAgentInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutAgentInput
     analytics?: AgentAnalyticsUncheckedCreateNestedManyWithoutAgentInput
+    reviews?: AgentReviewUncheckedCreateNestedManyWithoutAgentInput
+    contacts?: AgentContactUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUpdateInput = {
@@ -32568,6 +35341,8 @@ export namespace Prisma {
     inquiries?: InquiryUpdateManyWithoutAgentNestedInput
     appointments?: AppointmentUpdateManyWithoutAgentNestedInput
     analytics?: AgentAnalyticsUpdateManyWithoutAgentNestedInput
+    reviews?: AgentReviewUpdateManyWithoutAgentNestedInput
+    contacts?: AgentContactUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateInput = {
@@ -32593,6 +35368,8 @@ export namespace Prisma {
     inquiries?: InquiryUncheckedUpdateManyWithoutAgentNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutAgentNestedInput
     analytics?: AgentAnalyticsUncheckedUpdateManyWithoutAgentNestedInput
+    reviews?: AgentReviewUncheckedUpdateManyWithoutAgentNestedInput
+    contacts?: AgentContactUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentCreateManyInput = {
@@ -34485,6 +37262,173 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AgentReviewCreateInput = {
+    userId?: number | null
+    name: string
+    email: string
+    rating: number
+    comment: string
+    isApproved?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agent: AgentCreateNestedOneWithoutReviewsInput
+  }
+
+  export type AgentReviewUncheckedCreateInput = {
+    id?: number
+    agentId: number
+    userId?: number | null
+    name: string
+    email: string
+    rating: number
+    comment: string
+    isApproved?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AgentReviewUpdateInput = {
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    rating?: IntFieldUpdateOperationsInput | number
+    comment?: StringFieldUpdateOperationsInput | string
+    isApproved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agent?: AgentUpdateOneRequiredWithoutReviewsNestedInput
+  }
+
+  export type AgentReviewUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    agentId?: IntFieldUpdateOperationsInput | number
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    rating?: IntFieldUpdateOperationsInput | number
+    comment?: StringFieldUpdateOperationsInput | string
+    isApproved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentReviewCreateManyInput = {
+    id?: number
+    agentId: number
+    userId?: number | null
+    name: string
+    email: string
+    rating: number
+    comment: string
+    isApproved?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AgentReviewUpdateManyMutationInput = {
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    rating?: IntFieldUpdateOperationsInput | number
+    comment?: StringFieldUpdateOperationsInput | string
+    isApproved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentReviewUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    agentId?: IntFieldUpdateOperationsInput | number
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    rating?: IntFieldUpdateOperationsInput | number
+    comment?: StringFieldUpdateOperationsInput | string
+    isApproved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentContactCreateInput = {
+    name: string
+    email: string
+    subject?: string | null
+    message: string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agent: AgentCreateNestedOneWithoutContactsInput
+  }
+
+  export type AgentContactUncheckedCreateInput = {
+    id?: number
+    agentId: number
+    name: string
+    email: string
+    subject?: string | null
+    message: string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AgentContactUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agent?: AgentUpdateOneRequiredWithoutContactsNestedInput
+  }
+
+  export type AgentContactUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    agentId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentContactCreateManyInput = {
+    id?: number
+    agentId: number
+    name: string
+    email: string
+    subject?: string | null
+    message: string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AgentContactUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentContactUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    agentId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -34849,11 +37793,31 @@ export namespace Prisma {
     none?: AgentAnalyticsWhereInput
   }
 
+  export type AgentReviewListRelationFilter = {
+    every?: AgentReviewWhereInput
+    some?: AgentReviewWhereInput
+    none?: AgentReviewWhereInput
+  }
+
+  export type AgentContactListRelationFilter = {
+    every?: AgentContactWhereInput
+    some?: AgentContactWhereInput
+    none?: AgentContactWhereInput
+  }
+
   export type InquiryOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type AgentAnalyticsOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AgentReviewOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AgentContactOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -36177,6 +39141,105 @@ export namespace Prisma {
     views?: SortOrder
   }
 
+  export type AgentReviewCountOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    rating?: SortOrder
+    comment?: SortOrder
+    isApproved?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AgentReviewAvgOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    userId?: SortOrder
+    rating?: SortOrder
+  }
+
+  export type AgentReviewMaxOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    rating?: SortOrder
+    comment?: SortOrder
+    isApproved?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AgentReviewMinOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    rating?: SortOrder
+    comment?: SortOrder
+    isApproved?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AgentReviewSumOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    userId?: SortOrder
+    rating?: SortOrder
+  }
+
+  export type AgentContactCountOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    subject?: SortOrder
+    message?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AgentContactAvgOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+  }
+
+  export type AgentContactMaxOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    subject?: SortOrder
+    message?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AgentContactMinOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    subject?: SortOrder
+    message?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AgentContactSumOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+  }
+
   export type AgentCreateNestedOneWithoutUserInput = {
     create?: XOR<AgentCreateWithoutUserInput, AgentUncheckedCreateWithoutUserInput>
     connectOrCreate?: AgentCreateOrConnectWithoutUserInput
@@ -36607,6 +39670,20 @@ export namespace Prisma {
     connect?: AgentAnalyticsWhereUniqueInput | AgentAnalyticsWhereUniqueInput[]
   }
 
+  export type AgentReviewCreateNestedManyWithoutAgentInput = {
+    create?: XOR<AgentReviewCreateWithoutAgentInput, AgentReviewUncheckedCreateWithoutAgentInput> | AgentReviewCreateWithoutAgentInput[] | AgentReviewUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: AgentReviewCreateOrConnectWithoutAgentInput | AgentReviewCreateOrConnectWithoutAgentInput[]
+    createMany?: AgentReviewCreateManyAgentInputEnvelope
+    connect?: AgentReviewWhereUniqueInput | AgentReviewWhereUniqueInput[]
+  }
+
+  export type AgentContactCreateNestedManyWithoutAgentInput = {
+    create?: XOR<AgentContactCreateWithoutAgentInput, AgentContactUncheckedCreateWithoutAgentInput> | AgentContactCreateWithoutAgentInput[] | AgentContactUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: AgentContactCreateOrConnectWithoutAgentInput | AgentContactCreateOrConnectWithoutAgentInput[]
+    createMany?: AgentContactCreateManyAgentInputEnvelope
+    connect?: AgentContactWhereUniqueInput | AgentContactWhereUniqueInput[]
+  }
+
   export type PropertyUncheckedCreateNestedManyWithoutAgentInput = {
     create?: XOR<PropertyCreateWithoutAgentInput, PropertyUncheckedCreateWithoutAgentInput> | PropertyCreateWithoutAgentInput[] | PropertyUncheckedCreateWithoutAgentInput[]
     connectOrCreate?: PropertyCreateOrConnectWithoutAgentInput | PropertyCreateOrConnectWithoutAgentInput[]
@@ -36633,6 +39710,20 @@ export namespace Prisma {
     connectOrCreate?: AgentAnalyticsCreateOrConnectWithoutAgentInput | AgentAnalyticsCreateOrConnectWithoutAgentInput[]
     createMany?: AgentAnalyticsCreateManyAgentInputEnvelope
     connect?: AgentAnalyticsWhereUniqueInput | AgentAnalyticsWhereUniqueInput[]
+  }
+
+  export type AgentReviewUncheckedCreateNestedManyWithoutAgentInput = {
+    create?: XOR<AgentReviewCreateWithoutAgentInput, AgentReviewUncheckedCreateWithoutAgentInput> | AgentReviewCreateWithoutAgentInput[] | AgentReviewUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: AgentReviewCreateOrConnectWithoutAgentInput | AgentReviewCreateOrConnectWithoutAgentInput[]
+    createMany?: AgentReviewCreateManyAgentInputEnvelope
+    connect?: AgentReviewWhereUniqueInput | AgentReviewWhereUniqueInput[]
+  }
+
+  export type AgentContactUncheckedCreateNestedManyWithoutAgentInput = {
+    create?: XOR<AgentContactCreateWithoutAgentInput, AgentContactUncheckedCreateWithoutAgentInput> | AgentContactCreateWithoutAgentInput[] | AgentContactUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: AgentContactCreateOrConnectWithoutAgentInput | AgentContactCreateOrConnectWithoutAgentInput[]
+    createMany?: AgentContactCreateManyAgentInputEnvelope
+    connect?: AgentContactWhereUniqueInput | AgentContactWhereUniqueInput[]
   }
 
   export type NullableDecimalFieldUpdateOperationsInput = {
@@ -36715,6 +39806,34 @@ export namespace Prisma {
     deleteMany?: AgentAnalyticsScalarWhereInput | AgentAnalyticsScalarWhereInput[]
   }
 
+  export type AgentReviewUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<AgentReviewCreateWithoutAgentInput, AgentReviewUncheckedCreateWithoutAgentInput> | AgentReviewCreateWithoutAgentInput[] | AgentReviewUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: AgentReviewCreateOrConnectWithoutAgentInput | AgentReviewCreateOrConnectWithoutAgentInput[]
+    upsert?: AgentReviewUpsertWithWhereUniqueWithoutAgentInput | AgentReviewUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: AgentReviewCreateManyAgentInputEnvelope
+    set?: AgentReviewWhereUniqueInput | AgentReviewWhereUniqueInput[]
+    disconnect?: AgentReviewWhereUniqueInput | AgentReviewWhereUniqueInput[]
+    delete?: AgentReviewWhereUniqueInput | AgentReviewWhereUniqueInput[]
+    connect?: AgentReviewWhereUniqueInput | AgentReviewWhereUniqueInput[]
+    update?: AgentReviewUpdateWithWhereUniqueWithoutAgentInput | AgentReviewUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: AgentReviewUpdateManyWithWhereWithoutAgentInput | AgentReviewUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: AgentReviewScalarWhereInput | AgentReviewScalarWhereInput[]
+  }
+
+  export type AgentContactUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<AgentContactCreateWithoutAgentInput, AgentContactUncheckedCreateWithoutAgentInput> | AgentContactCreateWithoutAgentInput[] | AgentContactUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: AgentContactCreateOrConnectWithoutAgentInput | AgentContactCreateOrConnectWithoutAgentInput[]
+    upsert?: AgentContactUpsertWithWhereUniqueWithoutAgentInput | AgentContactUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: AgentContactCreateManyAgentInputEnvelope
+    set?: AgentContactWhereUniqueInput | AgentContactWhereUniqueInput[]
+    disconnect?: AgentContactWhereUniqueInput | AgentContactWhereUniqueInput[]
+    delete?: AgentContactWhereUniqueInput | AgentContactWhereUniqueInput[]
+    connect?: AgentContactWhereUniqueInput | AgentContactWhereUniqueInput[]
+    update?: AgentContactUpdateWithWhereUniqueWithoutAgentInput | AgentContactUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: AgentContactUpdateManyWithWhereWithoutAgentInput | AgentContactUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: AgentContactScalarWhereInput | AgentContactScalarWhereInput[]
+  }
+
   export type PropertyUncheckedUpdateManyWithoutAgentNestedInput = {
     create?: XOR<PropertyCreateWithoutAgentInput, PropertyUncheckedCreateWithoutAgentInput> | PropertyCreateWithoutAgentInput[] | PropertyUncheckedCreateWithoutAgentInput[]
     connectOrCreate?: PropertyCreateOrConnectWithoutAgentInput | PropertyCreateOrConnectWithoutAgentInput[]
@@ -36769,6 +39888,34 @@ export namespace Prisma {
     update?: AgentAnalyticsUpdateWithWhereUniqueWithoutAgentInput | AgentAnalyticsUpdateWithWhereUniqueWithoutAgentInput[]
     updateMany?: AgentAnalyticsUpdateManyWithWhereWithoutAgentInput | AgentAnalyticsUpdateManyWithWhereWithoutAgentInput[]
     deleteMany?: AgentAnalyticsScalarWhereInput | AgentAnalyticsScalarWhereInput[]
+  }
+
+  export type AgentReviewUncheckedUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<AgentReviewCreateWithoutAgentInput, AgentReviewUncheckedCreateWithoutAgentInput> | AgentReviewCreateWithoutAgentInput[] | AgentReviewUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: AgentReviewCreateOrConnectWithoutAgentInput | AgentReviewCreateOrConnectWithoutAgentInput[]
+    upsert?: AgentReviewUpsertWithWhereUniqueWithoutAgentInput | AgentReviewUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: AgentReviewCreateManyAgentInputEnvelope
+    set?: AgentReviewWhereUniqueInput | AgentReviewWhereUniqueInput[]
+    disconnect?: AgentReviewWhereUniqueInput | AgentReviewWhereUniqueInput[]
+    delete?: AgentReviewWhereUniqueInput | AgentReviewWhereUniqueInput[]
+    connect?: AgentReviewWhereUniqueInput | AgentReviewWhereUniqueInput[]
+    update?: AgentReviewUpdateWithWhereUniqueWithoutAgentInput | AgentReviewUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: AgentReviewUpdateManyWithWhereWithoutAgentInput | AgentReviewUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: AgentReviewScalarWhereInput | AgentReviewScalarWhereInput[]
+  }
+
+  export type AgentContactUncheckedUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<AgentContactCreateWithoutAgentInput, AgentContactUncheckedCreateWithoutAgentInput> | AgentContactCreateWithoutAgentInput[] | AgentContactUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: AgentContactCreateOrConnectWithoutAgentInput | AgentContactCreateOrConnectWithoutAgentInput[]
+    upsert?: AgentContactUpsertWithWhereUniqueWithoutAgentInput | AgentContactUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: AgentContactCreateManyAgentInputEnvelope
+    set?: AgentContactWhereUniqueInput | AgentContactWhereUniqueInput[]
+    disconnect?: AgentContactWhereUniqueInput | AgentContactWhereUniqueInput[]
+    delete?: AgentContactWhereUniqueInput | AgentContactWhereUniqueInput[]
+    connect?: AgentContactWhereUniqueInput | AgentContactWhereUniqueInput[]
+    update?: AgentContactUpdateWithWhereUniqueWithoutAgentInput | AgentContactUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: AgentContactUpdateManyWithWhereWithoutAgentInput | AgentContactUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: AgentContactScalarWhereInput | AgentContactScalarWhereInput[]
   }
 
   export type PropertyCreateNestedManyWithoutPropertyTypeInput = {
@@ -37641,6 +40788,34 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutBlogPostsInput, UserUpdateWithoutBlogPostsInput>, UserUncheckedUpdateWithoutBlogPostsInput>
   }
 
+  export type AgentCreateNestedOneWithoutReviewsInput = {
+    create?: XOR<AgentCreateWithoutReviewsInput, AgentUncheckedCreateWithoutReviewsInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutReviewsInput
+    connect?: AgentWhereUniqueInput
+  }
+
+  export type AgentUpdateOneRequiredWithoutReviewsNestedInput = {
+    create?: XOR<AgentCreateWithoutReviewsInput, AgentUncheckedCreateWithoutReviewsInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutReviewsInput
+    upsert?: AgentUpsertWithoutReviewsInput
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutReviewsInput, AgentUpdateWithoutReviewsInput>, AgentUncheckedUpdateWithoutReviewsInput>
+  }
+
+  export type AgentCreateNestedOneWithoutContactsInput = {
+    create?: XOR<AgentCreateWithoutContactsInput, AgentUncheckedCreateWithoutContactsInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutContactsInput
+    connect?: AgentWhereUniqueInput
+  }
+
+  export type AgentUpdateOneRequiredWithoutContactsNestedInput = {
+    create?: XOR<AgentCreateWithoutContactsInput, AgentUncheckedCreateWithoutContactsInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutContactsInput
+    upsert?: AgentUpsertWithoutContactsInput
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutContactsInput, AgentUpdateWithoutContactsInput>, AgentUncheckedUpdateWithoutContactsInput>
+  }
+
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -37940,6 +41115,8 @@ export namespace Prisma {
     inquiries?: InquiryCreateNestedManyWithoutAgentInput
     appointments?: AppointmentCreateNestedManyWithoutAgentInput
     analytics?: AgentAnalyticsCreateNestedManyWithoutAgentInput
+    reviews?: AgentReviewCreateNestedManyWithoutAgentInput
+    contacts?: AgentContactCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutUserInput = {
@@ -37964,6 +41141,8 @@ export namespace Prisma {
     inquiries?: InquiryUncheckedCreateNestedManyWithoutAgentInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutAgentInput
     analytics?: AgentAnalyticsUncheckedCreateNestedManyWithoutAgentInput
+    reviews?: AgentReviewUncheckedCreateNestedManyWithoutAgentInput
+    contacts?: AgentContactUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutUserInput = {
@@ -38337,6 +41516,8 @@ export namespace Prisma {
     inquiries?: InquiryUpdateManyWithoutAgentNestedInput
     appointments?: AppointmentUpdateManyWithoutAgentNestedInput
     analytics?: AgentAnalyticsUpdateManyWithoutAgentNestedInput
+    reviews?: AgentReviewUpdateManyWithoutAgentNestedInput
+    contacts?: AgentContactUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutUserInput = {
@@ -38361,6 +41542,8 @@ export namespace Prisma {
     inquiries?: InquiryUncheckedUpdateManyWithoutAgentNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutAgentNestedInput
     analytics?: AgentAnalyticsUncheckedUpdateManyWithoutAgentNestedInput
+    reviews?: AgentReviewUncheckedUpdateManyWithoutAgentNestedInput
+    contacts?: AgentContactUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type PropertyUpsertWithWhereUniqueWithoutOwnerInput = {
@@ -38890,6 +42073,70 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type AgentReviewCreateWithoutAgentInput = {
+    userId?: number | null
+    name: string
+    email: string
+    rating: number
+    comment: string
+    isApproved?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AgentReviewUncheckedCreateWithoutAgentInput = {
+    id?: number
+    userId?: number | null
+    name: string
+    email: string
+    rating: number
+    comment: string
+    isApproved?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AgentReviewCreateOrConnectWithoutAgentInput = {
+    where: AgentReviewWhereUniqueInput
+    create: XOR<AgentReviewCreateWithoutAgentInput, AgentReviewUncheckedCreateWithoutAgentInput>
+  }
+
+  export type AgentReviewCreateManyAgentInputEnvelope = {
+    data: AgentReviewCreateManyAgentInput | AgentReviewCreateManyAgentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AgentContactCreateWithoutAgentInput = {
+    name: string
+    email: string
+    subject?: string | null
+    message: string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AgentContactUncheckedCreateWithoutAgentInput = {
+    id?: number
+    name: string
+    email: string
+    subject?: string | null
+    message: string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AgentContactCreateOrConnectWithoutAgentInput = {
+    where: AgentContactWhereUniqueInput
+    create: XOR<AgentContactCreateWithoutAgentInput, AgentContactUncheckedCreateWithoutAgentInput>
+  }
+
+  export type AgentContactCreateManyAgentInputEnvelope = {
+    data: AgentContactCreateManyAgentInput | AgentContactCreateManyAgentInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutAgentInput = {
     update: XOR<UserUpdateWithoutAgentInput, UserUncheckedUpdateWithoutAgentInput>
     create: XOR<UserCreateWithoutAgentInput, UserUncheckedCreateWithoutAgentInput>
@@ -39046,6 +42293,69 @@ export namespace Prisma {
     appointmentsConducted?: IntFilter<"AgentAnalytics"> | number
     createdAt?: DateTimeFilter<"AgentAnalytics"> | Date | string
     updatedAt?: DateTimeFilter<"AgentAnalytics"> | Date | string
+  }
+
+  export type AgentReviewUpsertWithWhereUniqueWithoutAgentInput = {
+    where: AgentReviewWhereUniqueInput
+    update: XOR<AgentReviewUpdateWithoutAgentInput, AgentReviewUncheckedUpdateWithoutAgentInput>
+    create: XOR<AgentReviewCreateWithoutAgentInput, AgentReviewUncheckedCreateWithoutAgentInput>
+  }
+
+  export type AgentReviewUpdateWithWhereUniqueWithoutAgentInput = {
+    where: AgentReviewWhereUniqueInput
+    data: XOR<AgentReviewUpdateWithoutAgentInput, AgentReviewUncheckedUpdateWithoutAgentInput>
+  }
+
+  export type AgentReviewUpdateManyWithWhereWithoutAgentInput = {
+    where: AgentReviewScalarWhereInput
+    data: XOR<AgentReviewUpdateManyMutationInput, AgentReviewUncheckedUpdateManyWithoutAgentInput>
+  }
+
+  export type AgentReviewScalarWhereInput = {
+    AND?: AgentReviewScalarWhereInput | AgentReviewScalarWhereInput[]
+    OR?: AgentReviewScalarWhereInput[]
+    NOT?: AgentReviewScalarWhereInput | AgentReviewScalarWhereInput[]
+    id?: IntFilter<"AgentReview"> | number
+    agentId?: IntFilter<"AgentReview"> | number
+    userId?: IntNullableFilter<"AgentReview"> | number | null
+    name?: StringFilter<"AgentReview"> | string
+    email?: StringFilter<"AgentReview"> | string
+    rating?: IntFilter<"AgentReview"> | number
+    comment?: StringFilter<"AgentReview"> | string
+    isApproved?: BoolFilter<"AgentReview"> | boolean
+    createdAt?: DateTimeFilter<"AgentReview"> | Date | string
+    updatedAt?: DateTimeFilter<"AgentReview"> | Date | string
+  }
+
+  export type AgentContactUpsertWithWhereUniqueWithoutAgentInput = {
+    where: AgentContactWhereUniqueInput
+    update: XOR<AgentContactUpdateWithoutAgentInput, AgentContactUncheckedUpdateWithoutAgentInput>
+    create: XOR<AgentContactCreateWithoutAgentInput, AgentContactUncheckedCreateWithoutAgentInput>
+  }
+
+  export type AgentContactUpdateWithWhereUniqueWithoutAgentInput = {
+    where: AgentContactWhereUniqueInput
+    data: XOR<AgentContactUpdateWithoutAgentInput, AgentContactUncheckedUpdateWithoutAgentInput>
+  }
+
+  export type AgentContactUpdateManyWithWhereWithoutAgentInput = {
+    where: AgentContactScalarWhereInput
+    data: XOR<AgentContactUpdateManyMutationInput, AgentContactUncheckedUpdateManyWithoutAgentInput>
+  }
+
+  export type AgentContactScalarWhereInput = {
+    AND?: AgentContactScalarWhereInput | AgentContactScalarWhereInput[]
+    OR?: AgentContactScalarWhereInput[]
+    NOT?: AgentContactScalarWhereInput | AgentContactScalarWhereInput[]
+    id?: IntFilter<"AgentContact"> | number
+    agentId?: IntFilter<"AgentContact"> | number
+    name?: StringFilter<"AgentContact"> | string
+    email?: StringFilter<"AgentContact"> | string
+    subject?: StringNullableFilter<"AgentContact"> | string | null
+    message?: StringFilter<"AgentContact"> | string
+    status?: StringFilter<"AgentContact"> | string
+    createdAt?: DateTimeFilter<"AgentContact"> | Date | string
+    updatedAt?: DateTimeFilter<"AgentContact"> | Date | string
   }
 
   export type PropertyCreateWithoutPropertyTypeInput = {
@@ -39442,6 +42752,8 @@ export namespace Prisma {
     inquiries?: InquiryCreateNestedManyWithoutAgentInput
     appointments?: AppointmentCreateNestedManyWithoutAgentInput
     analytics?: AgentAnalyticsCreateNestedManyWithoutAgentInput
+    reviews?: AgentReviewCreateNestedManyWithoutAgentInput
+    contacts?: AgentContactCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutPropertiesInput = {
@@ -39466,6 +42778,8 @@ export namespace Prisma {
     inquiries?: InquiryUncheckedCreateNestedManyWithoutAgentInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutAgentInput
     analytics?: AgentAnalyticsUncheckedCreateNestedManyWithoutAgentInput
+    reviews?: AgentReviewUncheckedCreateNestedManyWithoutAgentInput
+    contacts?: AgentContactUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutPropertiesInput = {
@@ -39887,6 +43201,8 @@ export namespace Prisma {
     inquiries?: InquiryUpdateManyWithoutAgentNestedInput
     appointments?: AppointmentUpdateManyWithoutAgentNestedInput
     analytics?: AgentAnalyticsUpdateManyWithoutAgentNestedInput
+    reviews?: AgentReviewUpdateManyWithoutAgentNestedInput
+    contacts?: AgentContactUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutPropertiesInput = {
@@ -39911,6 +43227,8 @@ export namespace Prisma {
     inquiries?: InquiryUncheckedUpdateManyWithoutAgentNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutAgentNestedInput
     analytics?: AgentAnalyticsUncheckedUpdateManyWithoutAgentNestedInput
+    reviews?: AgentReviewUncheckedUpdateManyWithoutAgentNestedInput
+    contacts?: AgentContactUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUpsertWithoutPropertiesInput = {
@@ -40627,6 +43945,8 @@ export namespace Prisma {
     properties?: PropertyCreateNestedManyWithoutAgentInput
     appointments?: AppointmentCreateNestedManyWithoutAgentInput
     analytics?: AgentAnalyticsCreateNestedManyWithoutAgentInput
+    reviews?: AgentReviewCreateNestedManyWithoutAgentInput
+    contacts?: AgentContactCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutInquiriesInput = {
@@ -40651,6 +43971,8 @@ export namespace Prisma {
     properties?: PropertyUncheckedCreateNestedManyWithoutAgentInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutAgentInput
     analytics?: AgentAnalyticsUncheckedCreateNestedManyWithoutAgentInput
+    reviews?: AgentReviewUncheckedCreateNestedManyWithoutAgentInput
+    contacts?: AgentContactUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutInquiriesInput = {
@@ -40774,6 +44096,8 @@ export namespace Prisma {
     properties?: PropertyUpdateManyWithoutAgentNestedInput
     appointments?: AppointmentUpdateManyWithoutAgentNestedInput
     analytics?: AgentAnalyticsUpdateManyWithoutAgentNestedInput
+    reviews?: AgentReviewUpdateManyWithoutAgentNestedInput
+    contacts?: AgentContactUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutInquiriesInput = {
@@ -40798,6 +44122,8 @@ export namespace Prisma {
     properties?: PropertyUncheckedUpdateManyWithoutAgentNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutAgentNestedInput
     analytics?: AgentAnalyticsUncheckedUpdateManyWithoutAgentNestedInput
+    reviews?: AgentReviewUncheckedUpdateManyWithoutAgentNestedInput
+    contacts?: AgentContactUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type PropertyCreateWithoutAppointmentsInput = {
@@ -40951,6 +44277,8 @@ export namespace Prisma {
     properties?: PropertyCreateNestedManyWithoutAgentInput
     inquiries?: InquiryCreateNestedManyWithoutAgentInput
     analytics?: AgentAnalyticsCreateNestedManyWithoutAgentInput
+    reviews?: AgentReviewCreateNestedManyWithoutAgentInput
+    contacts?: AgentContactCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutAppointmentsInput = {
@@ -40975,6 +44303,8 @@ export namespace Prisma {
     properties?: PropertyUncheckedCreateNestedManyWithoutAgentInput
     inquiries?: InquiryUncheckedCreateNestedManyWithoutAgentInput
     analytics?: AgentAnalyticsUncheckedCreateNestedManyWithoutAgentInput
+    reviews?: AgentReviewUncheckedCreateNestedManyWithoutAgentInput
+    contacts?: AgentContactUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutAppointmentsInput = {
@@ -41156,6 +44486,8 @@ export namespace Prisma {
     properties?: PropertyUpdateManyWithoutAgentNestedInput
     inquiries?: InquiryUpdateManyWithoutAgentNestedInput
     analytics?: AgentAnalyticsUpdateManyWithoutAgentNestedInput
+    reviews?: AgentReviewUpdateManyWithoutAgentNestedInput
+    contacts?: AgentContactUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutAppointmentsInput = {
@@ -41180,6 +44512,8 @@ export namespace Prisma {
     properties?: PropertyUncheckedUpdateManyWithoutAgentNestedInput
     inquiries?: InquiryUncheckedUpdateManyWithoutAgentNestedInput
     analytics?: AgentAnalyticsUncheckedUpdateManyWithoutAgentNestedInput
+    reviews?: AgentReviewUncheckedUpdateManyWithoutAgentNestedInput
+    contacts?: AgentContactUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type UserCreateWithoutTasksInput = {
@@ -41475,6 +44809,8 @@ export namespace Prisma {
     properties?: PropertyCreateNestedManyWithoutAgentInput
     inquiries?: InquiryCreateNestedManyWithoutAgentInput
     appointments?: AppointmentCreateNestedManyWithoutAgentInput
+    reviews?: AgentReviewCreateNestedManyWithoutAgentInput
+    contacts?: AgentContactCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutAnalyticsInput = {
@@ -41499,6 +44835,8 @@ export namespace Prisma {
     properties?: PropertyUncheckedCreateNestedManyWithoutAgentInput
     inquiries?: InquiryUncheckedCreateNestedManyWithoutAgentInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutAgentInput
+    reviews?: AgentReviewUncheckedCreateNestedManyWithoutAgentInput
+    contacts?: AgentContactUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutAnalyticsInput = {
@@ -41538,6 +44876,8 @@ export namespace Prisma {
     properties?: PropertyUpdateManyWithoutAgentNestedInput
     inquiries?: InquiryUpdateManyWithoutAgentNestedInput
     appointments?: AppointmentUpdateManyWithoutAgentNestedInput
+    reviews?: AgentReviewUpdateManyWithoutAgentNestedInput
+    contacts?: AgentContactUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutAnalyticsInput = {
@@ -41562,6 +44902,8 @@ export namespace Prisma {
     properties?: PropertyUncheckedUpdateManyWithoutAgentNestedInput
     inquiries?: InquiryUncheckedUpdateManyWithoutAgentNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutAgentNestedInput
+    reviews?: AgentReviewUncheckedUpdateManyWithoutAgentNestedInput
+    contacts?: AgentContactUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type UserCreateWithoutNotificationsInput = {
@@ -42577,6 +45919,242 @@ export namespace Prisma {
     testimonials?: TestimonialUncheckedUpdateManyWithoutUserNestedInput
   }
 
+  export type AgentCreateWithoutReviewsInput = {
+    bio?: string | null
+    specialization?: string | null
+    licenseNumber?: string | null
+    commissionRate?: Decimal | DecimalJsLike | number | string | null
+    joinDate?: Date | string
+    status?: string
+    rating?: Decimal | DecimalJsLike | number | string | null
+    totalSales?: number
+    totalListings?: number
+    totalRevenue?: Decimal | DecimalJsLike | number | string
+    serviceAreas?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialMediaLinks?: NullableJsonNullValueInput | InputJsonValue
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutAgentInput
+    properties?: PropertyCreateNestedManyWithoutAgentInput
+    inquiries?: InquiryCreateNestedManyWithoutAgentInput
+    appointments?: AppointmentCreateNestedManyWithoutAgentInput
+    analytics?: AgentAnalyticsCreateNestedManyWithoutAgentInput
+    contacts?: AgentContactCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentUncheckedCreateWithoutReviewsInput = {
+    id?: number
+    userId: number
+    bio?: string | null
+    specialization?: string | null
+    licenseNumber?: string | null
+    commissionRate?: Decimal | DecimalJsLike | number | string | null
+    joinDate?: Date | string
+    status?: string
+    rating?: Decimal | DecimalJsLike | number | string | null
+    totalSales?: number
+    totalListings?: number
+    totalRevenue?: Decimal | DecimalJsLike | number | string
+    serviceAreas?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialMediaLinks?: NullableJsonNullValueInput | InputJsonValue
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    properties?: PropertyUncheckedCreateNestedManyWithoutAgentInput
+    inquiries?: InquiryUncheckedCreateNestedManyWithoutAgentInput
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutAgentInput
+    analytics?: AgentAnalyticsUncheckedCreateNestedManyWithoutAgentInput
+    contacts?: AgentContactUncheckedCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutReviewsInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutReviewsInput, AgentUncheckedCreateWithoutReviewsInput>
+  }
+
+  export type AgentUpsertWithoutReviewsInput = {
+    update: XOR<AgentUpdateWithoutReviewsInput, AgentUncheckedUpdateWithoutReviewsInput>
+    create: XOR<AgentCreateWithoutReviewsInput, AgentUncheckedCreateWithoutReviewsInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutReviewsInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutReviewsInput, AgentUncheckedUpdateWithoutReviewsInput>
+  }
+
+  export type AgentUpdateWithoutReviewsInput = {
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    specialization?: NullableStringFieldUpdateOperationsInput | string | null
+    licenseNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    commissionRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    joinDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    rating?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalSales?: IntFieldUpdateOperationsInput | number
+    totalListings?: IntFieldUpdateOperationsInput | number
+    totalRevenue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    serviceAreas?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialMediaLinks?: NullableJsonNullValueInput | InputJsonValue
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutAgentNestedInput
+    properties?: PropertyUpdateManyWithoutAgentNestedInput
+    inquiries?: InquiryUpdateManyWithoutAgentNestedInput
+    appointments?: AppointmentUpdateManyWithoutAgentNestedInput
+    analytics?: AgentAnalyticsUpdateManyWithoutAgentNestedInput
+    contacts?: AgentContactUpdateManyWithoutAgentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutReviewsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    specialization?: NullableStringFieldUpdateOperationsInput | string | null
+    licenseNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    commissionRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    joinDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    rating?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalSales?: IntFieldUpdateOperationsInput | number
+    totalListings?: IntFieldUpdateOperationsInput | number
+    totalRevenue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    serviceAreas?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialMediaLinks?: NullableJsonNullValueInput | InputJsonValue
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    properties?: PropertyUncheckedUpdateManyWithoutAgentNestedInput
+    inquiries?: InquiryUncheckedUpdateManyWithoutAgentNestedInput
+    appointments?: AppointmentUncheckedUpdateManyWithoutAgentNestedInput
+    analytics?: AgentAnalyticsUncheckedUpdateManyWithoutAgentNestedInput
+    contacts?: AgentContactUncheckedUpdateManyWithoutAgentNestedInput
+  }
+
+  export type AgentCreateWithoutContactsInput = {
+    bio?: string | null
+    specialization?: string | null
+    licenseNumber?: string | null
+    commissionRate?: Decimal | DecimalJsLike | number | string | null
+    joinDate?: Date | string
+    status?: string
+    rating?: Decimal | DecimalJsLike | number | string | null
+    totalSales?: number
+    totalListings?: number
+    totalRevenue?: Decimal | DecimalJsLike | number | string
+    serviceAreas?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialMediaLinks?: NullableJsonNullValueInput | InputJsonValue
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutAgentInput
+    properties?: PropertyCreateNestedManyWithoutAgentInput
+    inquiries?: InquiryCreateNestedManyWithoutAgentInput
+    appointments?: AppointmentCreateNestedManyWithoutAgentInput
+    analytics?: AgentAnalyticsCreateNestedManyWithoutAgentInput
+    reviews?: AgentReviewCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentUncheckedCreateWithoutContactsInput = {
+    id?: number
+    userId: number
+    bio?: string | null
+    specialization?: string | null
+    licenseNumber?: string | null
+    commissionRate?: Decimal | DecimalJsLike | number | string | null
+    joinDate?: Date | string
+    status?: string
+    rating?: Decimal | DecimalJsLike | number | string | null
+    totalSales?: number
+    totalListings?: number
+    totalRevenue?: Decimal | DecimalJsLike | number | string
+    serviceAreas?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialMediaLinks?: NullableJsonNullValueInput | InputJsonValue
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    properties?: PropertyUncheckedCreateNestedManyWithoutAgentInput
+    inquiries?: InquiryUncheckedCreateNestedManyWithoutAgentInput
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutAgentInput
+    analytics?: AgentAnalyticsUncheckedCreateNestedManyWithoutAgentInput
+    reviews?: AgentReviewUncheckedCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutContactsInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutContactsInput, AgentUncheckedCreateWithoutContactsInput>
+  }
+
+  export type AgentUpsertWithoutContactsInput = {
+    update: XOR<AgentUpdateWithoutContactsInput, AgentUncheckedUpdateWithoutContactsInput>
+    create: XOR<AgentCreateWithoutContactsInput, AgentUncheckedCreateWithoutContactsInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutContactsInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutContactsInput, AgentUncheckedUpdateWithoutContactsInput>
+  }
+
+  export type AgentUpdateWithoutContactsInput = {
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    specialization?: NullableStringFieldUpdateOperationsInput | string | null
+    licenseNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    commissionRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    joinDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    rating?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalSales?: IntFieldUpdateOperationsInput | number
+    totalListings?: IntFieldUpdateOperationsInput | number
+    totalRevenue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    serviceAreas?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialMediaLinks?: NullableJsonNullValueInput | InputJsonValue
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutAgentNestedInput
+    properties?: PropertyUpdateManyWithoutAgentNestedInput
+    inquiries?: InquiryUpdateManyWithoutAgentNestedInput
+    appointments?: AppointmentUpdateManyWithoutAgentNestedInput
+    analytics?: AgentAnalyticsUpdateManyWithoutAgentNestedInput
+    reviews?: AgentReviewUpdateManyWithoutAgentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutContactsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    specialization?: NullableStringFieldUpdateOperationsInput | string | null
+    licenseNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    commissionRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    joinDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    rating?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalSales?: IntFieldUpdateOperationsInput | number
+    totalListings?: IntFieldUpdateOperationsInput | number
+    totalRevenue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    serviceAreas?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialMediaLinks?: NullableJsonNullValueInput | InputJsonValue
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    properties?: PropertyUncheckedUpdateManyWithoutAgentNestedInput
+    inquiries?: InquiryUncheckedUpdateManyWithoutAgentNestedInput
+    appointments?: AppointmentUncheckedUpdateManyWithoutAgentNestedInput
+    analytics?: AgentAnalyticsUncheckedUpdateManyWithoutAgentNestedInput
+    reviews?: AgentReviewUncheckedUpdateManyWithoutAgentNestedInput
+  }
+
   export type PropertyCreateManyOwnerInput = {
     id?: number
     title: string
@@ -43148,6 +46726,29 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type AgentReviewCreateManyAgentInput = {
+    id?: number
+    userId?: number | null
+    name: string
+    email: string
+    rating: number
+    comment: string
+    isApproved?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AgentContactCreateManyAgentInput = {
+    id?: number
+    name: string
+    email: string
+    subject?: string | null
+    message: string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type PropertyUpdateWithoutAgentInput = {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43367,6 +46968,73 @@ export namespace Prisma {
     revenue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     inquiriesHandled?: IntFieldUpdateOperationsInput | number
     appointmentsConducted?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentReviewUpdateWithoutAgentInput = {
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    rating?: IntFieldUpdateOperationsInput | number
+    comment?: StringFieldUpdateOperationsInput | string
+    isApproved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentReviewUncheckedUpdateWithoutAgentInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    rating?: IntFieldUpdateOperationsInput | number
+    comment?: StringFieldUpdateOperationsInput | string
+    isApproved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentReviewUncheckedUpdateManyWithoutAgentInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    rating?: IntFieldUpdateOperationsInput | number
+    comment?: StringFieldUpdateOperationsInput | string
+    isApproved?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentContactUpdateWithoutAgentInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentContactUncheckedUpdateWithoutAgentInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentContactUncheckedUpdateManyWithoutAgentInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

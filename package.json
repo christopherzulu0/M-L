@@ -111,7 +111,13 @@
       "@types/react-dom": "19.2.3"
     },
     "ignoredBuiltDependencies": [
-      "@clerk/shared"
+      "@clerk/shared",
+      "@prisma/engines",
+      "esbuild",
+      "msgpackr-extract",
+      "prisma",
+      "sharp",
+      "unrs-resolver"
     ]
   }
 }
