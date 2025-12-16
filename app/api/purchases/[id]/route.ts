@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@/lib/generated/prisma'
-import { auth } from '@clerk/nextjs/server'
 
-const prisma = new PrismaClient()
+import { auth } from '@clerk/nextjs/server'
+import { prisma } from '@/lib/prisma'
+
+
 
 // GET /api/purchases/[id] - Get a specific purchase
 export async function GET(
@@ -16,7 +17,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = await params
+    const { id } =  params
     const purchaseId = parseInt(id)
 
     if (isNaN(purchaseId)) {

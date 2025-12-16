@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@/lib/generated/prisma';
-import { sendInvoiceNotification, identifyUser } from '@/lib/knock';
 
-const prisma = new PrismaClient();
+import { sendInvoiceNotification, identifyUser } from '@/lib/knock';
+import { prisma } from '@/lib/prisma';
+
+
 
 export async function POST(request: NextRequest) {
   try {

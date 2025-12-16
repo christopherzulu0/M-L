@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@/lib/generated/prisma'
 import { auth } from '@clerk/nextjs/server'
+import { prisma } from '@/lib/prisma'
 
-const prisma = new PrismaClient()
+
 
 // POST /api/payments/admin - Create a new payment (admin only)
 export async function POST(request: NextRequest) {

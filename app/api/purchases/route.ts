@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@/lib/generated/prisma'
 import { auth } from '@clerk/nextjs/server'
+import { prisma } from '@/lib/prisma'
 
-const prisma = new PrismaClient()
+
 
 // GET /api/purchases - Get all purchases (admin) or user's purchases (regular user)
 export async function GET(request: NextRequest) {

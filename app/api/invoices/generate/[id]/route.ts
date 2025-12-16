@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@/lib/generated/prisma'
 import { auth } from '@clerk/nextjs/server'
 import * as fs from 'fs'
 import * as path from 'path'
+import { prisma } from '@/lib/prisma'
 
-const prisma = new PrismaClient()
+
 
 // POST /api/invoices/generate/[id] - Generate an invoice for a payment
 export async function POST(

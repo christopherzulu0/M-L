@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
+import {prisma} from '@/lib/prisma'
 
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id: userId } = await params
+    const { id: userId } =  params
     const favorites = await prisma.favorite.findMany({
       where: { userId },
       include: {

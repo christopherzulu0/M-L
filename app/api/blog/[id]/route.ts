@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@/lib/generated/prisma'
-import { auth } from '@clerk/nextjs/server'
 
-const prisma = new PrismaClient()
+import { auth } from '@clerk/nextjs/server'
+import { prisma } from '@/lib/prisma'
+
 
 // GET /api/blog/[id] - Get a specific blog post
 export async function GET(

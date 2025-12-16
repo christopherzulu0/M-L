@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@/lib/generated/prisma"
+import { prisma } from "@/lib/prisma"
 
-const prisma = new PrismaClient()
 
 // PATCH /api/users/[id]/role - Update a user's role
 export async function PATCH(
@@ -9,7 +9,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id: paramId } = await params
+    const { id: paramId } =  params
     const id = parseInt(paramId)
 
     if (isNaN(id)) {

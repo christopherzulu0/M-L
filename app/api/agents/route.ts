@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 // Mock previous period data for calculating percentage changes
 const PREVIOUS_PERIOD = {
@@ -68,7 +68,7 @@ export async function GET() {
           phone: agent.user.phone,
           profileImage: agent.user.profileImage,
         },
-        name: `${agent.user.firstName} ${agent.user.lastName}`,
+        name: `${agent.user.firstName} ${agent.user.lastName} `,
         image: agent.user.profileImage || "/placeholder.svg", // Add image property for AgentCard
         propertyCount: propertyCounts[index],
         soldPropertyCount: soldPropertyCounts[index],

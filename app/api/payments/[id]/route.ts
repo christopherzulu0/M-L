@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@/lib/generated/prisma'
 import { auth } from '@clerk/nextjs/server'
+import { prisma } from '@/lib/prisma'
 
-const prisma = new PrismaClient()
+
 
 // GET /api/payments/[id] - Get a specific payment
 export async function GET(
@@ -17,7 +17,7 @@ export async function GET(
     }
 
     // Await params before accessing its properties
-    const unwrappedParams = await params
+    const unwrappedParams =  params
     const paymentId = parseInt(unwrappedParams.id)
 
     if (isNaN(paymentId)) {

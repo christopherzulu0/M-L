@@ -1,15 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@/lib/generated/prisma'
-import { auth } from '@clerk/nextjs/server'
 
-// Initialize Prisma client with error handling
-let prisma: PrismaClient
-try {
-  prisma = new PrismaClient()
-} catch (error) {
-  console.error('Failed to initialize Prisma client:', error)
-  prisma = null as any // This will be checked before use
-}
+import { auth } from '@clerk/nextjs/server'
+import { prisma } from '@/lib/prisma'
+
+
 
 // GET /api/blog - Get blog posts with optional filtering
 export async function GET(request: NextRequest) {
