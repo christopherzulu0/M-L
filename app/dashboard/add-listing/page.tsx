@@ -1,46 +1,44 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import dynamic from "next/dynamic"
-import "leaflet/dist/leaflet.css"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
-import {
-  Upload,
-  MapPin,
-  DollarSign,
-  BedSingle,
-  Bath,
-  Ruler,
-  Info,
-  ImageIcon,
-  FileText,
-  ArrowLeft,
-  Plus,
-  Trash2,
-  Search,
-  Navigation,
-} from "lucide-react"
-import Image from "next/image"
-import { generateClientDropzoneAccept } from "uploadthing/client"
-import { useDropzone } from "react-dropzone"
 import { useUploadThing } from "@/lib/uploadthing"
+import { zodResolver } from "@hookform/resolvers/zod"
+import "leaflet/dist/leaflet.css"
+import {
+    ArrowLeft,
+    Bath,
+    BedSingle,
+    DollarSign,
+    FileText,
+    ImageIcon,
+    Info,
+    MapPin,
+    Navigation,
+    Ruler,
+    Search,
+    Trash2,
+    Upload
+} from "lucide-react"
+import dynamic from "next/dynamic"
+import Image from "next/image"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useRef, useState } from "react"
+import { useDropzone } from "react-dropzone"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 
 // Dynamically import the Map components to avoid SSR issues
 const MapContainer = dynamic(
@@ -186,27 +184,20 @@ const availableAmenities = [
 
 // Form schema
 const formSchema = z.object({
-  title: z.string().min(5, { message: "Title must be at least 5 characters" }),
-  description: z.string().min(20, { message: "Description must be at least 20 characters" }),
-  propertyTypeId: z.number({
-    required_error: "Property type is required",
-    invalid_type_error: "Property type must be a number"
-  }),
-  listingTypeId: z.number({
-    required_error: "Listing type is required",
-    invalid_type_error: "Listing type must be a number"
-  }),
-  price: z.string(),
+  // NOTE: We intentionally keep the schema permissive so the user can submit/save
+  // even when some fields are missing (e.g. save as draft).
+  title: z.string().optional().default(""),
+  description: z.string().optional().default(""),
+  propertyTypeId: z.coerce.number().optional(),
+  listingTypeId: z.coerce.number().optional(),
+  price: z.string().optional().default(""),
   priceType: z.string().default("total"),
-  address: z.string().min(5, { message: "Address is required" }),
-  city: z.string(),
-  state: z.string(),
-  zipCode: z.string(),
+  address: z.string().optional().default(""),
+  city: z.string().optional().default(""),
+  state: z.string().optional().default(""),
+  zipCode: z.string().optional().default(""),
   country: z.string().default("Zambia"),
-  locationId: z.number({
-    required_error: "Location is required",
-    invalid_type_error: "Location must be a number"
-  }),
+  locationId: z.coerce.number().optional(),
   latitude: z.string().optional(),
   longitude: z.string().optional(),
   bedrooms: z.string().optional(),
@@ -498,13 +489,16 @@ export default function AddListingPage() {
       console.log('Selected features:', values.features);
       console.log('Edit mode:', isEditMode);
 
-      // Check for required fields
-      if (!values.title) console.log('Title is missing');
-      if (!values.description) console.log('Description is missing');
-      if (!values.propertyTypeId) console.log('Property type is missing');
-      if (!values.listingTypeId) console.log('Listing type is missing');
-      if (!values.address) console.log('Address is missing');
-      if (!values.locationId) console.log('Location is missing');
+      // If any core fields are missing, we force a draft save instead of blocking submission.
+      const isMissingCore =
+        !values.title?.trim() ||
+        !values.description?.trim() ||
+        !values.address?.trim() ||
+        !values.propertyTypeId ||
+        !values.listingTypeId ||
+        !values.locationId
+
+      const effectiveStatus = isMissingCore ? "draft" : (values.status || "draft")
 
       let featureConnections = [];
 
@@ -548,16 +542,16 @@ export default function AddListingPage() {
 
       // Prepare the base request data
       const baseRequestData = {
-        title: values.title,
-        description: values.description,
-        price: values.price,
-        status: values.status,
+        title: values.title || "",
+        description: values.description || "",
+        price: values.price || "",
+        status: effectiveStatus,
         DView: values.DView,
         FloorPlan: values.floorPlan,
-        address: values.address,
-        propertyTypeId: Number(values.propertyTypeId),
-        listingTypeId: Number(values.listingTypeId),
-        locationId: Number(values.locationId),
+        address: values.address || "",
+        propertyTypeId: values.propertyTypeId ? Number(values.propertyTypeId) : null,
+        listingTypeId: values.listingTypeId ? Number(values.listingTypeId) : null,
+        locationId: values.locationId ? Number(values.locationId) : null,
         agentId: values.agentId ? Number(values.agentId) : null,
         latitude: values.latitude || null,
         longitude: values.longitude || null,
@@ -686,12 +680,15 @@ export default function AddListingPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create property');
+        // Don’t crash hard on drafts; show the server error and keep the user on the form.
+        throw new Error(errorData.error || 'Failed to save listing');
       }
 
       toast({
-        title: "Listing created successfully",
-        description: "Your property listing has been created.",
+        title: effectiveStatus === "draft" ? "Draft saved" : "Listing saved",
+        description: effectiveStatus === "draft"
+          ? "Saved what you have so far. You can finish missing fields later."
+          : "Your listing has been saved.",
       });
       router.push("/dashboard/properties");
     } catch (error) {
